@@ -5,14 +5,12 @@ package nomix
 
 import (
 	"time"
-
-	"github.com/gofrs/uuid/v5"
 )
 
 // TagType represents supported tag types.
 type TagType interface {
 	byte | string | int64 | float64 | time.Time |
-		int | bool | time.Duration | uuid.UUID
+		int | bool | time.Duration
 }
 
 // TagKind describes the type of [Tag] value.
@@ -25,30 +23,24 @@ const (
 	KindFloat64 TagKind = 0b00000000_00001000
 	KindTime    TagKind = 0b00000000_00010000
 	KindJSON    TagKind = 0b00000000_00100000
-	KindUUID    TagKind = 0b00000000_01000000
 )
 
 // Derivative [Tag] kinds.
 // Derivative kinds are types that are derived from base kinds.
 const (
-	KindBool     = 0b00000001_00000000 | KindInt64
-	KindInt      = 0b00000010_00000000 | KindInt64
-	KindDuration = 0b00000100_00000000 | KindInt64
-	KindLink     = 0b00001000_00000000 | KindUUID
+	KindBool = 0b00000001_00000000 | KindInt64
+	KindInt  = 0b00000010_00000000 | KindInt64
 )
 
 // Multi value (slice) [Tag] kinds.
 const (
-	KindByteSlice     = 0b00000000_00000001 | KindSlice
-	KindStringSlice   = KindString | KindSlice
-	KindInt64Slice    = KindInt64 | KindSlice
-	KindFloat64Slice  = KindFloat64 | KindSlice
-	KindTimeSlice     = KindTime | KindSlice
-	KindBoolSlice     = KindBool | KindSlice
-	KindIntSlice      = KindInt | KindSlice
-	KindDurationSlice = KindDuration | KindSlice
-	KindUUIDSlice     = KindUUID | KindSlice
-	KindLinkSlice     = KindLink | KindSlice
+	KindByteSlice    = 0b00000000_00000001 | KindSlice
+	KindStringSlice  = KindString | KindSlice
+	KindInt64Slice   = KindInt64 | KindSlice
+	KindFloat64Slice = KindFloat64 | KindSlice
+	KindTimeSlice    = KindTime | KindSlice
+	KindBoolSlice    = KindBool | KindSlice
+	KindIntSlice     = KindInt | KindSlice
 )
 
 // KindSlice is a [TagKind] type modifier indicating it is a slice.
