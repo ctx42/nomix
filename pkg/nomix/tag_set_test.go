@@ -207,7 +207,7 @@ func Test_TagSet_TagGetAll(t *testing.T) {
 	})
 }
 
-func Test_TagSet_Reset(t *testing.T) {
+func Test_TagSet_TagDeleteAll(t *testing.T) {
 	// --- Given ---
 	set := TagSet{
 		m: map[string]Tag{
@@ -217,7 +217,7 @@ func Test_TagSet_Reset(t *testing.T) {
 	}
 
 	// --- When ---
-	set.Reset()
+	set.TagDeleteAll()
 
 	// --- Then ---
 	assert.Len(t, 0, set.m)

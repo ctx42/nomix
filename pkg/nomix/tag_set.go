@@ -57,11 +57,10 @@ func (set TagSet) TagCount() int {
 
 func (set TagSet) TagGetAll() map[string]Tag { return set.m }
 
-// Reset removes all tags from the set.
-func (set TagSet) Reset() {
-	// TODO(rz): Rename to TagReset.
-	for k := range set.m {
-		delete(set.m, k)
+// TagDeleteAll deletes all tags from the set.
+func (set TagSet) TagDeleteAll() {
+	for name := range set.m {
+		delete(set.m, name)
 	}
 }
 

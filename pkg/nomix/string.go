@@ -7,7 +7,7 @@ package nomix
 type String = single[string]
 
 // NewString returns a new instance of [String].
-func NewString(name string, v string) *String {
+func NewString(name, v string) *String {
 	return &single[string]{
 		name:     name,
 		value:    v,

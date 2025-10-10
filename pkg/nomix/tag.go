@@ -25,8 +25,8 @@ const (
 	KindJSON    TagKind = 0b00000000_00100000
 )
 
-// Derivative [Tag] kinds.
-// Derivative kinds are types that are derived from base kinds.
+// Derived [Tag] kinds.
+// Derived kinds are types that are derived from base kinds.
 const (
 	KindBool = 0b00000001_00000000 | KindInt64
 	KindInt  = 0b00000010_00000000 | KindInt64

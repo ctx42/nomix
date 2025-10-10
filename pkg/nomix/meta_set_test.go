@@ -168,6 +168,17 @@ func Test_MetaSet_MetaGetAll(t *testing.T) {
 	})
 }
 
+func Test_MetaSet_MetaDeleteAll(t *testing.T) {
+	// --- Given ---
+	set := MetaSet{m: map[string]any{"A": 1, "B": 2}}
+
+	// --- When ---
+	set.MetaDeleteAll()
+
+	// --- Then ---
+	assert.Len(t, 0, set.m)
+}
+
 func Test_MetaSet_MetaGetString(t *testing.T) {
 	t.Run("existing", func(t *testing.T) {
 		// --- Given ---

@@ -56,7 +56,12 @@ func (set MetaSet) MetaCount() int { return len(set.m) }
 
 func (set MetaSet) MetaGetAll() map[string]any { return set.m }
 
-// TODO(rz): Implement to MetaReset.
+// MetaDeleteAll deletes all metadata from the set.
+func (set MetaSet) MetaDeleteAll() {
+	for name := range set.m {
+		delete(set.m, name)
+	}
+}
 
 // MetaGetString gets a metadata value by name as a string. Returns the value
 // and nil error if it exists and is the string type. Returns empty string and
