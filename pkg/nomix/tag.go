@@ -44,7 +44,7 @@ const (
 )
 
 // KindSlice is a [TagKind] type modifier indicating it is a slice.
-const KindSlice TagKind = 0b10000000_00000000
+const KindSlice TagKind = 0b01000000_00000000
 
 // Tag is an interface representing a tag.
 //
