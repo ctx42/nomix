@@ -21,3 +21,23 @@ func Test_NewStringSlice(t *testing.T) {
 	assert.NotNil(t, tag.stringer)
 	assert.Equal(t, `["abc", "xyz"]`, tag.stringer([]string{"abc", "xyz"}))
 }
+
+func Test_asStringSlice(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		// --- When ---
+		have, err := asStringSlice([]string{"abc", "xyz"}, nil)
+
+		// --- Then ---
+		assert.NoError(t, err)
+		assert.Equal(t, []string{"abc", "xyz"}, have)
+	})
+
+	t.Run("error - invalid type", func(t *testing.T) {
+		// --- When ---
+		have, err := asStringSlice(42, nil)
+
+		// --- Then ---
+		assert.ErrorIs(t, err, ErrInvType)
+		assert.Empty(t, have)
+	})
+}

@@ -180,3 +180,57 @@ func Test_parseTime(t *testing.T) {
 		assert.Zero(t, have)
 	})
 }
+
+func Test_asTime(t *testing.T) {
+	t.Run("error - invalid type", func(t *testing.T) {
+		// --- When ---
+		have, err := asTime(42, nil)
+
+		// --- Then ---
+		assert.ErrorIs(t, err, ErrInvType)
+		assert.Empty(t, have)
+	})
+
+	t.Run("error - by default sting is not supported", func(t *testing.T) {
+		// --- When ---
+		have, err := asTime("2000-01-02T03:04:05Z", nil)
+
+		// --- Then ---
+		assert.ErrorIs(t, err, ErrInvType)
+		assert.Empty(t, have)
+	})
+}
+
+func Test_asTime_success_tabular(t *testing.T) {
+	tt := []struct {
+		testN string
+
+		have any
+		want time.Time
+	}{
+		{
+			"time.Time",
+			time.Date(2000, 1, 2, 3, 4, 5, 0, time.UTC),
+			time.Date(2000, 1, 2, 3, 4, 5, 0, time.UTC),
+		},
+		{
+			"string",
+			"2000-01-02T03:04:05Z",
+			time.Date(2000, 1, 2, 3, 4, 5, 0, time.UTC),
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.testN, func(t *testing.T) {
+			// --- Given ---
+			opts := &Options{timeFormat: time.RFC3339}
+
+			// --- When ---
+			have, err := asTime(tc.have, opts)
+
+			// --- Then ---
+			assert.NoError(t, err)
+			assert.Equal(t, tc.want, have)
+		})
+	}
+}

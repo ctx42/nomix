@@ -66,3 +66,19 @@ func parseTime(val string, opts *Options) (time.Time, error) {
 
 // timeToString converts [time.Time] to its string representation.
 func timeToString(v time.Time) string { return v.Format(time.RFC3339Nano) }
+
+// asTime casts the value to [time.Time] or when the value is a string parses
+// it time but only when [Options.timeFormat] is set. Returns the time and nil
+// error on success. Returns zero value time and [ErrInvType] if the value is
+// not a supported type.
+func asTime(val any, opts *Options) (time.Time, error) {
+	switch v := val.(type) {
+	case time.Time:
+		return v, nil
+	case string:
+		if opts != nil && opts.timeFormat != "" {
+			return parseTime(v, opts)
+		}
+	}
+	return time.Time{}, ErrInvType
+}

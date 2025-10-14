@@ -36,3 +36,24 @@ func ParseInt64(name, v string, opts ...Option) (*Int64, error) {
 
 // int64ToString converts int64 to its string representation.
 func int64ToString(v int64) string { return strconv.FormatInt(v, 10) }
+
+// asInt64 casts the value to int64. Returns the int64 and nil error if the
+// value is a byte, int, int8, int16, int32, or int64. Returns 0 and
+// [ErrInvType] if the value is not a supported integer type.
+func asInt64(val any, _ *Options) (int64, error) {
+	switch v := val.(type) {
+	case int:
+		return int64(v), nil
+	case byte:
+		return int64(v), nil
+	case int8:
+		return int64(v), nil
+	case int16:
+		return int64(v), nil
+	case int32:
+		return int64(v), nil
+	case int64:
+		return v, nil
+	}
+	return 0, ErrInvType
+}

@@ -31,3 +31,26 @@ func timeSliceToString(v []time.Time) string {
 	}
 	return ret + "]"
 }
+
+// asTimeSlice casts the value to []time.Time or when the value is a []string
+// parses its values as time but only when [Options.timeFormat] is set. Returns
+// the slice and nil error on success. Returns nil and [ErrInvType] if the
+// value is not a supported type.
+func asTimeSlice(val any, opts *Options) ([]time.Time, error) {
+	switch v := val.(type) {
+	case []time.Time:
+		return v, nil
+	case []string:
+		if opts != nil && opts.timeFormat != "" {
+			times := make([]time.Time, len(v))
+			for i, str := range v {
+				var err error
+				if times[i], err = parseTime(str, opts); err != nil {
+					return nil, err
+				}
+			}
+			return times, nil
+		}
+	}
+	return nil, ErrInvType
+}

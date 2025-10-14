@@ -21,3 +21,42 @@ func Test_NewFloat64Slice(t *testing.T) {
 	assert.NotNil(t, tag.stringer)
 	assert.Equal(t, "[42.1, 44.2]", tag.stringer([]float64{42.1, 44.2}))
 }
+
+func Test_asFloat64Slice(t *testing.T) {
+	t.Run("error - invalid type", func(t *testing.T) {
+		// --- When ---
+		have, err := asFloat64Slice("abc", nil)
+
+		// --- Then ---
+		assert.ErrorIs(t, err, ErrInvType)
+		assert.Empty(t, have)
+	})
+}
+
+func Test_asFloat64Slice_success_tabular(t *testing.T) {
+	tt := []struct {
+		testN string
+
+		have any
+		want []float64
+	}{
+		{"[]int", []int{42, 44}, []float64{42, 44}},
+		{"[]int8", []int8{42, 44}, []float64{42, 44}},
+		{"[]int16", []int16{42, 44}, []float64{42, 44}},
+		{"[]int32", []int32{42, 44}, []float64{42, 44}},
+		{"[]int64", []int64{42, 44}, []float64{42, 44}},
+		{"[]float32", []float32{42, 44}, []float64{42, 44}},
+		{"[]float64", []float64{42, 44}, []float64{42, 44}},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.testN, func(t *testing.T) {
+			// --- When ---
+			have, err := asFloat64Slice(tc.have, nil)
+
+			// --- Then ---
+			assert.NoError(t, err)
+			assert.Equal(t, tc.want, have)
+		})
+	}
+}

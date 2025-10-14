@@ -27,3 +27,14 @@ func stringSliceToString(v []string) string {
 	}
 	return ret + "]"
 }
+
+// asStringSlice casts the value to []string. Returns the slice and nil error
+// if the value is a []string. Returns nil and [ErrInvType] if not a []string.
+func asStringSlice(val any, _ *Options) ([]string, error) {
+	switch v := val.(type) {
+	case []string:
+		return v, nil
+	default:
+		return nil, ErrInvType
+	}
+}

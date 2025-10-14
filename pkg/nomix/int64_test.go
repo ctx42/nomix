@@ -72,3 +72,41 @@ func Test_ParseInt64_error(t *testing.T) {
 		assert.Nil(t, tag)
 	})
 }
+
+func Test_asInt64(t *testing.T) {
+	t.Run("error - invalid type", func(t *testing.T) {
+		// --- When ---
+		have, err := asInt64("abc", nil)
+
+		// --- Then ---
+		assert.ErrorIs(t, err, ErrInvType)
+		assert.Empty(t, have)
+	})
+}
+
+func Test_asInt64_success_tabular(t *testing.T) {
+	tt := []struct {
+		testN string
+
+		have any
+		want int64
+	}{
+		{"int", 42, 42},
+		{"byte", byte(42), 42},
+		{"int8", int8(42), 42},
+		{"int16", int16(42), 42},
+		{"int32", int32(42), 42},
+		{"int64", int64(42), 42},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.testN, func(t *testing.T) {
+			// --- When ---
+			have, err := asInt64(tc.have, nil)
+
+			// --- Then ---
+			assert.NoError(t, err)
+			assert.Equal(t, tc.want, have)
+		})
+	}
+}
