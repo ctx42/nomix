@@ -42,6 +42,8 @@ func float64ToString(v float64) string {
 // NOTE: For int64 values outside ±2^53 range, the result is undefined.
 func asFloat64(val any, _ Options) (float64, error) {
 	switch v := val.(type) {
+	case float64:
+		return v, nil
 	case int:
 		return float64(v), nil
 	case byte:
@@ -56,8 +58,6 @@ func asFloat64(val any, _ Options) (float64, error) {
 		return float64(v), nil
 	case float32:
 		return float64(v), nil
-	case float64:
-		return v, nil
 	}
 	return 0, ErrInvType
 }
