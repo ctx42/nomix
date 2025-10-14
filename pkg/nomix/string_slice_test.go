@@ -25,7 +25,7 @@ func Test_NewStringSlice(t *testing.T) {
 func Test_asStringSlice(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		// --- When ---
-		have, err := asStringSlice([]string{"abc", "xyz"}, nil)
+		have, err := asStringSlice([]string{"abc", "xyz"}, Options{})
 
 		// --- Then ---
 		assert.NoError(t, err)
@@ -34,7 +34,7 @@ func Test_asStringSlice(t *testing.T) {
 
 	t.Run("error - invalid type", func(t *testing.T) {
 		// --- When ---
-		have, err := asStringSlice(42, nil)
+		have, err := asStringSlice(42, Options{})
 
 		// --- Then ---
 		assert.ErrorIs(t, err, ErrInvType)

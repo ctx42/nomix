@@ -56,12 +56,15 @@ type Options struct {
 }
 
 // DefaultOptions returns default options.
-func DefaultOptions() *Options {
-	return &Options{
+func DefaultOptions() Options {
+	return Options{
 		timeFormat: time.RFC3339Nano,
 		intBase:    10,
 	}
 }
+
+// defaultOptions is default options.
+var defaultOptions = DefaultOptions()
 
 // WithLen is an option to set the default length for the map.
 func WithLen(n int) Option {

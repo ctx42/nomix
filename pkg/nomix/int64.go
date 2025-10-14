@@ -23,9 +23,9 @@ func NewInt64(name string, v int64) *Int64 {
 
 // ParseInt64 parses string representation of the 64-bit integer tag.
 func ParseInt64(name, v string, opts ...Option) (*Int64, error) {
-	def := DefaultOptions()
+	def := defaultOptions
 	for _, opt := range opts {
-		opt(def)
+		opt(&def)
 	}
 	val, err := strconv.ParseInt(v, def.intBase, 64)
 	if err != nil {
@@ -40,7 +40,7 @@ func int64ToString(v int64) string { return strconv.FormatInt(v, 10) }
 // asInt64 casts the value to int64. Returns the int64 and nil error if the
 // value is a byte, int, int8, int16, int32, or int64. Returns 0 and
 // [ErrInvType] if the value is not a supported integer type.
-func asInt64(val any, _ *Options) (int64, error) {
+func asInt64(val any, _ Options) (int64, error) {
 	switch v := val.(type) {
 	case int:
 		return int64(v), nil

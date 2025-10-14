@@ -13,10 +13,10 @@ type TagSet struct {
 }
 
 // NewTagSet returns a new instance of [TagSet].
-func NewTagSet(opts ...func(*Options)) TagSet {
-	def := &Options{length: 10}
+func NewTagSet(opts ...Option) TagSet {
+	def := defaultOptions
 	for _, opt := range opts {
-		opt(def)
+		opt(&def)
 	}
 	set := TagSet{}
 	if m, ok := def.init.(map[string]Tag); ok {

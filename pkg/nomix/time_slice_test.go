@@ -29,7 +29,7 @@ func Test_NewTimeSlice(t *testing.T) {
 func Test_asTimeSlice(t *testing.T) {
 	t.Run("error - not supported type", func(t *testing.T) {
 		// --- When ---
-		have, err := asTimeSlice(42, nil)
+		have, err := asTimeSlice(42, Options{})
 
 		// --- Then ---
 		assert.ErrorIs(t, ErrInvType, err)
@@ -38,7 +38,7 @@ func Test_asTimeSlice(t *testing.T) {
 
 	t.Run("error - string type is not allowed by default", func(t *testing.T) {
 		// --- When ---
-		have, err := asTimeSlice("2000-01-02T03:04:05Z", nil)
+		have, err := asTimeSlice("2000-01-02T03:04:05Z", Options{})
 
 		// --- Then ---
 		assert.ErrorIs(t, ErrInvType, err)
@@ -47,7 +47,7 @@ func Test_asTimeSlice(t *testing.T) {
 
 	t.Run("error - parsing string time", func(t *testing.T) {
 		// --- Given ---
-		opts := &Options{timeFormat: time.RFC3339}
+		opts := Options{timeFormat: time.RFC3339}
 
 		// --- When ---
 		have, err := asTimeSlice([]string{"abc"}, opts)
@@ -89,7 +89,7 @@ func Test_asTimeSlice_success_tabular(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.testN, func(t *testing.T) {
 			// --- Given ---
-			opt := &Options{timeFormat: time.RFC3339}
+			opt := Options{timeFormat: time.RFC3339}
 
 			// --- When ---
 			have, err := asTimeSlice(tc.have, opt)

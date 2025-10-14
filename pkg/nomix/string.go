@@ -27,7 +27,7 @@ func stringToString(v string) string { return v }
 // asString casts the value to a string. Returns the string and nil error if
 // the value is a string. Returns "" and [ErrInvType] if the value is not a
 // string.
-func asString(val any, _ *Options) (string, error) {
+func asString(val any, _ Options) (string, error) {
 	switch v := val.(type) {
 	case string:
 		return v, nil

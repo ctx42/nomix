@@ -46,7 +46,7 @@ func Test_ParseString_tabular(t *testing.T) {
 func Test_asString(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		// --- When ---
-		have, err := asString("abc", nil)
+		have, err := asString("abc", Options{})
 
 		// --- Then ---
 		assert.NoError(t, err)
@@ -55,7 +55,7 @@ func Test_asString(t *testing.T) {
 
 	t.Run("error - invalid type", func(t *testing.T) {
 		// --- When ---
-		have, err := asString(42, nil)
+		have, err := asString(42, Options{})
 
 		// --- Then ---
 		assert.ErrorIs(t, err, ErrInvType)

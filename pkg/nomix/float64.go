@@ -40,7 +40,7 @@ func float64ToString(v float64) string {
 // Returns 0.0 and [ErrInvType] if the value is not a supported numeric type.
 //
 // NOTE: For int64 values outside ±2^53 range, the result is undefined.
-func asFloat64(val any, _ *Options) (float64, error) {
+func asFloat64(val any, _ Options) (float64, error) {
 	switch v := val.(type) {
 	case int:
 		return float64(v), nil

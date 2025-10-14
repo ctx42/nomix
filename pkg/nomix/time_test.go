@@ -78,9 +78,7 @@ func Test_ParseTime(t *testing.T) {
 func Test_parseTime(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		// --- Given ---
-		opts := &Options{
-			timeFormat: time.RFC3339,
-		}
+		opts := Options{timeFormat: time.RFC3339}
 
 		// --- When ---
 		have, err := parseTime("2000-01-02T03:04:05Z", opts)
@@ -95,7 +93,7 @@ func Test_parseTime(t *testing.T) {
 	t.Run("parse in location", func(t *testing.T) {
 		// --- Given ---
 		WAW := must.Value(time.LoadLocation("Europe/Warsaw"))
-		opts := &Options{
+		opts := Options{
 			timeFormat: "2006-01-02",
 			location:   WAW,
 		}
@@ -112,7 +110,7 @@ func Test_parseTime(t *testing.T) {
 
 	t.Run("recognize zero value time", func(t *testing.T) {
 		// --- Given ---
-		opts := &Options{
+		opts := Options{
 			timeFormat: "2006-01-02",
 			zeroTime:   []string{"0000-00-00"},
 		}
@@ -127,7 +125,7 @@ func Test_parseTime(t *testing.T) {
 
 	t.Run("use UTC if the location is an empty string", func(t *testing.T) {
 		// --- Given ---
-		opts := &Options{
+		opts := Options{
 			timeFormat: "2006-01-02",
 			location:   time.FixedZone("", 120),
 		}
@@ -144,7 +142,7 @@ func Test_parseTime(t *testing.T) {
 
 	t.Run("error - time format isn't set", func(t *testing.T) {
 		// --- When ---
-		have, err := parseTime("2000-01-02T03:04:05Z", nil)
+		have, err := parseTime("2000-01-02T03:04:05Z", Options{})
 
 		// --- Then ---
 		assert.ErrorIs(t, ErrInvType, err)
@@ -153,9 +151,7 @@ func Test_parseTime(t *testing.T) {
 
 	t.Run("error - invalid time format", func(t *testing.T) {
 		// --- Given ---
-		opts := &Options{
-			timeFormat: time.RFC3339,
-		}
+		opts := Options{timeFormat: time.RFC3339}
 
 		// --- When ---
 		have, err := parseTime("2000-01-02", opts)
@@ -167,7 +163,7 @@ func Test_parseTime(t *testing.T) {
 
 	t.Run("error - invalid time format with a loc option", func(t *testing.T) {
 		// --- Given ---
-		opts := &Options{
+		opts := Options{
 			timeFormat: time.RFC3339,
 			location:   time.UTC,
 		}
@@ -184,7 +180,7 @@ func Test_parseTime(t *testing.T) {
 func Test_asTime(t *testing.T) {
 	t.Run("error - invalid type", func(t *testing.T) {
 		// --- When ---
-		have, err := asTime(42, nil)
+		have, err := asTime(42, Options{})
 
 		// --- Then ---
 		assert.ErrorIs(t, err, ErrInvType)
@@ -193,7 +189,7 @@ func Test_asTime(t *testing.T) {
 
 	t.Run("error - by default sting is not supported", func(t *testing.T) {
 		// --- When ---
-		have, err := asTime("2000-01-02T03:04:05Z", nil)
+		have, err := asTime("2000-01-02T03:04:05Z", Options{})
 
 		// --- Then ---
 		assert.ErrorIs(t, err, ErrInvType)
@@ -223,7 +219,7 @@ func Test_asTime_success_tabular(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.testN, func(t *testing.T) {
 			// --- Given ---
-			opts := &Options{timeFormat: time.RFC3339}
+			opts := Options{timeFormat: time.RFC3339}
 
 			// --- When ---
 			have, err := asTime(tc.have, opts)

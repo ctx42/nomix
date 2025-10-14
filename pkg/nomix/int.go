@@ -23,9 +23,9 @@ func NewInt(name string, v int) *Int {
 
 // ParseInt parses string representation of the integer tag.
 func ParseInt(name, v string, opts ...Option) (*Int64, error) {
-	def := DefaultOptions()
+	def := defaultOptions
 	for _, opt := range opts {
-		opt(def)
+		opt(&def)
 	}
 	val, err := strconv.ParseInt(v, def.intBase, 0)
 	if err != nil {

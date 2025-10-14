@@ -12,16 +12,14 @@ import (
 var _ Metadata = MetaSet{} // Compile time check.
 
 // MetaSet represents a set of metadata key-values.
-type MetaSet struct {
-	m map[string]any
-}
+type MetaSet struct{ m map[string]any }
 
 // NewMetaSet returns a new [MetaSet] instance. By default, the new map is
 // initialized with the length equal to 10.
-func NewMetaSet(opts ...func(*Options)) MetaSet {
-	def := &Options{length: 10}
+func NewMetaSet(opts ...Option) MetaSet {
+	def := defaultOptions
 	for _, opt := range opts {
-		opt(def)
+		opt(&def)
 	}
 	set := MetaSet{}
 	if m, ok := def.init.(map[string]any); ok {
@@ -38,9 +36,7 @@ func NewMetaSet(opts ...func(*Options)) MetaSet {
 	return set
 }
 
-func (set MetaSet) MetaGet(key string) any {
-	return set.m[key]
-}
+func (set MetaSet) MetaGet(key string) any { return set.m[key] }
 
 func (set MetaSet) MetaSet(key string, value any) {
 	if value == nil {
@@ -69,7 +65,7 @@ func (set MetaSet) MetaDeleteAll() {
 // the value is of a different type.
 func (set MetaSet) MetaGetString(name string) (string, error) {
 	if v, ok := set.m[name]; ok {
-		val, err := asString(v, nil)
+		val, err := asString(v, Options{})
 		if err != nil {
 			return "", fmt.Errorf("%s: %w", name, err)
 		}
@@ -84,7 +80,7 @@ func (set MetaSet) MetaGetString(name string) (string, error) {
 // is of a different type.
 func (set MetaSet) MetaGetStringSlice(name string) ([]string, error) {
 	if v, ok := set.m[name]; ok {
-		val, err := asStringSlice(v, nil)
+		val, err := asStringSlice(v, Options{})
 		if err != nil {
 			return nil, fmt.Errorf("%s: %w", name, err)
 		}
@@ -99,7 +95,7 @@ func (set MetaSet) MetaGetStringSlice(name string) ([]string, error) {
 // [ErrInvType] if the value is of a different type.
 func (set MetaSet) MetaGetInt64(name string) (int64, error) {
 	if v, ok := set.m[name]; ok {
-		val, err := asInt64(v, nil)
+		val, err := asInt64(v, Options{})
 		if err != nil {
 			return 0, fmt.Errorf("%s: %w", name, err)
 		}
@@ -114,7 +110,7 @@ func (set MetaSet) MetaGetInt64(name string) (int64, error) {
 // missing, or nil and [ErrInvType] if the value is of a different type.
 func (set MetaSet) MetaGetInt64Slice(name string) ([]int64, error) {
 	if v, ok := set.m[name]; ok {
-		val, err := asInt64Slice(v, nil)
+		val, err := asInt64Slice(v, Options{})
 		if err != nil {
 			return nil, fmt.Errorf("%s: %w", name, err)
 		}
@@ -131,7 +127,7 @@ func (set MetaSet) MetaGetInt64Slice(name string) ([]int64, error) {
 // NOTE: For int64 values outside ±2^53 range, the result is undefined.
 func (set MetaSet) MetaGetFloat64(name string) (float64, error) {
 	if v, ok := set.m[name]; ok {
-		val, err := asFloat64(v, nil)
+		val, err := asFloat64(v, Options{})
 		if err != nil {
 			return 0, fmt.Errorf("%s: %w", name, err)
 		}
@@ -149,7 +145,7 @@ func (set MetaSet) MetaGetFloat64(name string) (float64, error) {
 // NOTE: For int64 values outside ±2^53 range, the result is undefined.
 func (set MetaSet) MetaGetFloat64Slice(name string) ([]float64, error) {
 	if v, ok := set.m[name]; ok {
-		val, err := asFloat64Slice(v, nil)
+		val, err := asFloat64Slice(v, Options{})
 		if err != nil {
 			return nil, fmt.Errorf("%s: %w", name, err)
 		}
@@ -167,10 +163,10 @@ func (set MetaSet) MetaGetFloat64Slice(name string) ([]float64, error) {
 //
 // To support string zero time values, use the [WithZeroTime] option.
 func (set MetaSet) MetaGetTime(name string, opts ...Option) (time.Time, error) {
-	def := DefaultOptions()
+	def := defaultOptions
 	def.timeFormat = "" // By default, the string type is not supported.
 	for _, opt := range opts {
-		opt(def)
+		opt(&def)
 	}
 	if v, ok := set.m[name]; ok {
 		val, err := asTime(v, def)
@@ -192,10 +188,10 @@ func (set MetaSet) MetaGetTime(name string, opts ...Option) (time.Time, error) {
 //
 // To support string zero time values, use the [WithZeroTime] option.
 func (set MetaSet) MetaGetTimeSlice(name string, opts ...Option) ([]time.Time, error) {
-	def := DefaultOptions()
+	def := defaultOptions
 	def.timeFormat = "" // By default, tring type is not supported.
 	for _, opt := range opts {
-		opt(def)
+		opt(&def)
 	}
 	if v, ok := set.m[name]; ok {
 		val, err := asTimeSlice(v, def)
@@ -261,9 +257,9 @@ func (set MetaSet) MetaGetBoolSlice(name string) ([]bool, error) {
 }
 
 // MetaGetInt gets a metadata value by name as an int. Returns the value and
-// nil error if it exists and is the int type. Returns false and [ErrMissing] if
-// the value is missing, or empty string and [ErrInvType] if the value is of a
-// different type.
+// nil error if it exists and is the int type. Returns false and [ErrMissing]
+// if the value is missing, or empty string and [ErrInvType] if the value is of
+// a different type.
 func (set MetaSet) MetaGetInt(name string) (int, error) {
 	if val, ok := set.m[name]; ok {
 		if v, ok := val.(int); ok {

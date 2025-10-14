@@ -25,9 +25,9 @@ func NewTime(name string, v time.Time) *Time {
 // ParseTime parses string representation of the time tag. The time is always
 // returned as UTC.
 func ParseTime(name, v string, opts ...Option) (*Time, error) {
-	def := DefaultOptions()
+	def := defaultOptions
 	for _, opt := range opts {
-		opt(def)
+		opt(&def)
 	}
 	val, err := parseTime(v, def)
 	if err != nil {
@@ -41,8 +41,8 @@ func ParseTime(name, v string, opts ...Option) (*Time, error) {
 // time and [ErrInvFormat] if the value is not a valid time representation.
 //
 // To support string zero time values, use the [WithZeroTime] option.
-func parseTime(val string, opts *Options) (time.Time, error) {
-	if opts == nil || opts.timeFormat == "" {
+func parseTime(val string, opts Options) (time.Time, error) {
+	if opts.timeFormat == "" {
 		return time.Time{}, ErrInvType
 	}
 	if slices.Contains(opts.zeroTime, val) {
@@ -71,12 +71,12 @@ func timeToString(v time.Time) string { return v.Format(time.RFC3339Nano) }
 // it time but only when [Options.timeFormat] is set. Returns the time and nil
 // error on success. Returns zero value time and [ErrInvType] if the value is
 // not a supported type.
-func asTime(val any, opts *Options) (time.Time, error) {
+func asTime(val any, opts Options) (time.Time, error) {
 	switch v := val.(type) {
 	case time.Time:
 		return v, nil
 	case string:
-		if opts != nil && opts.timeFormat != "" {
+		if opts.timeFormat != "" {
 			return parseTime(v, opts)
 		}
 	}

@@ -27,7 +27,7 @@ func Test_toInt64Slice(t *testing.T) {
 	i32s := []int32{42, 44}
 
 	// --- When ---
-	have := toInt64Slice(i32s, nil)
+	have := toInt64Slice(i32s, Options{})
 
 	// --- Then ---
 	assert.Equal(t, []int64{42, 44}, have)
@@ -36,7 +36,7 @@ func Test_toInt64Slice(t *testing.T) {
 func Test_asInt64Slice(t *testing.T) {
 	t.Run("error - invalid type", func(t *testing.T) {
 		// --- When ---
-		have, err := asInt64Slice("abc", nil)
+		have, err := asInt64Slice("abc", Options{})
 
 		// --- Then ---
 		assert.ErrorIs(t, err, ErrInvType)
@@ -61,7 +61,7 @@ func Test_asInt64Slice_success_tabular(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.testN, func(t *testing.T) {
 			// --- When ---
-			have, err := asInt64Slice(tc.have, nil)
+			have, err := asInt64Slice(tc.have, Options{})
 
 			// --- Then ---
 			assert.NoError(t, err)

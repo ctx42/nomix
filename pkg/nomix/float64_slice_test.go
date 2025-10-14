@@ -25,7 +25,7 @@ func Test_NewFloat64Slice(t *testing.T) {
 func Test_asFloat64Slice(t *testing.T) {
 	t.Run("error - invalid type", func(t *testing.T) {
 		// --- When ---
-		have, err := asFloat64Slice("abc", nil)
+		have, err := asFloat64Slice("abc", Options{})
 
 		// --- Then ---
 		assert.ErrorIs(t, err, ErrInvType)
@@ -52,7 +52,7 @@ func Test_asFloat64Slice_success_tabular(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.testN, func(t *testing.T) {
 			// --- When ---
-			have, err := asFloat64Slice(tc.have, nil)
+			have, err := asFloat64Slice(tc.have, Options{})
 
 			// --- Then ---
 			assert.NoError(t, err)
