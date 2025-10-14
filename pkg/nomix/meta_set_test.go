@@ -659,6 +659,19 @@ func Test_MetaSet_MetaGetJSON(t *testing.T) {
 		assert.Nil(t, have)
 	})
 
+	t.Run("error - invalid type", func(t *testing.T) {
+		// --- Given ---
+		set := MetaSet{m: map[string]any{"A": 42}}
+
+		// --- When ---
+		have, err := set.MetaGetJOSN("A")
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrInvType, err)
+		assert.ErrorContain(t, "A: ", err)
+		assert.Nil(t, have)
+	})
+
 	t.Run("[]byte", func(t *testing.T) {
 		// --- Given ---
 		data := []byte(`{"field": "value"}`)

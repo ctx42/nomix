@@ -40,6 +40,16 @@ func Test_array_TagValue(t *testing.T) {
 	assert.Equal(t, []int{42, 44}, have)
 }
 
+func Test_array_Value(t *testing.T) {
+	tag := &slice[int]{value: []int{42, 44}}
+
+	// --- When ---
+	have := tag.Value()
+
+	// --- Then ---
+	assert.Equal(t, []int{42, 44}, have)
+}
+
 func Test_array_Set(t *testing.T) {
 	// --- Given ---
 	tag := &slice[int]{value: []int{42, 44}}

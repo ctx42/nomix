@@ -95,6 +95,17 @@ func Test_WithLocString(t *testing.T) {
 	assert.True(t, opts.locationAsString)
 }
 
+func Test_WithZeroTime(t *testing.T) {
+	// --- Given ---
+	opts := &Options{}
+
+	// --- When ---
+	WithZeroTime("a", "b", "c")(opts)
+
+	// --- Then ---
+	assert.Equal(t, []string{"a", "b", "c"}, opts.zeroTime)
+}
+
 func Test_WithBaseHEX(t *testing.T) {
 	// --- Given ---
 	opts := &Options{}

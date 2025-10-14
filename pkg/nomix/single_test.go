@@ -39,6 +39,16 @@ func Test_generic_TagValue(t *testing.T) {
 	assert.Equal(t, 42, have)
 }
 
+func Test_generic_Value(t *testing.T) {
+	tag := &single[int]{value: 42}
+
+	// --- When ---
+	have := tag.Value()
+
+	// --- Then ---
+	assert.Equal(t, 42, have)
+}
+
 func Test_generic_Set(t *testing.T) {
 	// --- Given ---
 	tag := &single[int]{value: 42}
