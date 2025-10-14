@@ -8,6 +8,8 @@ import (
 	"time"
 
 	"github.com/ctx42/testing/pkg/assert"
+	"github.com/ctx42/testing/pkg/check"
+	"github.com/ctx42/testing/pkg/must"
 )
 
 func Test_NewTime(t *testing.T) {
@@ -52,33 +54,129 @@ func Test_ParseTime_success_tabular(t *testing.T) {
 			t.Parallel()
 
 			// --- When ---
-			tag, err := ParseTime("name", tc.str, tc.opts...)
+			have, err := ParseTime("name", tc.str, tc.opts...)
 
 			// --- Then ---
 			assert.NoError(t, err)
-			assert.Equal(t, tc.exp, tag.TagValue())
+			assert.Equal(t, tc.exp, have.TagValue())
 		})
 	}
 }
 
 func Test_ParseTime(t *testing.T) {
-	t.Run("error - not supported string value", func(t *testing.T) {
+	t.Run("error - invalid time format", func(t *testing.T) {
 		// --- When ---
-		tag, err := ParseTime("name", "bad")
+		have, err := ParseTime("name", "2022-03-04")
 
 		// --- Then ---
 		assert.ErrorEqual(t, "name: invalid element format", err)
 		assert.ErrorIs(t, ErrInvFormat, err)
-		assert.Nil(t, tag)
+		assert.Nil(t, have)
+	})
+}
+
+func Test_parseTime(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		// --- Given ---
+		opts := &Options{
+			timeFormat: time.RFC3339,
+		}
+
+		// --- When ---
+		have, err := parseTime("2000-01-02T03:04:05Z", opts)
+
+		// --- Then ---
+		assert.NoError(t, err)
+		want := time.Date(2000, 1, 2, 3, 4, 5, 0, time.UTC)
+		exactTime := check.WithTypeChecker(time.Time{}, check.Exact)
+		assert.Equal(t, want, have, exactTime)
+	})
+
+	t.Run("parse in location", func(t *testing.T) {
+		// --- Given ---
+		WAW := must.Value(time.LoadLocation("Europe/Warsaw"))
+		opts := &Options{
+			timeFormat: "2006-01-02",
+			location:   WAW,
+		}
+
+		// --- When ---
+		have, err := parseTime("2000-01-02", opts)
+
+		// --- Then ---
+		assert.NoError(t, err)
+		want := time.Date(2000, 1, 2, 0, 0, 0, 0, WAW)
+		exactTime := check.WithTypeChecker(time.Time{}, check.Exact)
+		assert.Equal(t, want, have, exactTime)
+	})
+
+	t.Run("recognize zero value time", func(t *testing.T) {
+		// --- Given ---
+		opts := &Options{
+			timeFormat: "2006-01-02",
+			zeroTime:   []string{"0000-00-00"},
+		}
+
+		// --- When ---
+		have, err := parseTime("0000-00-00", opts)
+
+		// --- Then ---
+		assert.NoError(t, err)
+		assert.Zero(t, have)
+	})
+
+	t.Run("use UTC if the location is an empty string", func(t *testing.T) {
+		// --- Given ---
+		opts := &Options{
+			timeFormat: "2006-01-02",
+			location:   time.FixedZone("", 120),
+		}
+
+		// --- When ---
+		have, err := parseTime("2000-01-02", opts)
+
+		// --- Then ---
+		assert.NoError(t, err)
+		want := time.Date(2000, 1, 1, 23, 58, 0, 0, time.UTC)
+		exactTime := check.WithTypeChecker(time.Time{}, check.Exact)
+		assert.Equal(t, want, have, exactTime)
+	})
+
+	t.Run("error - time format isn't set", func(t *testing.T) {
+		// --- When ---
+		have, err := parseTime("2000-01-02T03:04:05Z", nil)
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrInvType, err)
+		assert.Zero(t, have)
 	})
 
 	t.Run("error - invalid time format", func(t *testing.T) {
+		// --- Given ---
+		opts := &Options{
+			timeFormat: time.RFC3339,
+		}
+
 		// --- When ---
-		tag, err := ParseTime("name", "2022-03-04")
+		have, err := parseTime("2000-01-02", opts)
 
 		// --- Then ---
-		assert.ErrorEqual(t, "name: invalid element format", err)
 		assert.ErrorIs(t, ErrInvFormat, err)
-		assert.Nil(t, tag)
+		assert.Zero(t, have)
+	})
+
+	t.Run("error - invalid time format with a loc option", func(t *testing.T) {
+		// --- Given ---
+		opts := &Options{
+			timeFormat: time.RFC3339,
+			location:   time.UTC,
+		}
+
+		// --- When ---
+		have, err := parseTime("2000-01-02", opts)
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrInvFormat, err)
+		assert.Zero(t, have)
 	})
 }

@@ -42,7 +42,7 @@ func ParseTime(name, v string, opts ...Option) (*Time, error) {
 //
 // To support string zero time values, use the [WithZeroTime] option.
 func parseTime(val string, opts *Options) (time.Time, error) {
-	if opts.timeFormat == "" {
+	if opts == nil || opts.timeFormat == "" {
 		return time.Time{}, ErrInvType
 	}
 	if slices.Contains(opts.zeroTime, val) {

@@ -10,7 +10,6 @@ import (
 
 	"github.com/ctx42/testing/pkg/assert"
 	"github.com/ctx42/testing/pkg/check"
-	"github.com/ctx42/testing/pkg/must"
 )
 
 func Test_NewMetaSet(t *testing.T) {
@@ -492,20 +491,7 @@ func Test_MetaSet_MetaGetFloat64Slice(t *testing.T) {
 }
 
 func Test_MetaSet_MetaGetTime(t *testing.T) {
-	t.Run("error - not existing", func(t *testing.T) {
-		// --- Given ---
-		set := MetaSet{m: map[string]any{}}
-
-		// --- When ---
-		have, err := set.MetaGetTime("A")
-
-		// --- Then ---
-		assert.ErrorIs(t, ErrMissing, err)
-		assert.ErrorContain(t, "A: ", err)
-		assert.Zero(t, have)
-	})
-
-	t.Run("time", func(t *testing.T) {
+	t.Run("time instance", func(t *testing.T) {
 		// --- Given ---
 		tim := time.Date(2000, 1, 2, 3, 4, 5, 0, time.UTC)
 		set := MetaSet{m: map[string]any{"A": tim}}
@@ -518,7 +504,48 @@ func Test_MetaSet_MetaGetTime(t *testing.T) {
 		assert.Exact(t, tim, have)
 	})
 
-	t.Run("error - not time or string type", func(t *testing.T) {
+	t.Run("error - string time is not allowed by default", func(t *testing.T) {
+		// --- Given ---
+		set := MetaSet{m: map[string]any{"A": "abc"}}
+
+		// --- When ---
+		have, err := set.MetaGetTime("A")
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrInvType, err)
+		assert.ErrorContain(t, "A: ", err)
+		assert.Zero(t, have)
+	})
+
+	t.Run("allow string time", func(t *testing.T) {
+		// --- Given ---
+		opt := WithTimeFormat(time.RFC3339)
+		set := MetaSet{m: map[string]any{"A": "2000-01-02T03:04:05Z"}}
+
+		// --- When ---
+		have, err := set.MetaGetTime("A", opt)
+
+		// --- Then ---
+		assert.NoError(t, err)
+		want := time.Date(2000, 1, 2, 3, 4, 5, 0, time.UTC)
+		exactTime := check.WithTypeChecker(time.Time{}, check.Exact)
+		assert.Exact(t, want, have, exactTime)
+	})
+
+	t.Run("error - not existing", func(t *testing.T) {
+		// --- Given ---
+		set := MetaSet{m: map[string]any{}}
+
+		// --- When ---
+		have, err := set.MetaGetTime("A")
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrMissing, err)
+		assert.ErrorContain(t, "A: ", err)
+		assert.Zero(t, have)
+	})
+
+	t.Run("error - not time type", func(t *testing.T) {
 		// --- Given ---
 		set := MetaSet{m: map[string]any{"A": 1}}
 
@@ -530,95 +557,13 @@ func Test_MetaSet_MetaGetTime(t *testing.T) {
 		assert.ErrorContain(t, "A: ", err)
 		assert.Zero(t, have)
 	})
-
-	t.Run("error - string type is not allowed by default", func(t *testing.T) {
-		// --- Given ---
-		set := MetaSet{m: map[string]any{"A": "abc"}}
-
-		// --- When ---
-		have, err := set.MetaGetTime("A")
-
-		// --- Then ---
-		assert.ErrorIs(t, ErrInvType, err)
-		assert.ErrorContain(t, "A: ", err)
-		assert.Zero(t, have)
-	})
-
-	t.Run("string time with format", func(t *testing.T) {
-		// --- Given ---
-		set := MetaSet{m: map[string]any{"A": "2000-01-02T03:04:05+01:02"}}
-		optTimFmt := WithTimeFormat(time.RFC3339)
-
-		// --- When ---
-		have, err := set.MetaGetTime("A", optTimFmt)
-
-		// --- Then ---
-		assert.NoError(t, err)
-		assert.Exact(t, time.Date(2000, 1, 2, 2, 2, 5, 0, time.UTC), have)
-	})
-
-	t.Run("string time parse in location", func(t *testing.T) {
-		// --- Given ---
-		WAW := must.Value(time.LoadLocation("Europe/Warsaw"))
-		optTimFmt := WithTimeFormat("2006-01-02T15:04:05")
-		optLoc := WithTimeLoc(WAW)
-		set := MetaSet{m: map[string]any{"A": "2000-01-02T03:04:05"}}
-
-		// --- When ---
-		have, err := set.MetaGetTime("A", optTimFmt, optLoc)
-
-		// --- Then ---
-		assert.NoError(t, err)
-		assert.Exact(t, time.Date(2000, 1, 2, 3, 4, 5, 0, WAW), have)
-	})
-
-	t.Run("error - parsing string time", func(t *testing.T) {
-		// --- Given ---
-		set := MetaSet{m: map[string]any{"A": "abc"}}
-		optTimFmt := WithTimeFormat(time.RFC3339)
-
-		// --- When ---
-		have, err := set.MetaGetTime("A", optTimFmt)
-
-		// --- Then ---
-		assert.ErrorIs(t, ErrInvFormat, err)
-		assert.ErrorContain(t, "A: ", err)
-		assert.Zero(t, have)
-	})
-
-	t.Run("zero value string time", func(t *testing.T) {
-		// --- Given ---
-		set := MetaSet{m: map[string]any{"A": "0000-00-00T00:00:00"}}
-		optTimFmt := WithTimeFormat(time.RFC3339)
-		optTimZero := WithZeroTime("0000-00-00T00:00:00")
-
-		// --- When ---
-		have, err := set.MetaGetTime("A", optTimFmt, optTimZero)
-
-		// --- Then ---
-		assert.NoError(t, err)
-		assert.Zero(t, have)
-	})
 }
 
 func Test_MetaSet_MetaGetTimeSlice(t *testing.T) {
 	tim0 := time.Date(2000, 1, 2, 3, 4, 5, 0, time.UTC)
 	tim1 := time.Date(2001, 1, 2, 3, 4, 5, 0, time.UTC)
 
-	t.Run("error - not existing", func(t *testing.T) {
-		// --- Given ---
-		set := MetaSet{m: map[string]any{}}
-
-		// --- When ---
-		have, err := set.MetaGetTimeSlice("A")
-
-		// --- Then ---
-		assert.ErrorIs(t, ErrMissing, err)
-		assert.ErrorContain(t, "A: ", err)
-		assert.Nil(t, have)
-	})
-
-	t.Run("time", func(t *testing.T) {
+	t.Run("time intance", func(t *testing.T) {
 		// --- Given ---
 		set := MetaSet{m: map[string]any{"A": []time.Time{tim0, tim1}}}
 
@@ -631,19 +576,6 @@ func Test_MetaSet_MetaGetTimeSlice(t *testing.T) {
 		assert.Equal(t, []time.Time{tim0, tim1}, have, exactTime)
 	})
 
-	t.Run("error - not supported type", func(t *testing.T) {
-		// --- Given ---
-		set := MetaSet{m: map[string]any{"A": 1}}
-
-		// --- When ---
-		have, err := set.MetaGetTimeSlice("A")
-
-		// --- Then ---
-		assert.ErrorIs(t, ErrInvType, err)
-		assert.ErrorContain(t, "A: ", err)
-		assert.Nil(t, have)
-	})
-
 	t.Run("error - string type is not allowed by default", func(t *testing.T) {
 		// --- Given ---
 		set := MetaSet{m: map[string]any{"A": "abc"}}
@@ -657,7 +589,7 @@ func Test_MetaSet_MetaGetTimeSlice(t *testing.T) {
 		assert.Nil(t, have)
 	})
 
-	t.Run("string time with format", func(t *testing.T) {
+	t.Run("string time", func(t *testing.T) {
 		// --- Given ---
 		tim0Str := "2000-01-02T03:04:05Z"
 		tim1Str := "2001-01-02T03:04:05Z"
@@ -673,55 +605,30 @@ func Test_MetaSet_MetaGetTimeSlice(t *testing.T) {
 		assert.Equal(t, []time.Time{tim0, tim1}, have, exactTime)
 	})
 
-	t.Run("string time parse in location", func(t *testing.T) {
+	t.Run("error - not existing", func(t *testing.T) {
 		// --- Given ---
-		WAW := must.Value(time.LoadLocation("Europe/Warsaw"))
-		optTimFmt := WithTimeFormat("2006-01-02T15:04:05")
-		optLoc := WithTimeLoc(WAW)
-		tim0Str := "2000-01-02T03:04:05"
-		tim1Str := "2001-01-02T03:04:05"
-		set := MetaSet{m: map[string]any{"A": []string{tim0Str, tim1Str}}}
+		set := MetaSet{m: map[string]any{}}
 
 		// --- When ---
-		have, err := set.MetaGetTimeSlice("A", optTimFmt, optLoc)
+		have, err := set.MetaGetTimeSlice("A")
 
 		// --- Then ---
-		assert.NoError(t, err)
-		want := []time.Time{
-			time.Date(2000, 1, 2, 3, 4, 5, 0, WAW),
-			time.Date(2001, 1, 2, 3, 4, 5, 0, WAW),
-		}
-		exactTime := check.WithTypeChecker(time.Time{}, check.Exact)
-		assert.Equal(t, want, have, exactTime)
-	})
-
-	t.Run("error - parsing string time", func(t *testing.T) {
-		// --- Given ---
-		set := MetaSet{m: map[string]any{"A": []string{"abc"}}}
-		optTimFmt := WithTimeFormat(time.RFC3339)
-
-		// --- When ---
-		have, err := set.MetaGetTimeSlice("A", optTimFmt)
-
-		// --- Then ---
-		assert.ErrorIs(t, ErrInvFormat, err)
+		assert.ErrorIs(t, ErrMissing, err)
 		assert.ErrorContain(t, "A: ", err)
 		assert.Nil(t, have)
 	})
 
-	t.Run("zero value string time", func(t *testing.T) {
+	t.Run("error - not supported type", func(t *testing.T) {
 		// --- Given ---
-		set := MetaSet{m: map[string]any{"A": []string{"0000-00-00T00:00:00"}}}
-		optTimFmt := WithTimeFormat(time.RFC3339)
-		optTimZero := WithZeroTime("0000-00-00T00:00:00")
+		set := MetaSet{m: map[string]any{"A": 1}}
 
 		// --- When ---
-		have, err := set.MetaGetTimeSlice("A", optTimFmt, optTimZero)
+		have, err := set.MetaGetTimeSlice("A")
 
 		// --- Then ---
-		assert.NoError(t, err)
-		exactTime := check.WithTypeChecker(time.Time{}, check.Exact)
-		assert.Equal(t, []time.Time{{}}, have, exactTime)
+		assert.ErrorIs(t, ErrInvType, err)
+		assert.ErrorContain(t, "A: ", err)
+		assert.Nil(t, have)
 	})
 }
 
