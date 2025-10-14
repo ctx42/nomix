@@ -67,36 +67,37 @@ func (set MetaSet) MetaDeleteAll() {
 // and nil error if it exists and is the string type. Returns empty string and
 // [ErrMissing] if the value is missing, or empty string and [ErrInvType] if
 // the value is of a different type.
-func (set MetaSet) MetaGetString(key string) (string, error) {
-	if valAny, ok := set.m[key]; ok {
-		if val, ok := valAny.(string); ok {
-			return val, nil
+func (set MetaSet) MetaGetString(name string) (string, error) {
+	if val, ok := set.m[name]; ok {
+		v, err := asString(val)
+		if err != nil {
+			return "", fmt.Errorf("%s: %w", name, ErrInvType)
 		}
-		return "", fmt.Errorf("%s: %w", key, ErrInvType)
+		return v, nil
 	}
-	return "", fmt.Errorf("%s: %w", key, ErrMissing)
+	return "", fmt.Errorf("%s: %w", name, ErrMissing)
 }
 
 // MetaGetStringSlice gets a metadata value by name as a []string. Returns the
 // slice and nil error if it exists and is the []string type. Returns nil and
 // [ErrMissing] if the value is missing, or nil and [ErrInvType] if the value
 // is of a different type.
-func (set MetaSet) MetaGetStringSlice(key string) ([]string, error) {
-	if valAny, ok := set.m[key]; ok {
+func (set MetaSet) MetaGetStringSlice(name string) ([]string, error) {
+	if valAny, ok := set.m[name]; ok {
 		if val, ok := valAny.([]string); ok {
 			return val, nil
 		}
-		return nil, fmt.Errorf("%s: %w", key, ErrInvType)
+		return nil, fmt.Errorf("%s: %w", name, ErrInvType)
 	}
-	return nil, fmt.Errorf("%s: %w", key, ErrMissing)
+	return nil, fmt.Errorf("%s: %w", name, ErrMissing)
 }
 
 // MetaGetInt64 gets a metadata value by name as an int64. Returns the value
 // and nil error if it exists and is one of int, int8, int16, int32 or int64
 // types. Returns 0 and [ErrMissing] if the value is missing, or 0 and
 // [ErrInvType] if the value is of a different type.
-func (set MetaSet) MetaGetInt64(key string) (int64, error) {
-	if val, ok := set.m[key]; ok {
+func (set MetaSet) MetaGetInt64(name string) (int64, error) {
+	if val, ok := set.m[name]; ok {
 		switch v := val.(type) {
 		case int:
 			return int64(v), nil
@@ -109,48 +110,32 @@ func (set MetaSet) MetaGetInt64(key string) (int64, error) {
 		case int64:
 			return v, nil
 		}
-		return 0, fmt.Errorf("%s: %w", key, ErrInvType)
+		return 0, fmt.Errorf("%s: %w", name, ErrInvType)
 	}
-	return 0, fmt.Errorf("%s: %w", key, ErrMissing)
-}
-
-// upgradableToInt64 lists types that can be upgraded to int64 without loss of
-// precision.
-type upgradableToInt64 interface {
-	int | int8 | int16 | int32 | int64
-}
-
-// upgradeToInt64Slice upgrades a slice of values that can be upgraded to []int64
-// without loss of precision.
-func upgradeToInt64Slice[T upgradableToInt64](v []T) []int64 {
-	upgraded := make([]int64, len(v))
-	for i, val := range v {
-		upgraded[i] = int64(val)
-	}
-	return upgraded
+	return 0, fmt.Errorf("%s: %w", name, ErrMissing)
 }
 
 // MetaGetInt64Slice gets a metadata value by name as a []int64. Returns the
 // slice and nil error if it exists and is one of []int, []int8, []int16,
 // []int32 or []int64 types. Returns nil and [ErrMissing] if the value is
 // missing, or nil and [ErrInvType] if the value is of a different type.
-func (set MetaSet) MetaGetInt64Slice(key string) ([]int64, error) {
-	if val, ok := set.m[key]; ok {
+func (set MetaSet) MetaGetInt64Slice(name string) ([]int64, error) {
+	if val, ok := set.m[name]; ok {
 		switch v := val.(type) {
 		case []int:
-			return upgradeToInt64Slice(v), nil
+			return asInt64Slice(v), nil
 		case []int8:
-			return upgradeToInt64Slice(v), nil
+			return asInt64Slice(v), nil
 		case []int16:
-			return upgradeToInt64Slice(v), nil
+			return asInt64Slice(v), nil
 		case []int32:
-			return upgradeToInt64Slice(v), nil
+			return asInt64Slice(v), nil
 		case []int64:
 			return v, nil
 		}
-		return nil, fmt.Errorf("%s: %w", key, ErrInvType)
+		return nil, fmt.Errorf("%s: %w", name, ErrInvType)
 	}
-	return nil, fmt.Errorf("%s: %w", key, ErrMissing)
+	return nil, fmt.Errorf("%s: %w", name, ErrMissing)
 }
 
 // MetaGetFloat64 gets a metadata value by name as a float64. Returns the value
@@ -159,8 +144,8 @@ func (set MetaSet) MetaGetInt64Slice(key string) ([]int64, error) {
 // or 0.0 and [ErrInvType] if the value is of a different type.
 //
 // NOTE: For int64 values outside ±2^53 range, the result is undefined.
-func (set MetaSet) MetaGetFloat64(key string) (float64, error) {
-	if val, ok := set.m[key]; ok {
+func (set MetaSet) MetaGetFloat64(name string) (float64, error) {
+	if val, ok := set.m[name]; ok {
 		switch v := val.(type) {
 		case int:
 			return float64(v), nil
@@ -177,27 +162,9 @@ func (set MetaSet) MetaGetFloat64(key string) (float64, error) {
 		case float64:
 			return v, nil
 		}
-		return 0, fmt.Errorf("%s: %w", key, ErrInvType)
+		return 0, fmt.Errorf("%s: %w", name, ErrInvType)
 	}
-	return 0, fmt.Errorf("%s: %w", key, ErrMissing)
-}
-
-// upgradableToFloat64 lists types that can be upgraded to float64 without loss
-// of precision.
-type upgradableToFloat64 interface {
-	int | int8 | int16 | int32 | int64 | float32 | float64
-}
-
-// upgradeToFloat64Slice upgrades a slice of values that can be upgraded to
-// []float64 without loss of precision.
-//
-// NOTE: For int64 values outside ±2^53 range, the result is undefined.
-func upgradeToFloat64Slice[T upgradableToFloat64](v []T) []float64 {
-	upgraded := make([]float64, len(v))
-	for i, val := range v {
-		upgraded[i] = float64(val)
-	}
-	return upgraded
+	return 0, fmt.Errorf("%s: %w", name, ErrMissing)
 }
 
 // MetaGetFloat64Slice gets a metadata value by name as a []float. Returns the
@@ -207,27 +174,27 @@ func upgradeToFloat64Slice[T upgradableToFloat64](v []T) []float64 {
 // different type.
 //
 // NOTE: For int64 values outside ±2^53 range, the result is undefined.
-func (set MetaSet) MetaGetFloat64Slice(key string) ([]float64, error) {
-	if val, ok := set.m[key]; ok {
+func (set MetaSet) MetaGetFloat64Slice(name string) ([]float64, error) {
+	if val, ok := set.m[name]; ok {
 		switch v := val.(type) {
 		case []int:
-			return upgradeToFloat64Slice(v), nil
+			return asFloat64Slice(v), nil
 		case []int8:
-			return upgradeToFloat64Slice(v), nil
+			return asFloat64Slice(v), nil
 		case []int16:
-			return upgradeToFloat64Slice(v), nil
+			return asFloat64Slice(v), nil
 		case []int32:
-			return upgradeToFloat64Slice(v), nil
+			return asFloat64Slice(v), nil
 		case []int64:
-			return upgradeToFloat64Slice(v), nil
+			return asFloat64Slice(v), nil
 		case []float32:
-			return upgradeToFloat64Slice(v), nil
+			return asFloat64Slice(v), nil
 		case []float64:
 			return v, nil
 		}
-		return nil, fmt.Errorf("%s: %w", key, ErrInvType)
+		return nil, fmt.Errorf("%s: %w", name, ErrInvType)
 	}
-	return nil, fmt.Errorf("%s: %w", key, ErrMissing)
+	return nil, fmt.Errorf("%s: %w", name, ErrMissing)
 }
 
 // MetaGetTime gets a metadata value by name as a [time.Time]. Returns the
@@ -238,24 +205,24 @@ func (set MetaSet) MetaGetFloat64Slice(key string) ([]float64, error) {
 // the value is of a different type.
 //
 // To support string zero time values, use the [WithZeroTime] option.
-func (set MetaSet) MetaGetTime(key string, opts ...Option) (time.Time, error) {
+func (set MetaSet) MetaGetTime(name string, opts ...Option) (time.Time, error) {
 	def := DefaultOptions()
 	def.timeFormat = "" // By default, tring type is not supported.
 	for _, opt := range opts {
 		opt(def)
 	}
-	if val, ok := set.m[key]; ok {
+	if val, ok := set.m[name]; ok {
 		switch v := val.(type) {
 		case time.Time:
 			return v, nil
 		case string:
 			if def.timeFormat != "" {
-				return parseTime(key, v, def)
+				return parseTime(name, v, def)
 			}
 		}
-		return time.Time{}, fmt.Errorf("%s: %w", key, ErrInvType)
+		return time.Time{}, fmt.Errorf("%s: %w", name, ErrInvType)
 	}
-	return time.Time{}, fmt.Errorf("%s: %w", key, ErrMissing)
+	return time.Time{}, fmt.Errorf("%s: %w", name, ErrMissing)
 }
 
 // MetaGetTimeSlice gets a metadata value by name as a slice of [time.Time]
@@ -267,13 +234,13 @@ func (set MetaSet) MetaGetTime(key string, opts ...Option) (time.Time, error) {
 // [ErrInvFormat] if the value is not a valid time string.
 //
 // To support string zero time values, use the [WithZeroTime] option.
-func (set MetaSet) MetaGetTimeSlice(key string, opts ...Option) ([]time.Time, error) {
+func (set MetaSet) MetaGetTimeSlice(name string, opts ...Option) ([]time.Time, error) {
 	def := DefaultOptions()
 	def.timeFormat = "" // By default, tring type is not supported.
 	for _, opt := range opts {
 		opt(def)
 	}
-	if val, ok := set.m[key]; ok {
+	if val, ok := set.m[name]; ok {
 		switch v := val.(type) {
 		case []time.Time:
 			return v, nil
@@ -281,25 +248,25 @@ func (set MetaSet) MetaGetTimeSlice(key string, opts ...Option) ([]time.Time, er
 			times := make([]time.Time, len(v))
 			for i, vv := range v {
 				var err error
-				times[i], err = parseTime(key, vv, def)
+				times[i], err = parseTime(name, vv, def)
 				if err != nil {
 					return nil, err
 				}
 			}
 			return times, nil
 		}
-		return nil, fmt.Errorf("%s: %w", key, ErrInvType)
+		return nil, fmt.Errorf("%s: %w", name, ErrInvType)
 	}
-	return nil, fmt.Errorf("%s: %w", key, ErrMissing)
+	return nil, fmt.Errorf("%s: %w", name, ErrMissing)
 }
 
 // MetaGetJOSN gets a metadata value by name as a [json.RawMessage]. Returns
 // the value and nil error if it exists and is one of [json.RawMessage], string,
 // []byte types. Returns nil and [ErrMissing] if the value is missing, or nil
 // and [ErrInvType] if the value is of a different type.
-func (set MetaSet) MetaGetJOSN(key string) (json.RawMessage, error) {
+func (set MetaSet) MetaGetJOSN(name string) (json.RawMessage, error) {
 	var have []byte
-	if val, ok := set.m[key]; ok {
+	if val, ok := set.m[name]; ok {
 		switch v := val.(type) {
 		case []byte:
 			have = v
@@ -308,68 +275,68 @@ func (set MetaSet) MetaGetJOSN(key string) (json.RawMessage, error) {
 		case string:
 			have = []byte(v)
 		default:
-			return have, fmt.Errorf("%s: %w", key, ErrInvType)
+			return have, fmt.Errorf("%s: %w", name, ErrInvType)
 		}
 		if !json.Valid(have) {
-			return nil, fmt.Errorf("%s: %w", key, ErrInvFormat)
+			return nil, fmt.Errorf("%s: %w", name, ErrInvFormat)
 		}
 		return have, nil
 	}
-	return nil, fmt.Errorf("%s: %w", key, ErrMissing)
+	return nil, fmt.Errorf("%s: %w", name, ErrMissing)
 }
 
 // MetaGetBool gets a metadata value by name as a bool. Returns the value and
 // nil error if it exists and is the bool type. Returns false and [ErrMissing]
 // if the value is missing, or empty string and [ErrInvType] if the value is of
 // a different type.
-func (set MetaSet) MetaGetBool(key string) (bool, error) {
-	if val, ok := set.m[key]; ok {
+func (set MetaSet) MetaGetBool(name string) (bool, error) {
+	if val, ok := set.m[name]; ok {
 		if v, ok := val.(bool); ok {
 			return v, nil
 		}
-		return false, fmt.Errorf("%s: %w", key, ErrInvType)
+		return false, fmt.Errorf("%s: %w", name, ErrInvType)
 	}
-	return false, fmt.Errorf("%s: %w", key, ErrMissing)
+	return false, fmt.Errorf("%s: %w", name, ErrMissing)
 }
 
 // MetaGetBoolSlice gets a metadata value by name as a []bool. Returns the
 // slice and nil error if it exists and is the []bool type. Returns nil and
 // [ErrMissing] if the value is missing, or nil and [ErrInvType] if the value
 // is of a different type.
-func (set MetaSet) MetaGetBoolSlice(key string) ([]bool, error) {
-	if valAny, ok := set.m[key]; ok {
+func (set MetaSet) MetaGetBoolSlice(name string) ([]bool, error) {
+	if valAny, ok := set.m[name]; ok {
 		if val, ok := valAny.([]bool); ok {
 			return val, nil
 		}
-		return nil, fmt.Errorf("%s: %w", key, ErrInvType)
+		return nil, fmt.Errorf("%s: %w", name, ErrInvType)
 	}
-	return nil, fmt.Errorf("%s: %w", key, ErrMissing)
+	return nil, fmt.Errorf("%s: %w", name, ErrMissing)
 }
 
 // MetaGetInt gets a metadata value by name as an int. Returns the value and
 // nil error if it exists and is the int type. Returns false and [ErrMissing] if
 // the value is missing, or empty string and [ErrInvType] if the value is of a
 // different type.
-func (set MetaSet) MetaGetInt(key string) (int, error) {
-	if val, ok := set.m[key]; ok {
+func (set MetaSet) MetaGetInt(name string) (int, error) {
+	if val, ok := set.m[name]; ok {
 		if v, ok := val.(int); ok {
 			return v, nil
 		}
-		return 0, fmt.Errorf("%s: %w", key, ErrInvType)
+		return 0, fmt.Errorf("%s: %w", name, ErrInvType)
 	}
-	return 0, fmt.Errorf("%s: %w", key, ErrMissing)
+	return 0, fmt.Errorf("%s: %w", name, ErrMissing)
 }
 
 // MetaGetIntSlice gets a metadata value by name as a []int. Returns the
 // slice and nil error if it exists and is the []int type. Returns nil and
 // [ErrMissing] if the value is missing, or nil and [ErrInvType] if the value
 // is of a different type.
-func (set MetaSet) MetaGetIntSlice(key string) ([]int, error) {
-	if valAny, ok := set.m[key]; ok {
+func (set MetaSet) MetaGetIntSlice(name string) ([]int, error) {
+	if valAny, ok := set.m[name]; ok {
 		if val, ok := valAny.([]int); ok {
 			return val, nil
 		}
-		return nil, fmt.Errorf("%s: %w", key, ErrInvType)
+		return nil, fmt.Errorf("%s: %w", name, ErrInvType)
 	}
-	return nil, fmt.Errorf("%s: %w", key, ErrMissing)
+	return nil, fmt.Errorf("%s: %w", name, ErrMissing)
 }
