@@ -29,9 +29,9 @@ func ParseTime(name, v string, opts ...Option) (*Time, error) {
 	for _, opt := range opts {
 		opt(def)
 	}
-	val, err := parseTime(name, v, def)
+	val, err := parseTime(v, def)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%s: %w", name, err)
 	}
 	return NewTime(name, val), nil
 }
@@ -41,9 +41,9 @@ func ParseTime(name, v string, opts ...Option) (*Time, error) {
 // time and [ErrInvFormat] if the value is not a valid time representation.
 //
 // To support string zero time values, use the [WithZeroTime] option.
-func parseTime(name, val string, opts *Options) (time.Time, error) {
+func parseTime(val string, opts *Options) (time.Time, error) {
 	if opts.timeFormat == "" {
-		return time.Time{}, fmt.Errorf("%s: %w", name, ErrInvType)
+		return time.Time{}, ErrInvType
 	}
 	if slices.Contains(opts.zeroTime, val) {
 		return time.Time{}, nil
@@ -56,7 +56,7 @@ func parseTime(name, val string, opts *Options) (time.Time, error) {
 		tim, err = time.Parse(opts.timeFormat, val)
 	}
 	if err != nil {
-		return time.Time{}, fmt.Errorf("%s: %w", name, ErrInvFormat)
+		return time.Time{}, ErrInvFormat
 	}
 	if tim.Location().String() == "" {
 		tim = tim.UTC()

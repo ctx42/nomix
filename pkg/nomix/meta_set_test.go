@@ -572,7 +572,7 @@ func Test_MetaSet_MetaGetTime(t *testing.T) {
 		assert.Exact(t, time.Date(2000, 1, 2, 3, 4, 5, 0, WAW), have)
 	})
 
-	t.Run("error parsing string time", func(t *testing.T) {
+	t.Run("error - parsing string time", func(t *testing.T) {
 		// --- Given ---
 		set := MetaSet{m: map[string]any{"A": "abc"}}
 		optTimFmt := WithTimeFormat(time.RFC3339)

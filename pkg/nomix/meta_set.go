@@ -68,12 +68,12 @@ func (set MetaSet) MetaDeleteAll() {
 // [ErrMissing] if the value is missing, or empty string and [ErrInvType] if
 // the value is of a different type.
 func (set MetaSet) MetaGetString(name string) (string, error) {
-	if val, ok := set.m[name]; ok {
-		v, err := asString(val)
+	if v, ok := set.m[name]; ok {
+		val, err := asString(v, nil)
 		if err != nil {
-			return "", fmt.Errorf("%s: %w", name, ErrInvType)
+			return "", fmt.Errorf("%s: %w", name, err)
 		}
-		return v, nil
+		return val, nil
 	}
 	return "", fmt.Errorf("%s: %w", name, ErrMissing)
 }
@@ -83,11 +83,12 @@ func (set MetaSet) MetaGetString(name string) (string, error) {
 // [ErrMissing] if the value is missing, or nil and [ErrInvType] if the value
 // is of a different type.
 func (set MetaSet) MetaGetStringSlice(name string) ([]string, error) {
-	if valAny, ok := set.m[name]; ok {
-		if val, ok := valAny.([]string); ok {
-			return val, nil
+	if v, ok := set.m[name]; ok {
+		val, err := asStringSlice(v, nil)
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", name, err)
 		}
-		return nil, fmt.Errorf("%s: %w", name, ErrInvType)
+		return val, nil
 	}
 	return nil, fmt.Errorf("%s: %w", name, ErrMissing)
 }
@@ -97,20 +98,12 @@ func (set MetaSet) MetaGetStringSlice(name string) ([]string, error) {
 // types. Returns 0 and [ErrMissing] if the value is missing, or 0 and
 // [ErrInvType] if the value is of a different type.
 func (set MetaSet) MetaGetInt64(name string) (int64, error) {
-	if val, ok := set.m[name]; ok {
-		switch v := val.(type) {
-		case int:
-			return int64(v), nil
-		case int8:
-			return int64(v), nil
-		case int16:
-			return int64(v), nil
-		case int32:
-			return int64(v), nil
-		case int64:
-			return v, nil
+	if v, ok := set.m[name]; ok {
+		val, err := asInt64(v, nil)
+		if err != nil {
+			return 0, fmt.Errorf("%s: %w", name, err)
 		}
-		return 0, fmt.Errorf("%s: %w", name, ErrInvType)
+		return val, nil
 	}
 	return 0, fmt.Errorf("%s: %w", name, ErrMissing)
 }
@@ -120,20 +113,12 @@ func (set MetaSet) MetaGetInt64(name string) (int64, error) {
 // []int32 or []int64 types. Returns nil and [ErrMissing] if the value is
 // missing, or nil and [ErrInvType] if the value is of a different type.
 func (set MetaSet) MetaGetInt64Slice(name string) ([]int64, error) {
-	if val, ok := set.m[name]; ok {
-		switch v := val.(type) {
-		case []int:
-			return asInt64Slice(v), nil
-		case []int8:
-			return asInt64Slice(v), nil
-		case []int16:
-			return asInt64Slice(v), nil
-		case []int32:
-			return asInt64Slice(v), nil
-		case []int64:
-			return v, nil
+	if v, ok := set.m[name]; ok {
+		val, err := asInt64Slice(v, nil)
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", name, err)
 		}
-		return nil, fmt.Errorf("%s: %w", name, ErrInvType)
+		return val, nil
 	}
 	return nil, fmt.Errorf("%s: %w", name, ErrMissing)
 }
@@ -145,24 +130,12 @@ func (set MetaSet) MetaGetInt64Slice(name string) ([]int64, error) {
 //
 // NOTE: For int64 values outside ±2^53 range, the result is undefined.
 func (set MetaSet) MetaGetFloat64(name string) (float64, error) {
-	if val, ok := set.m[name]; ok {
-		switch v := val.(type) {
-		case int:
-			return float64(v), nil
-		case int8:
-			return float64(v), nil
-		case int16:
-			return float64(v), nil
-		case int32:
-			return float64(v), nil
-		case int64:
-			return float64(v), nil
-		case float32:
-			return float64(v), nil
-		case float64:
-			return v, nil
+	if v, ok := set.m[name]; ok {
+		val, err := asFloat64(v, nil)
+		if err != nil {
+			return 0, fmt.Errorf("%s: %w", name, err)
 		}
-		return 0, fmt.Errorf("%s: %w", name, ErrInvType)
+		return val, nil
 	}
 	return 0, fmt.Errorf("%s: %w", name, ErrMissing)
 }
@@ -175,24 +148,12 @@ func (set MetaSet) MetaGetFloat64(name string) (float64, error) {
 //
 // NOTE: For int64 values outside ±2^53 range, the result is undefined.
 func (set MetaSet) MetaGetFloat64Slice(name string) ([]float64, error) {
-	if val, ok := set.m[name]; ok {
-		switch v := val.(type) {
-		case []int:
-			return asFloat64Slice(v), nil
-		case []int8:
-			return asFloat64Slice(v), nil
-		case []int16:
-			return asFloat64Slice(v), nil
-		case []int32:
-			return asFloat64Slice(v), nil
-		case []int64:
-			return asFloat64Slice(v), nil
-		case []float32:
-			return asFloat64Slice(v), nil
-		case []float64:
-			return v, nil
+	if v, ok := set.m[name]; ok {
+		val, err := asFloat64Slice(v, nil)
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", name, err)
 		}
-		return nil, fmt.Errorf("%s: %w", name, ErrInvType)
+		return val, nil
 	}
 	return nil, fmt.Errorf("%s: %w", name, ErrMissing)
 }
@@ -207,20 +168,16 @@ func (set MetaSet) MetaGetFloat64Slice(name string) ([]float64, error) {
 // To support string zero time values, use the [WithZeroTime] option.
 func (set MetaSet) MetaGetTime(name string, opts ...Option) (time.Time, error) {
 	def := DefaultOptions()
-	def.timeFormat = "" // By default, tring type is not supported.
+	def.timeFormat = "" // By default, the string type is not supported.
 	for _, opt := range opts {
 		opt(def)
 	}
-	if val, ok := set.m[name]; ok {
-		switch v := val.(type) {
-		case time.Time:
-			return v, nil
-		case string:
-			if def.timeFormat != "" {
-				return parseTime(name, v, def)
-			}
+	if v, ok := set.m[name]; ok {
+		val, err := asTime(v, def)
+		if err != nil {
+			return time.Time{}, fmt.Errorf("%s: %w", name, err)
 		}
-		return time.Time{}, fmt.Errorf("%s: %w", name, ErrInvType)
+		return val, nil
 	}
 	return time.Time{}, fmt.Errorf("%s: %w", name, ErrMissing)
 }
@@ -240,22 +197,12 @@ func (set MetaSet) MetaGetTimeSlice(name string, opts ...Option) ([]time.Time, e
 	for _, opt := range opts {
 		opt(def)
 	}
-	if val, ok := set.m[name]; ok {
-		switch v := val.(type) {
-		case []time.Time:
-			return v, nil
-		case []string:
-			times := make([]time.Time, len(v))
-			for i, vv := range v {
-				var err error
-				times[i], err = parseTime(name, vv, def)
-				if err != nil {
-					return nil, err
-				}
-			}
-			return times, nil
+	if v, ok := set.m[name]; ok {
+		val, err := asTimeSlice(v, def)
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", name, err)
 		}
-		return nil, fmt.Errorf("%s: %w", name, ErrInvType)
+		return val, nil
 	}
 	return nil, fmt.Errorf("%s: %w", name, ErrMissing)
 }
