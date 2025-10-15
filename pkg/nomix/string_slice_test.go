@@ -40,4 +40,13 @@ func Test_asStringSlice(t *testing.T) {
 		assert.ErrorIs(t, err, ErrInvType)
 		assert.Empty(t, have)
 	})
+
+	t.Run("nil value", func(t *testing.T) {
+		// --- When ---
+		have, err := asStringSlice(nil, Options{})
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrInvType, err)
+		assert.Nil(t, have)
+	})
 }

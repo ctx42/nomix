@@ -56,6 +56,14 @@ func Test_asTimeSlice(t *testing.T) {
 		assert.ErrorIs(t, ErrInvFormat, err)
 		assert.Nil(t, have)
 	})
+	t.Run("nil value", func(t *testing.T) {
+		// --- When ---
+		have, err := asTimeSlice(nil, Options{})
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrInvType, err)
+		assert.Nil(t, have)
+	})
 }
 
 func Test_asTimeSlice_success_tabular(t *testing.T) {

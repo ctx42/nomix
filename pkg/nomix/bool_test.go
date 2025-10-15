@@ -68,6 +68,24 @@ func Test_ParseBool(t *testing.T) {
 }
 
 func Test_asBool(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		// --- When ---
+		have, err := asBool(true, Options{})
+
+		// --- Then ---
+		assert.NoError(t, err)
+		assert.True(t, have)
+	})
+
+	t.Run("nil value", func(t *testing.T) {
+		// --- When ---
+		have, err := asBool(nil, Options{})
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrInvType, err)
+		assert.False(t, have)
+	})
+
 	t.Run("error - invalid type", func(t *testing.T) {
 		// --- When ---
 		have, err := asBool(42, Options{})
@@ -76,49 +94,4 @@ func Test_asBool(t *testing.T) {
 		assert.ErrorIs(t, err, ErrInvType)
 		assert.Empty(t, have)
 	})
-
-	t.Run("error - invalid format", func(t *testing.T) {
-		// --- When ---
-		have, err := asBool("abc", Options{})
-
-		// --- Then ---
-		assert.ErrorIs(t, err, ErrInvFormat)
-		assert.Empty(t, have)
-	})
-}
-
-func Test_asBool_success_tabular(t *testing.T) {
-	tt := []struct {
-		testN string
-
-		have any
-		want bool
-	}{
-		{"1", "1", true},
-		{"t", "t", true},
-		{"T", "T", true},
-		{"true", "true", true},
-		{"TRUE", "TRUE", true},
-		{"True", "True", true},
-		{"bool true", true, true},
-		{"bool false", false, false},
-
-		{"0", "0", false},
-		{"f", "f", false},
-		{"F", "F", false},
-		{"false", "false", false},
-		{"FALSE", "FALSE", false},
-		{"False", "False", false},
-	}
-
-	for _, tc := range tt {
-		t.Run(tc.testN, func(t *testing.T) {
-			// --- When ---
-			have, err := asBool(tc.have, Options{})
-
-			// --- Then ---
-			assert.NoError(t, err)
-			assert.Equal(t, tc.want, have)
-		})
-	}
 }

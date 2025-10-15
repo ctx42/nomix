@@ -23,6 +23,15 @@ func Test_NewFloat64Slice(t *testing.T) {
 }
 
 func Test_asFloat64Slice(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		// --- When ---
+		have, err := asFloat64Slice([]float64{42, 44}, Options{})
+
+		// --- Then ---
+		assert.NoError(t, err)
+		assert.Equal(t, []float64{42, 44}, have)
+	})
+
 	t.Run("error - invalid type", func(t *testing.T) {
 		// --- When ---
 		have, err := asFloat64Slice("abc", Options{})
@@ -30,6 +39,15 @@ func Test_asFloat64Slice(t *testing.T) {
 		// --- Then ---
 		assert.ErrorIs(t, err, ErrInvType)
 		assert.Empty(t, have)
+	})
+
+	t.Run("nil value", func(t *testing.T) {
+		// --- When ---
+		have, err := asFloat64Slice(nil, Options{})
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrInvType, err)
+		assert.Nil(t, have)
 	})
 }
 

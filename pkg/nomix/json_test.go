@@ -75,3 +75,50 @@ func Test_ParseJSON(t *testing.T) {
 		assert.Nil(t, tag)
 	})
 }
+
+func Test_asJSON(t *testing.T) {
+	t.Run("valid json.RawMessage", func(t *testing.T) {
+		// --- When ---
+		have, err := asJSON(json.RawMessage(`{"A": 1}`), Options{})
+
+		// --- Then ---
+		assert.NoError(t, err)
+		assert.Equal(t, json.RawMessage(`{"A": 1}`), have)
+	})
+
+	t.Run("valid []byte", func(t *testing.T) {
+		// --- When ---
+		have, err := asJSON([]byte(`{"A": 1}`), Options{})
+
+		// --- Then ---
+		assert.NoError(t, err)
+		assert.Equal(t, json.RawMessage(`{"A": 1}`), have)
+	})
+
+	t.Run("error - invalid type", func(t *testing.T) {
+		// --- When ---
+		have, err := asJSON("abc", Options{})
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrInvType, err)
+		assert.Nil(t, have)
+	})
+
+	t.Run("error - invalid format", func(t *testing.T) {
+		// --- When ---
+		have, err := asJSON([]byte(`{!!!}`), Options{})
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrInvFormat, err)
+		assert.Nil(t, have)
+	})
+
+	t.Run("nil value", func(t *testing.T) {
+		// --- When ---
+		have, err := asJSON(nil, Options{})
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrInvType, err)
+		assert.Nil(t, have)
+	})
+}

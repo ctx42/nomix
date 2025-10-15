@@ -74,6 +74,15 @@ func Test_ParseInt64_error(t *testing.T) {
 }
 
 func Test_asInt64(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		// --- When ---
+		have, err := asInt64(42, Options{})
+
+		// --- Then ---
+		assert.NoError(t, err)
+		assert.Equal(t, int64(42), have)
+	})
+
 	t.Run("error - invalid type", func(t *testing.T) {
 		// --- When ---
 		have, err := asInt64("abc", Options{})
@@ -81,6 +90,15 @@ func Test_asInt64(t *testing.T) {
 		// --- Then ---
 		assert.ErrorIs(t, err, ErrInvType)
 		assert.Empty(t, have)
+	})
+
+	t.Run("nil value", func(t *testing.T) {
+		// --- When ---
+		have, err := asInt64(nil, Options{})
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrInvType, err)
+		assert.Equal(t, int64(0), have)
 	})
 }
 

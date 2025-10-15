@@ -195,6 +195,15 @@ func Test_asTime(t *testing.T) {
 		assert.ErrorIs(t, err, ErrInvType)
 		assert.Empty(t, have)
 	})
+
+	t.Run("nil value", func(t *testing.T) {
+		// --- When ---
+		have, err := asTime(nil, Options{})
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrInvType, err)
+		assert.Zero(t, have)
+	})
 }
 
 func Test_asTime_success_tabular(t *testing.T) {

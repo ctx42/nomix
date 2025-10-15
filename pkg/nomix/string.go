@@ -28,10 +28,8 @@ func stringToString(v string) string { return v }
 // the value is a string. Returns "" and [ErrInvType] if the value is not a
 // string.
 func asString(val any, _ Options) (string, error) {
-	switch v := val.(type) {
-	case string:
+	if v, ok := val.(string); ok {
 		return v, nil
-	default:
-		return "", ErrInvType
 	}
+	return "", ErrInvType
 }

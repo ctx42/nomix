@@ -21,3 +21,32 @@ func Test_NewBoolSlice(t *testing.T) {
 	assert.NotNil(t, tag.stringer)
 	assert.Equal(t, "[true, false]", tag.stringer([]bool{true, false}))
 }
+
+func Test_asBoolSlice(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		// --- When ---
+		have, err := asBoolSlice([]bool{true, false}, Options{})
+
+		// --- Then ---
+		assert.NoError(t, err)
+		assert.Equal(t, []bool{true, false}, have)
+	})
+
+	t.Run("nil value", func(t *testing.T) {
+		// --- When ---
+		have, err := asBoolSlice(nil, Options{})
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrInvType, err)
+		assert.Nil(t, have)
+	})
+
+	t.Run("error - invalid type", func(t *testing.T) {
+		// --- When ---
+		have, err := asBoolSlice(42, Options{})
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrInvType, err)
+		assert.Nil(t, have)
+	})
+}

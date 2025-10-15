@@ -31,3 +31,12 @@ func boolSliceToString(v []bool) string {
 	}
 	return ret + "]"
 }
+
+// asBoolSlice casts the value to []bool. Returns the slice and nil error on
+// success. Returns nil and [ErrInvType] if the value is not a supported type.
+func asBoolSlice(val any, _ Options) ([]bool, error) {
+	if v, ok := val.([]bool); ok {
+		return v, nil
+	}
+	return nil, ErrInvType
+}

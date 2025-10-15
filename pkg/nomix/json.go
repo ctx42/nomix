@@ -33,3 +33,22 @@ func ParseJSON(name, v string, _ ...Option) (*JSON, error) {
 	}
 	return NewJSON(name, json.RawMessage(v)), nil
 }
+
+// asJSON casts the value to [json.RawMessage] and verifies it is valid JSON.
+// Returns the value and nil error if successful. Returns nil and [ErrInvType]
+// if the value is not a valid JSON type.
+func asJSON(val any, _ Options) (json.RawMessage, error) {
+	var vv json.RawMessage
+	switch v := val.(type) {
+	case json.RawMessage:
+		vv = v
+	case []byte:
+		vv = v
+	default:
+		return nil, ErrInvType
+	}
+	if !json.Valid(vv) {
+		return nil, ErrInvFormat
+	}
+	return vv, nil
+}

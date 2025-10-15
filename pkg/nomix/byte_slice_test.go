@@ -21,3 +21,32 @@ func Test_NewByteSlice(t *testing.T) {
 	assert.NotNil(t, tag.stringer)
 	assert.Equal(t, "[42, 44]", tag.stringer([]byte{42, 44}))
 }
+
+func Test_asByteSlice(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		// --- When ---
+		have, err := asByteSlice([]byte{0, 1, 2}, Options{})
+
+		// --- Then ---
+		assert.NoError(t, err)
+		assert.Equal(t, []byte{0, 1, 2}, have)
+	})
+
+	t.Run("nil value", func(t *testing.T) {
+		// --- When ---
+		have, err := asByteSlice(nil, Options{})
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrInvType, err)
+		assert.Nil(t, have)
+	})
+
+	t.Run("error - invalid type", func(t *testing.T) {
+		// --- When ---
+		have, err := asByteSlice(42, Options{})
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrInvType, err)
+		assert.Nil(t, have)
+	})
+}

@@ -61,6 +61,15 @@ func Test_ParseFloat64(t *testing.T) {
 }
 
 func Test_asFloat64(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		// --- When ---
+		have, err := asFloat64(42, Options{})
+
+		// --- Then ---
+		assert.NoError(t, err)
+		assert.Equal(t, 42.0, have)
+	})
+
 	t.Run("error - invalid type", func(t *testing.T) {
 		// --- When ---
 		have, err := asFloat64("abc", Options{})
@@ -68,6 +77,15 @@ func Test_asFloat64(t *testing.T) {
 		// --- Then ---
 		assert.ErrorIs(t, err, ErrInvType)
 		assert.Empty(t, have)
+	})
+
+	t.Run("nil value", func(t *testing.T) {
+		// --- When ---
+		have, err := asFloat64(nil, Options{})
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrInvType, err)
+		assert.Equal(t, 0.0, have)
 	})
 }
 

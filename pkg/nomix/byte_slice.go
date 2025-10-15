@@ -31,3 +31,12 @@ func byteSliceToString(v []byte) string {
 	}
 	return ret + "]"
 }
+
+// asByteSlice casts the value to []byte. Returns the slice and nil error on
+// success. Returns nil and [ErrInvType] if the value is not a supported type.
+func asByteSlice(val any, _ Options) ([]byte, error) {
+	if v, ok := val.([]byte); ok {
+		return v, nil
+	}
+	return nil, ErrInvType
+}

@@ -70,3 +70,32 @@ func Test_ParseInt(t *testing.T) {
 		assert.Nil(t, tag)
 	})
 }
+
+func Test_asInt(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		// --- When ---
+		have, err := asInt(42, Options{})
+
+		// --- Then ---
+		assert.NoError(t, err)
+		assert.Equal(t, 42, have)
+	})
+
+	t.Run("error - invalid type", func(t *testing.T) {
+		// --- When ---
+		have, err := asInt("abc", Options{})
+
+		// --- Then ---
+		assert.ErrorIs(t, err, ErrInvType)
+		assert.Empty(t, have)
+	})
+
+	t.Run("nil value", func(t *testing.T) {
+		// --- When ---
+		have, err := asInt(nil, Options{})
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrInvType, err)
+		assert.Equal(t, 0, have)
+	})
+}

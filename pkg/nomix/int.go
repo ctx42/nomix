@@ -36,3 +36,12 @@ func ParseInt(name, v string, opts ...Option) (*Int64, error) {
 
 // intToString converts int to its string representation.
 func intToString(v int) string { return strconv.Itoa(v) }
+
+// asInt casts the value to int. Returns the int and nil error on success.
+// Returns false and [ErrInvType] if the value is not a supported type.
+func asInt(val any, _ Options) (int, error) {
+	if v, ok := val.(int); ok {
+		return v, nil
+	}
+	return 0, ErrInvType
+}

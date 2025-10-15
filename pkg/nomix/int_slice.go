@@ -31,3 +31,12 @@ func intSliceToString(v []int) string {
 	}
 	return ret + "]"
 }
+
+// asIntSlice casts the value to []int. Returns the slice and nil error if the
+// value is a []int. Returns nil and [ErrInvType] if the value is not []int.
+func asIntSlice(val any, _ Options) ([]int, error) {
+	if v, ok := val.([]int); ok {
+		return v, nil
+	}
+	return nil, ErrInvType
+}
