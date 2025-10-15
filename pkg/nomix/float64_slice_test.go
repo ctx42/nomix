@@ -22,10 +22,36 @@ func Test_NewFloat64Slice(t *testing.T) {
 	assert.Equal(t, "[42.1, 44.2]", tag.stringer([]float64{42.1, 44.2}))
 }
 
-func Test_asFloat64Slice(t *testing.T) {
+func Test_CreateFloat64Slice(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		// --- When ---
-		have, err := asFloat64Slice([]float64{42, 44}, Options{})
+		tag, err := CreateFloat64Slice("name", []float64{42.1, 44.2})
+
+		// --- Then ---
+		assert.NoError(t, err)
+		assert.SameType(t, &Float64Slice{}, tag)
+		assert.Equal(t, "name", tag.name)
+		assert.Equal(t, []float64{42.1, 44.2}, tag.value)
+		assert.Equal(t, KindFloat64Slice, tag.kind)
+		assert.NotNil(t, tag.stringer)
+		assert.Equal(t, "[42.1, 44.2]", tag.stringer([]float64{42.1, 44.2}))
+	})
+
+	t.Run("error - invalid type", func(t *testing.T) {
+		// --- When ---
+		tag, err := CreateFloat64Slice("name", "abc")
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrInvType, err)
+		assert.ErrorContain(t, "name: ", err)
+		assert.Nil(t, tag)
+	})
+}
+
+func Test_createFloat64Slice(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		// --- When ---
+		have, err := createFloat64Slice([]float64{42, 44}, Options{})
 
 		// --- Then ---
 		assert.NoError(t, err)
@@ -34,16 +60,16 @@ func Test_asFloat64Slice(t *testing.T) {
 
 	t.Run("error - invalid type", func(t *testing.T) {
 		// --- When ---
-		have, err := asFloat64Slice("abc", Options{})
+		have, err := createFloat64Slice("abc", Options{})
 
 		// --- Then ---
 		assert.ErrorIs(t, err, ErrInvType)
 		assert.Empty(t, have)
 	})
 
-	t.Run("nil value", func(t *testing.T) {
+	t.Run("error - nil value", func(t *testing.T) {
 		// --- When ---
-		have, err := asFloat64Slice(nil, Options{})
+		have, err := createFloat64Slice(nil, Options{})
 
 		// --- Then ---
 		assert.ErrorIs(t, ErrInvType, err)
@@ -70,7 +96,7 @@ func Test_asFloat64Slice_success_tabular(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.testN, func(t *testing.T) {
 			// --- When ---
-			have, err := asFloat64Slice(tc.have, Options{})
+			have, err := createFloat64Slice(tc.have, Options{})
 
 			// --- Then ---
 			assert.NoError(t, err)

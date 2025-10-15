@@ -22,10 +22,36 @@ func Test_NewStringSlice(t *testing.T) {
 	assert.Equal(t, `["abc", "xyz"]`, tag.stringer([]string{"abc", "xyz"}))
 }
 
-func Test_asStringSlice(t *testing.T) {
+func Test_CreateStringSlice(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		// --- When ---
-		have, err := asStringSlice([]string{"abc", "xyz"}, Options{})
+		tag, err := CreateStringSlice("name", []string{"abc", "xyz"})
+
+		// --- Then ---
+		assert.NoError(t, err)
+		assert.SameType(t, &StringSlice{}, tag)
+		assert.Equal(t, "name", tag.name)
+		assert.Equal(t, []string{"abc", "xyz"}, tag.value)
+		assert.Equal(t, KindStringSlice, tag.kind)
+		assert.NotNil(t, tag.stringer)
+		assert.Equal(t, `["abc", "xyz"]`, tag.stringer([]string{"abc", "xyz"}))
+	})
+
+	t.Run("error - invalid type", func(t *testing.T) {
+		// --- When ---
+		tag, err := CreateTime("name", 42)
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrInvType, err)
+		assert.ErrorContain(t, "name: ", err)
+		assert.Nil(t, tag)
+	})
+}
+
+func Test_createStringSlice(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		// --- When ---
+		have, err := createStringSlice([]string{"abc", "xyz"}, Options{})
 
 		// --- Then ---
 		assert.NoError(t, err)
@@ -34,16 +60,16 @@ func Test_asStringSlice(t *testing.T) {
 
 	t.Run("error - invalid type", func(t *testing.T) {
 		// --- When ---
-		have, err := asStringSlice(42, Options{})
+		have, err := createStringSlice(42, Options{})
 
 		// --- Then ---
 		assert.ErrorIs(t, err, ErrInvType)
 		assert.Empty(t, have)
 	})
 
-	t.Run("nil value", func(t *testing.T) {
+	t.Run("error - nil value", func(t *testing.T) {
 		// --- When ---
-		have, err := asStringSlice(nil, Options{})
+		have, err := createStringSlice(nil, Options{})
 
 		// --- Then ---
 		assert.ErrorIs(t, ErrInvType, err)

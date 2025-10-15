@@ -21,6 +21,31 @@ func Test_NewFloat64(t *testing.T) {
 	assert.Equal(t, "4.4", tag.stringer(4.4))
 }
 
+func Test_CreateFloat64(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		// --- When ---
+		tag, err := CreateFloat64("name", 4.2)
+
+		// --- Then ---
+		assert.NoError(t, err)
+		assert.Equal(t, "name", tag.name)
+		assert.Equal(t, 4.2, tag.value)
+		assert.Equal(t, KindFloat64, tag.kind)
+		assert.NotNil(t, tag.stringer)
+		assert.Equal(t, "4.4", tag.stringer(4.4))
+	})
+
+	t.Run("error - invalid type", func(t *testing.T) {
+		// --- When ---
+		tag, err := CreateFloat64("name", "abc")
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrInvType, err)
+		assert.ErrorContain(t, "name: ", err)
+		assert.Nil(t, tag)
+	})
+}
+
 func Test_ParseFloat64_success_tabular(t *testing.T) {
 	tt := []struct {
 		testN string
@@ -60,10 +85,10 @@ func Test_ParseFloat64(t *testing.T) {
 	})
 }
 
-func Test_asFloat64(t *testing.T) {
+func Test_createFloat64(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		// --- When ---
-		have, err := asFloat64(42, Options{})
+		have, err := createFloat64(42, Options{})
 
 		// --- Then ---
 		assert.NoError(t, err)
@@ -72,16 +97,16 @@ func Test_asFloat64(t *testing.T) {
 
 	t.Run("error - invalid type", func(t *testing.T) {
 		// --- When ---
-		have, err := asFloat64("abc", Options{})
+		have, err := createFloat64("abc", Options{})
 
 		// --- Then ---
 		assert.ErrorIs(t, err, ErrInvType)
 		assert.Empty(t, have)
 	})
 
-	t.Run("nil value", func(t *testing.T) {
+	t.Run("error - nil value", func(t *testing.T) {
 		// --- When ---
-		have, err := asFloat64(nil, Options{})
+		have, err := createFloat64(nil, Options{})
 
 		// --- Then ---
 		assert.ErrorIs(t, ErrInvType, err)
@@ -89,7 +114,7 @@ func Test_asFloat64(t *testing.T) {
 	})
 }
 
-func Test_asFloat64_success_tabular(t *testing.T) {
+func Test_createFloat64_success_tabular(t *testing.T) {
 	tt := []struct {
 		testN string
 
@@ -109,7 +134,7 @@ func Test_asFloat64_success_tabular(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.testN, func(t *testing.T) {
 			// --- When ---
-			have, err := asFloat64(tc.have, Options{})
+			have, err := createFloat64(tc.have, Options{})
 
 			// --- Then ---
 			assert.NoError(t, err)

@@ -22,6 +22,32 @@ func Test_NewInt64(t *testing.T) {
 	assert.Equal(t, "44", tag.stringer(44))
 }
 
+func Test_CreateInt64(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		// --- When ---
+		tag, err := CreateInt64("name", 42)
+
+		// --- Then ---
+		assert.NoError(t, err)
+		assert.SameType(t, &Int64{}, tag)
+		assert.Equal(t, "name", tag.name)
+		assert.Equal(t, int64(42), tag.value)
+		assert.Equal(t, KindInt64, tag.kind)
+		assert.NotNil(t, tag.stringer)
+		assert.Equal(t, "44", tag.stringer(44))
+	})
+
+	t.Run("error - invalid type", func(t *testing.T) {
+		// --- When ---
+		tag, err := CreateInt64("name", "abc")
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrInvType, err)
+		assert.ErrorContain(t, "name: ", err)
+		assert.Nil(t, tag)
+	})
+}
+
 func Test_ParseInt64_success_tabular(t *testing.T) {
 	tt := []struct {
 		testN string
@@ -73,10 +99,10 @@ func Test_ParseInt64_error(t *testing.T) {
 	})
 }
 
-func Test_asInt64(t *testing.T) {
+func Test_createInt64(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		// --- When ---
-		have, err := asInt64(42, Options{})
+		have, err := createInt64(42, Options{})
 
 		// --- Then ---
 		assert.NoError(t, err)
@@ -85,16 +111,16 @@ func Test_asInt64(t *testing.T) {
 
 	t.Run("error - invalid type", func(t *testing.T) {
 		// --- When ---
-		have, err := asInt64("abc", Options{})
+		have, err := createInt64("abc", Options{})
 
 		// --- Then ---
 		assert.ErrorIs(t, err, ErrInvType)
 		assert.Empty(t, have)
 	})
 
-	t.Run("nil value", func(t *testing.T) {
+	t.Run("error - nil value", func(t *testing.T) {
 		// --- When ---
-		have, err := asInt64(nil, Options{})
+		have, err := createInt64(nil, Options{})
 
 		// --- Then ---
 		assert.ErrorIs(t, ErrInvType, err)
@@ -120,7 +146,7 @@ func Test_asInt64_success_tabular(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.testN, func(t *testing.T) {
 			// --- When ---
-			have, err := asInt64(tc.have, Options{})
+			have, err := createInt64(tc.have, Options{})
 
 			// --- Then ---
 			assert.NoError(t, err)

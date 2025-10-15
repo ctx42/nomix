@@ -4,6 +4,7 @@
 package nomix
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -20,6 +21,19 @@ func NewTimeSlice(name string, v []time.Time) *TimeSlice {
 	}
 }
 
+// CreateTimeSlice casts the value to []time.Time, or when the value is a
+// []string, it parses its elements as [time.RFC3339Nano] time. Returns the
+// [TImeSlice] instance with the given name and nil error on success. Returns
+// nil and error if the value's type is not a supported type or the value is
+// not a valid time representation.
+func CreateTimeSlice(name string, val any, _ ...Option) (*TimeSlice, error) {
+	v, err := createTimeSlice(val, defaultOptions)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", name, err)
+	}
+	return NewTimeSlice(name, v), nil
+}
+
 // timeSliceToString converts a [time.Time] slice to its string representation.
 func timeSliceToString(v []time.Time) string {
 	ret := "["
@@ -32,11 +46,12 @@ func timeSliceToString(v []time.Time) string {
 	return ret + "]"
 }
 
-// asTimeSlice casts the value to []time.Time or when the value is a []string
-// parses its values as time but only when [Options.timeFormat] is set. Returns
-// the slice and nil error on success. Returns nil and [ErrInvType] if the
-// value is not a supported type.
-func asTimeSlice(val any, opts Options) ([]time.Time, error) {
+// createTimeSlice casts the value to []time.Time, or when the value is a
+// []string, it parses its elements as time but only when [Options.timeFormat]
+// is set. Returns the []time.Time and nil error on success. Returns nil and
+// error if the value's type is not a supported type or the value is not a
+// valid time representation.
+func createTimeSlice(val any, opts Options) ([]time.Time, error) {
 	switch v := val.(type) {
 	case []time.Time:
 		return v, nil

@@ -4,6 +4,7 @@
 package nomix
 
 import (
+	"fmt"
 	"strconv"
 )
 
@@ -20,6 +21,17 @@ func NewIntSlice(name string, v ...int) *IntSlice {
 	}
 }
 
+// CreateIntSlice casts the value to []int. Returns the [IntSlice] instance
+// with the given name and nil error on success. Returns nil and [ErrInvType]
+// if the value is not []int type.
+func CreateIntSlice(name string, val any, _ ...Option) (*IntSlice, error) {
+	v, err := createIntSlice(val, defaultOptions)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", name, err)
+	}
+	return NewIntSlice(name, v...), nil
+}
+
 // intSliceToString converts an int slice to its string representation.
 func intSliceToString(v []int) string {
 	ret := "["
@@ -32,9 +44,9 @@ func intSliceToString(v []int) string {
 	return ret + "]"
 }
 
-// asIntSlice casts the value to []int. Returns the slice and nil error if the
-// value is a []int. Returns nil and [ErrInvType] if the value is not []int.
-func asIntSlice(val any, _ Options) ([]int, error) {
+// createIntSlice casts the value to []int. Returns the []int and nil error on
+// success. Returns nil and [ErrInvType] if the value is not the []int.
+func createIntSlice(val any, _ Options) ([]int, error) {
 	if v, ok := val.([]int); ok {
 		return v, nil
 	}

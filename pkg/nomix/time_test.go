@@ -27,6 +27,34 @@ func Test_NewTime(t *testing.T) {
 	assert.Equal(t, "2000-01-01T00:00:00Z", tag.stringer(tim))
 }
 
+func Test_CreateTime(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		// --- When ---
+		tag, err := CreateTime("name", time.Date(2000, 1, 2, 3, 4, 5, 0, time.UTC))
+
+		// --- Then ---
+		assert.NoError(t, err)
+		assert.SameType(t, &Time{}, tag)
+		assert.Equal(t, "name", tag.name)
+		assert.Exact(t, time.Date(2000, 1, 2, 3, 4, 5, 0, time.UTC), tag.value)
+		assert.Equal(t, KindTime, tag.kind)
+		assert.NotNil(t, tag.stringer)
+
+		tim := time.Date(2000, 1, 1, 0, 0, 0, 0, time.UTC)
+		assert.Equal(t, "2000-01-01T00:00:00Z", tag.stringer(tim))
+	})
+
+	t.Run("error - invalid type", func(t *testing.T) {
+		// --- When ---
+		tag, err := CreateTime("name", 42)
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrInvType, err)
+		assert.ErrorContain(t, "name: ", err)
+		assert.Nil(t, tag)
+	})
+}
+
 func Test_ParseTime_success_tabular(t *testing.T) {
 	tt := []struct {
 		testN string
@@ -177,10 +205,10 @@ func Test_parseTime(t *testing.T) {
 	})
 }
 
-func Test_asTime(t *testing.T) {
+func Test_createTime(t *testing.T) {
 	t.Run("error - invalid type", func(t *testing.T) {
 		// --- When ---
-		have, err := asTime(42, Options{})
+		have, err := createTime(42, Options{})
 
 		// --- Then ---
 		assert.ErrorIs(t, err, ErrInvType)
@@ -189,16 +217,16 @@ func Test_asTime(t *testing.T) {
 
 	t.Run("error - by default sting is not supported", func(t *testing.T) {
 		// --- When ---
-		have, err := asTime("2000-01-02T03:04:05Z", Options{})
+		have, err := createTime("2000-01-02T03:04:05Z", Options{})
 
 		// --- Then ---
 		assert.ErrorIs(t, err, ErrInvType)
 		assert.Empty(t, have)
 	})
 
-	t.Run("nil value", func(t *testing.T) {
+	t.Run("error - nil value", func(t *testing.T) {
 		// --- When ---
-		have, err := asTime(nil, Options{})
+		have, err := createTime(nil, Options{})
 
 		// --- Then ---
 		assert.ErrorIs(t, ErrInvType, err)
@@ -231,7 +259,7 @@ func Test_asTime_success_tabular(t *testing.T) {
 			opts := Options{timeFormat: time.RFC3339}
 
 			// --- When ---
-			have, err := asTime(tc.have, opts)
+			have, err := createTime(tc.have, opts)
 
 			// --- Then ---
 			assert.NoError(t, err)

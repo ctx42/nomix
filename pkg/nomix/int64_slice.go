@@ -4,6 +4,7 @@
 package nomix
 
 import (
+	"fmt"
 	"strconv"
 )
 
@@ -18,6 +19,18 @@ func NewInt64Slice(name string, v ...int64) *Int64Slice {
 		kind:     KindInt64Slice,
 		stringer: int64SliceToString,
 	}
+}
+
+// CreateInt64Slice casts the value to []int64. Returns the [Int64Slice]
+// instance with the given name and nil error if the value is a []int, []int8,
+// []int16, []int32, or []int64. Returns nil and [ErrInvType] if the value's
+// type is not a supported numeric slice type.
+func CreateInt64Slice(name string, val any, _ ...Option) (*Int64Slice, error) {
+	v, err := createInt64Slice(val, defaultOptions)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", name, err)
+	}
+	return NewInt64Slice(name, v...), nil
 }
 
 // int64SliceToString converts an int64 slice to its string representation.
@@ -38,7 +51,7 @@ type convertableToInt64 interface {
 	int | int8 | int16 | int32 | int64
 }
 
-// asInt64Slice upgrades a slice of values that can be upgraded to []int64
+// createInt64Slice upgrades a slice of values that can be upgraded to []int64
 // without loss of precision.
 func toInt64Slice[T convertableToInt64](v []T, _ Options) []int64 {
 	upgraded := make([]int64, len(v))
@@ -48,10 +61,11 @@ func toInt64Slice[T convertableToInt64](v []T, _ Options) []int64 {
 	return upgraded
 }
 
-// asInt64Slice casts the value to []int64. Returns the slice and nil error if
-// the value is a []int, []int8, []int16, []int32, or []int64. Returns 0 and
-// [ErrInvType] if the value is not a supported integer type.
-func asInt64Slice(val any, opts Options) ([]int64, error) {
+// createInt64Slice casts the value to []int64. Returns the []int64 and nil
+// error if the value is a []int, []int8, []int16, []int32, or []int64. Returns
+// nil and [ErrInvType] if the value's type is not a supported numeric slice
+// type.
+func createInt64Slice(val any, opts Options) ([]int64, error) {
 	switch v := val.(type) {
 	case []int:
 		return toInt64Slice(v, opts), nil

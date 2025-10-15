@@ -214,7 +214,7 @@ func Test_array_TagSame(t *testing.T) {
 }
 
 func Test_array_String(t *testing.T) {
-	t.Run("nil value", func(t *testing.T) {
+	t.Run("error - nil value", func(t *testing.T) {
 		// --- Given ---
 		tag := &slice[int]{
 			value:    nil,

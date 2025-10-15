@@ -21,6 +21,17 @@ func NewInt(name string, v int) *Int {
 	}
 }
 
+// CreateInt casts the value to int. Returns the [Int] instance with the given
+// type and nil error on success. Returns nil and [ErrInvType] if the value is
+// not the int type.
+func CreateInt(name string, val any, _ ...Option) (*Int, error) {
+	v, err := createInt(val, defaultOptions)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", name, err)
+	}
+	return NewInt(name, v), nil
+}
+
 // ParseInt parses string representation of the integer tag.
 func ParseInt(name, v string, opts ...Option) (*Int64, error) {
 	def := defaultOptions
@@ -37,9 +48,9 @@ func ParseInt(name, v string, opts ...Option) (*Int64, error) {
 // intToString converts int to its string representation.
 func intToString(v int) string { return strconv.Itoa(v) }
 
-// asInt casts the value to int. Returns the int and nil error on success.
-// Returns false and [ErrInvType] if the value is not a supported type.
-func asInt(val any, _ Options) (int, error) {
+// createInt casts the value to int. Returns the int and nil error on success.
+// Returns 0 and [ErrInvType] if the value is not the int type.
+func createInt(val any, _ Options) (int, error) {
 	if v, ok := val.(int); ok {
 		return v, nil
 	}

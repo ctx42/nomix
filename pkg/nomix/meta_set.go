@@ -65,7 +65,7 @@ func (set MetaSet) MetaDeleteAll() {
 // the value is of a different type.
 func (set MetaSet) MetaGetString(name string) (string, error) {
 	if v, ok := set.m[name]; ok {
-		val, err := asString(v, Options{})
+		val, err := createString(v, Options{})
 		if err != nil {
 			return "", fmt.Errorf("%s: %w", name, err)
 		}
@@ -80,7 +80,7 @@ func (set MetaSet) MetaGetString(name string) (string, error) {
 // is of a different type.
 func (set MetaSet) MetaGetStringSlice(name string) ([]string, error) {
 	if v, ok := set.m[name]; ok {
-		val, err := asStringSlice(v, Options{})
+		val, err := createStringSlice(v, Options{})
 		if err != nil {
 			return nil, fmt.Errorf("%s: %w", name, err)
 		}
@@ -95,7 +95,7 @@ func (set MetaSet) MetaGetStringSlice(name string) ([]string, error) {
 // [ErrInvType] if the value is of a different type.
 func (set MetaSet) MetaGetInt64(name string) (int64, error) {
 	if v, ok := set.m[name]; ok {
-		val, err := asInt64(v, Options{})
+		val, err := createInt64(v, Options{})
 		if err != nil {
 			return 0, fmt.Errorf("%s: %w", name, err)
 		}
@@ -110,7 +110,7 @@ func (set MetaSet) MetaGetInt64(name string) (int64, error) {
 // missing, or nil and [ErrInvType] if the value is of a different type.
 func (set MetaSet) MetaGetInt64Slice(name string) ([]int64, error) {
 	if v, ok := set.m[name]; ok {
-		val, err := asInt64Slice(v, Options{})
+		val, err := createInt64Slice(v, Options{})
 		if err != nil {
 			return nil, fmt.Errorf("%s: %w", name, err)
 		}
@@ -127,7 +127,7 @@ func (set MetaSet) MetaGetInt64Slice(name string) ([]int64, error) {
 // NOTE: For int64 values outside ±2^53 range, the result is undefined.
 func (set MetaSet) MetaGetFloat64(name string) (float64, error) {
 	if v, ok := set.m[name]; ok {
-		val, err := asFloat64(v, Options{})
+		val, err := createFloat64(v, Options{})
 		if err != nil {
 			return 0, fmt.Errorf("%s: %w", name, err)
 		}
@@ -145,7 +145,7 @@ func (set MetaSet) MetaGetFloat64(name string) (float64, error) {
 // NOTE: For int64 values outside ±2^53 range, the result is undefined.
 func (set MetaSet) MetaGetFloat64Slice(name string) ([]float64, error) {
 	if v, ok := set.m[name]; ok {
-		val, err := asFloat64Slice(v, Options{})
+		val, err := createFloat64Slice(v, Options{})
 		if err != nil {
 			return nil, fmt.Errorf("%s: %w", name, err)
 		}
@@ -169,7 +169,7 @@ func (set MetaSet) MetaGetTime(name string, opts ...Option) (time.Time, error) {
 		opt(&def)
 	}
 	if v, ok := set.m[name]; ok {
-		val, err := asTime(v, def)
+		val, err := createTime(v, def)
 		if err != nil {
 			return time.Time{}, fmt.Errorf("%s: %w", name, err)
 		}
@@ -194,7 +194,7 @@ func (set MetaSet) MetaGetTimeSlice(name string, opts ...Option) ([]time.Time, e
 		opt(&def)
 	}
 	if v, ok := set.m[name]; ok {
-		val, err := asTimeSlice(v, def)
+		val, err := createTimeSlice(v, def)
 		if err != nil {
 			return nil, fmt.Errorf("%s: %w", name, err)
 		}

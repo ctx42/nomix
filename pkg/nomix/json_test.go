@@ -23,6 +23,32 @@ func Test_NewJSON(t *testing.T) {
 	assert.Equal(t, `{}`, tag.stringer([]byte(`{}`)))
 }
 
+func Test_CreateJSON(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		// --- When ---
+		tag, err := CreateJSON("name", []byte(`{}`))
+
+		// --- Then ---
+		assert.NoError(t, err)
+		assert.SameType(t, &JSON{}, tag)
+		assert.Equal(t, "name", tag.name)
+		assert.Equal(t, []byte(`{}`), tag.value)
+		assert.Equal(t, KindJSON, tag.kind)
+		assert.NotNil(t, tag.stringer)
+		assert.Equal(t, `{}`, tag.stringer([]byte(`{}`)))
+	})
+
+	t.Run("error - invalid type", func(t *testing.T) {
+		// --- When ---
+		tag, err := CreateJSON("name", "abc")
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrInvType, err)
+		assert.ErrorContain(t, "name: ", err)
+		assert.Nil(t, tag)
+	})
+}
+
 func Test_ParseJSON_success_tabular(t *testing.T) {
 	tt := []struct {
 		testN string
@@ -76,10 +102,10 @@ func Test_ParseJSON(t *testing.T) {
 	})
 }
 
-func Test_asJSON(t *testing.T) {
+func Test_createJSON(t *testing.T) {
 	t.Run("valid json.RawMessage", func(t *testing.T) {
 		// --- When ---
-		have, err := asJSON(json.RawMessage(`{"A": 1}`), Options{})
+		have, err := createJSON(json.RawMessage(`{"A": 1}`), Options{})
 
 		// --- Then ---
 		assert.NoError(t, err)
@@ -88,7 +114,7 @@ func Test_asJSON(t *testing.T) {
 
 	t.Run("valid []byte", func(t *testing.T) {
 		// --- When ---
-		have, err := asJSON([]byte(`{"A": 1}`), Options{})
+		have, err := createJSON([]byte(`{"A": 1}`), Options{})
 
 		// --- Then ---
 		assert.NoError(t, err)
@@ -97,7 +123,7 @@ func Test_asJSON(t *testing.T) {
 
 	t.Run("error - invalid type", func(t *testing.T) {
 		// --- When ---
-		have, err := asJSON("abc", Options{})
+		have, err := createJSON("abc", Options{})
 
 		// --- Then ---
 		assert.ErrorIs(t, ErrInvType, err)
@@ -106,16 +132,16 @@ func Test_asJSON(t *testing.T) {
 
 	t.Run("error - invalid format", func(t *testing.T) {
 		// --- When ---
-		have, err := asJSON([]byte(`{!!!}`), Options{})
+		have, err := createJSON([]byte(`{!!!}`), Options{})
 
 		// --- Then ---
 		assert.ErrorIs(t, ErrInvFormat, err)
 		assert.Nil(t, have)
 	})
 
-	t.Run("nil value", func(t *testing.T) {
+	t.Run("error - nil value", func(t *testing.T) {
 		// --- When ---
-		have, err := asJSON(nil, Options{})
+		have, err := createJSON(nil, Options{})
 
 		// --- Then ---
 		assert.ErrorIs(t, ErrInvType, err)

@@ -21,6 +21,18 @@ func NewJSON(name string, v json.RawMessage) *JSON {
 	}
 }
 
+// CreateJSON casts the value to [json.RawMessage]. Returns the [JSON] with the
+// specified name and nil error if the value is a valid JSON represented as
+// [json.RawMessage], []byte or string. Returns nil and error if the value's
+// type is not a supported type or the value is not a valid JSON.
+func CreateJSON(name string, val any, _ ...Option) (*JSON, error) {
+	vv, err := createJSON(val, defaultOptions)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", name, err)
+	}
+	return NewJSON(name, vv), nil
+}
+
 // jsonToString converts [json.RawMessage] to its string representation.
 func jsonToString(v []byte) string {
 	return string(v)
@@ -34,10 +46,11 @@ func ParseJSON(name, v string, _ ...Option) (*JSON, error) {
 	return NewJSON(name, json.RawMessage(v)), nil
 }
 
-// asJSON casts the value to [json.RawMessage] and verifies it is valid JSON.
-// Returns the value and nil error if successful. Returns nil and [ErrInvType]
-// if the value is not a valid JSON type.
-func asJSON(val any, _ Options) (json.RawMessage, error) {
+// createJSON casts the value to [json.RawMessage]. Returns the cast value and
+// nil error if the value is a valid JSON represented as [json.RawMessage],
+// []byte or string. Returns nil and error if the value's type is not a
+// supported type or the value is not a valid JSON.
+func createJSON(val any, _ Options) (json.RawMessage, error) {
 	var vv json.RawMessage
 	switch v := val.(type) {
 	case json.RawMessage:

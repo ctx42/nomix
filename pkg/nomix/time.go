@@ -22,6 +22,18 @@ func NewTime(name string, v time.Time) *Time {
 	}
 }
 
+// CreateTime casts the value to [time.Time], or when the value is a string, it
+// parses it as [time.RFC3339Nano] time. Returns the [Time] instance with the
+// given name and nil error on success. Returns nil and error if the value's
+// type is not a supported type or the value is not a valid time representation.
+func CreateTime(name string, val any, _ ...Option) (*Time, error) {
+	v, err := createTime(val, defaultOptions)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", name, err)
+	}
+	return NewTime(name, v), nil
+}
+
 // ParseTime parses string representation of the time tag. The time is always
 // returned as UTC.
 func ParseTime(name, v string, opts ...Option) (*Time, error) {
@@ -67,11 +79,12 @@ func parseTime(val string, opts Options) (time.Time, error) {
 // timeToString converts [time.Time] to its string representation.
 func timeToString(v time.Time) string { return v.Format(time.RFC3339Nano) }
 
-// asTime casts the value to [time.Time] or when the value is a string parses
-// it as time but only when [Options.timeFormat] is set. Returns the time and
-// nil error on success. Returns zero value time and [ErrInvType] if the value
-// is not a supported type.
-func asTime(val any, opts Options) (time.Time, error) {
+// createTime casts the value to [time.Time] or when the value is a string
+// parses it as time but only when [Options.timeFormat] is set. Returns the
+// time and nil error on success. Returns zero value time and error if the
+// value's type is not a supported type or the value is not a valid time
+// representation.
+func createTime(val any, opts Options) (time.Time, error) {
 	switch v := val.(type) {
 	case time.Time:
 		return v, nil

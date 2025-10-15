@@ -11,9 +11,11 @@ import (
 )
 
 func Test_NewTimeSlice(t *testing.T) {
-	// --- When ---
+	// --- Given ---
 	tim0 := time.Date(2000, 1, 2, 3, 4, 5, 0, time.UTC)
 	tim1 := time.Date(2001, 1, 2, 3, 4, 5, 0, time.UTC)
+
+	// --- When ---
 	tag := NewTimeSlice("name", []time.Time{tim0, tim1})
 
 	// --- Then ---
@@ -26,10 +28,41 @@ func Test_NewTimeSlice(t *testing.T) {
 	assert.Equal(t, `["2000-01-02T03:04:05Z", "2001-01-02T03:04:05Z"]`, have)
 }
 
+func Test_CreateTimeSlice(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		// --- Given ---
+		tim0 := time.Date(2000, 1, 2, 3, 4, 5, 0, time.UTC)
+		tim1 := time.Date(2001, 1, 2, 3, 4, 5, 0, time.UTC)
+
+		// --- When ---
+		tag, err := CreateTimeSlice("name", []time.Time{tim0, tim1})
+
+		// --- Then ---
+		assert.NoError(t, err)
+		assert.SameType(t, &TimeSlice{}, tag)
+		assert.Equal(t, "name", tag.name)
+		assert.Equal(t, []time.Time{tim0, tim1}, tag.value)
+		assert.Equal(t, KindTimeSlice, tag.kind)
+		assert.NotNil(t, tag.stringer)
+		have := tag.stringer([]time.Time{tim0, tim1})
+		assert.Equal(t, `["2000-01-02T03:04:05Z", "2001-01-02T03:04:05Z"]`, have)
+	})
+
+	t.Run("error - invalid type", func(t *testing.T) {
+		// --- When ---
+		tag, err := CreateTimeSlice("name", 42)
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrInvType, err)
+		assert.ErrorContain(t, "name: ", err)
+		assert.Nil(t, tag)
+	})
+}
+
 func Test_asTimeSlice(t *testing.T) {
 	t.Run("error - not supported type", func(t *testing.T) {
 		// --- When ---
-		have, err := asTimeSlice(42, Options{})
+		have, err := createTimeSlice(42, Options{})
 
 		// --- Then ---
 		assert.ErrorIs(t, ErrInvType, err)
@@ -38,7 +71,7 @@ func Test_asTimeSlice(t *testing.T) {
 
 	t.Run("error - string type is not allowed by default", func(t *testing.T) {
 		// --- When ---
-		have, err := asTimeSlice("2000-01-02T03:04:05Z", Options{})
+		have, err := createTimeSlice("2000-01-02T03:04:05Z", Options{})
 
 		// --- Then ---
 		assert.ErrorIs(t, ErrInvType, err)
@@ -50,15 +83,16 @@ func Test_asTimeSlice(t *testing.T) {
 		opts := Options{timeFormat: time.RFC3339}
 
 		// --- When ---
-		have, err := asTimeSlice([]string{"abc"}, opts)
+		have, err := createTimeSlice([]string{"abc"}, opts)
 
 		// --- Then ---
 		assert.ErrorIs(t, ErrInvFormat, err)
 		assert.Nil(t, have)
 	})
-	t.Run("nil value", func(t *testing.T) {
+
+	t.Run("error - nil value", func(t *testing.T) {
 		// --- When ---
-		have, err := asTimeSlice(nil, Options{})
+		have, err := createTimeSlice(nil, Options{})
 
 		// --- Then ---
 		assert.ErrorIs(t, ErrInvType, err)
@@ -66,7 +100,7 @@ func Test_asTimeSlice(t *testing.T) {
 	})
 }
 
-func Test_asTimeSlice_success_tabular(t *testing.T) {
+func Test_createTimeSlice_success_tabular(t *testing.T) {
 	tt := []struct {
 		testN string
 
@@ -100,7 +134,7 @@ func Test_asTimeSlice_success_tabular(t *testing.T) {
 			opt := Options{timeFormat: time.RFC3339}
 
 			// --- When ---
-			have, err := asTimeSlice(tc.have, opt)
+			have, err := createTimeSlice(tc.have, opt)
 
 			// --- Then ---
 			assert.NoError(t, err)

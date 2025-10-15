@@ -4,6 +4,7 @@
 package nomix
 
 import (
+	"fmt"
 	"strconv"
 )
 
@@ -11,13 +12,24 @@ import (
 type ByteSlice = slice[byte]
 
 // NewByteSlice returns a new instance of [ByteSlice].
-func NewByteSlice(name string, v ...byte) *ByteSlice {
+func NewByteSlice(name string, val ...byte) *ByteSlice {
 	return &slice[byte]{
 		name:     name,
-		value:    v,
+		value:    val,
 		kind:     KindByteSlice,
 		stringer: byteSliceToString,
 	}
+}
+
+// CreateByteSlice casts the value to []byte. Returns the [ByteSlice] instance
+// with the given name and nil error on success. Returns nil and [ErrInvType]
+// if the value is not the []byte type.
+func CreateByteSlice(name string, val any, _ ...Option) (*ByteSlice, error) {
+	v, err := createByteSlice(val, defaultOptions)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", name, err)
+	}
+	return NewByteSlice(name, v...), nil
 }
 
 // byteSliceToString converts a byte slice to its string representation.
@@ -32,9 +44,9 @@ func byteSliceToString(v []byte) string {
 	return ret + "]"
 }
 
-// asByteSlice casts the value to []byte. Returns the slice and nil error on
-// success. Returns nil and [ErrInvType] if the value is not a supported type.
-func asByteSlice(val any, _ Options) ([]byte, error) {
+// createByteSlice casts the value to []byte. Returns the []byte and nil error
+// on success. Returns nil and [ErrInvType] if the value is not the []byte type.
+func createByteSlice(val any, _ Options) ([]byte, error) {
 	if v, ok := val.([]byte); ok {
 		return v, nil
 	}

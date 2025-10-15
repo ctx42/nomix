@@ -4,6 +4,7 @@
 package nomix
 
 import (
+	"fmt"
 	"strconv"
 )
 
@@ -18,6 +19,18 @@ func NewFloat64Slice(name string, v ...float64) *Float64Slice {
 		kind:     KindFloat64Slice,
 		stringer: float64SliceToString,
 	}
+}
+
+// CreateFloat64Slice casts the value to []float64. Returns the [Float64Slice]
+// instance with the given name and nil error if the value is a []int, []int8,
+// []int16, []int32, []int64, []float32, or []float64. Returns nil and
+// [ErrInvType] if the value's type is not a supported numeric slice type.
+func CreateFloat64Slice(name string, val any, _ ...Option) (*Float64Slice, error) {
+	v, err := createFloat64Slice(val, defaultOptions)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", name, err)
+	}
+	return NewFloat64Slice(name, v...), nil
 }
 
 // float64SliceToString converts a float64 slice to its string representation.
@@ -42,6 +55,7 @@ type convertableToFloat64 interface {
 // []float64 without loss of precision.
 //
 // NOTE: For int64 values outside ±2^53 range, the result is undefined.
+// TODO(rz): Return an error when above happens.
 func toFloat64Slice[T convertableToFloat64](v []T, _ Options) []float64 {
 	upgraded := make([]float64, len(v))
 	for i, val := range v {
@@ -50,11 +64,14 @@ func toFloat64Slice[T convertableToFloat64](v []T, _ Options) []float64 {
 	return upgraded
 }
 
-// asFloat64Slice casts the value to []float64. Returns the slice and nil error
-// if the value is a []int, []int8, []int16, []int32, []int64, []float32, or
-// []float64. Returns 0.0 and [ErrInvType] if the value is not a supported
-// numeric type.
-func asFloat64Slice(val any, opts Options) ([]float64, error) {
+// createFloat64Slice casts the value to []float64. Returns the slice and nil
+// error if the value is a []int, []int8, []int16, []int32, []int64, []float32,
+// or []float64. Returns nil and [ErrInvType] if the value's type is not a
+// supported numeric slice type.
+//
+// NOTE: For int64 values outside ±2^53 range, the result is undefined.
+// TODO(rz): Return an error when above happens.
+func createFloat64Slice(val any, opts Options) ([]float64, error) {
 	switch v := val.(type) {
 	case []int:
 		return toFloat64Slice(v, opts), nil

@@ -12,13 +12,28 @@ import (
 type Float64 = single[float64]
 
 // NewFloat64 returns a new instance of [Float64].
-func NewFloat64(name string, v float64) *Float64 {
+func NewFloat64(name string, val float64) *Float64 {
 	return &single[float64]{
 		name:     name,
-		value:    v,
+		value:    val,
 		kind:     KindFloat64,
 		stringer: float64ToString,
 	}
+}
+
+// CreateFloat64 casts the value to float64. Returns the [Float64] instance
+// with the given name and nil error if the value is a byte, int, int8, int16,
+// int32, int64, float32, or float64. Returns nil and [ErrInvType] if the
+// value's type is not a supported numeric type.
+//
+// NOTE: For int64 values outside ±2^53 range, the result is undefined.
+// TODO(rz): Return an error when above happens.
+func CreateFloat64(name string, val any, _ ...Option) (*Float64, error) {
+	v, err := createFloat64(val, defaultOptions)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", name, err)
+	}
+	return NewFloat64(name, v), nil
 }
 
 // ParseFloat64 parses string representation of the 64-bit floating point tag.
@@ -35,12 +50,14 @@ func float64ToString(v float64) string {
 	return strconv.FormatFloat(v, 'g', -1, 64)
 }
 
-// asFloat64 casts the value to float64. Returns the float64 and nil error if
-// the value is a byte, int, int8, int16, int32, int64, float32, or float64.
-// Returns 0.0 and [ErrInvType] if the value is not a supported numeric type.
+// createFloat64 casts the value to float64. Returns the float64 and nil error
+// if the value is a byte, int, int8, int16, int32, int64, float32, or float64.
+// Returns 0.0 and [ErrInvType] if the value's type is not a supported numeric
+// type.
 //
 // NOTE: For int64 values outside ±2^53 range, the result is undefined.
-func asFloat64(val any, _ Options) (float64, error) {
+// TODO(rz): Return an error when above happens.
+func createFloat64(val any, _ Options) (float64, error) {
 	switch v := val.(type) {
 	case float64:
 		return v, nil

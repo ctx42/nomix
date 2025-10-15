@@ -22,6 +22,32 @@ func Test_NewInt64Slice(t *testing.T) {
 	assert.Equal(t, "[42, 44]", tag.stringer([]int64{42, 44}))
 }
 
+func Test_CreateInt64Slice(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		// --- When ---
+		tag, err := CreateInt64Slice("name", []int64{42, 44})
+
+		// --- Then ---
+		assert.NoError(t, err)
+		assert.SameType(t, &Int64Slice{}, tag)
+		assert.Equal(t, "name", tag.name)
+		assert.Equal(t, []int64{42, 44}, tag.value)
+		assert.Equal(t, KindInt64Slice, tag.kind)
+		assert.NotNil(t, tag.stringer)
+		assert.Equal(t, "[42, 44]", tag.stringer([]int64{42, 44}))
+	})
+
+	t.Run("error - invalid type", func(t *testing.T) {
+		// --- When ---
+		tag, err := CreateInt64Slice("name", "abc")
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrInvType, err)
+		assert.ErrorContain(t, "name: ", err)
+		assert.Nil(t, tag)
+	})
+}
+
 func Test_toInt64Slice(t *testing.T) {
 	// --- Given ---
 	i32s := []int32{42, 44}
@@ -33,10 +59,10 @@ func Test_toInt64Slice(t *testing.T) {
 	assert.Equal(t, []int64{42, 44}, have)
 }
 
-func Test_asInt64Slice(t *testing.T) {
+func Test_createInt64Slice(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		// --- When ---
-		have, err := asInt64Slice([]int64{42, 44}, Options{})
+		have, err := createInt64Slice([]int64{42, 44}, Options{})
 
 		// --- Then ---
 		assert.NoError(t, err)
@@ -45,16 +71,16 @@ func Test_asInt64Slice(t *testing.T) {
 
 	t.Run("error - invalid type", func(t *testing.T) {
 		// --- When ---
-		have, err := asInt64Slice("abc", Options{})
+		have, err := createInt64Slice("abc", Options{})
 
 		// --- Then ---
 		assert.ErrorIs(t, err, ErrInvType)
 		assert.Empty(t, have)
 	})
 
-	t.Run("nil value", func(t *testing.T) {
+	t.Run("error - nil value", func(t *testing.T) {
 		// --- When ---
-		have, err := asInt64Slice(nil, Options{})
+		have, err := createInt64Slice(nil, Options{})
 
 		// --- Then ---
 		assert.ErrorIs(t, ErrInvType, err)
@@ -79,7 +105,7 @@ func Test_asInt64Slice_success_tabular(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.testN, func(t *testing.T) {
 			// --- When ---
-			have, err := asInt64Slice(tc.have, Options{})
+			have, err := createInt64Slice(tc.have, Options{})
 
 			// --- Then ---
 			assert.NoError(t, err)

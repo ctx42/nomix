@@ -12,13 +12,24 @@ import (
 type Bool = single[bool]
 
 // NewBool returns a new instance of [Bool].
-func NewBool(name string, v bool) *Bool {
+func NewBool(name string, val bool) *Bool {
 	return &single[bool]{
 		name:     name,
-		value:    v,
+		value:    val,
 		kind:     KindBool,
 		stringer: boolToString,
 	}
+}
+
+// CreateBool casts the given value to bool. Returns the [Bool] instance with
+// the given name and nil error on success. Returns nil and [ErrInvType] if the
+// value is not the bool type.
+func CreateBool(name string, val any, _ ...Option) (*Bool, error) {
+	v, err := createBool(val, defaultOptions)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", name, err)
+	}
+	return NewBool(name, v), nil
 }
 
 // ParseBool parses string representation of the boolean tag.
@@ -33,9 +44,9 @@ func ParseBool(name, val string, _ ...Option) (Tag, error) {
 // boolToString converts bool to its string representation.
 func boolToString(v bool) string { return strconv.FormatBool(v) }
 
-// asBool casts the value to bool. Returns the bool and nil error on success.
-// Returns false and [ErrInvType] if the value is not a supported type.
-func asBool(val any, _ Options) (bool, error) {
+// createBool casts the given value to bool. Returns the bool and nil error on
+// success. Returns false and [ErrInvType] if the value is not the bool type.
+func createBool(val any, _ Options) (bool, error) {
 	if v, ok := val.(bool); ok {
 		return v, nil
 	}

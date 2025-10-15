@@ -22,6 +22,32 @@ func Test_NewBool(t *testing.T) {
 	assert.Equal(t, "false", tag.stringer(false))
 }
 
+func Test_CreateBool(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		// --- When ---
+		tag, err := CreateBool("name", true)
+
+		// --- Then ---
+		assert.NoError(t, err)
+		assert.SameType(t, &Bool{}, tag)
+		assert.Equal(t, "name", tag.name)
+		assert.Equal(t, true, tag.value)
+		assert.Equal(t, KindBool, tag.kind)
+		assert.NotNil(t, tag.stringer)
+		assert.Equal(t, "false", tag.stringer(false))
+	})
+
+	t.Run("error - invalid type", func(t *testing.T) {
+		// --- When ---
+		tag, err := CreateBool("name", 42)
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrInvType, err)
+		assert.ErrorContain(t, "name: ", err)
+		assert.Nil(t, tag)
+	})
+}
+
 func Test_ParseBool_success_tabular(t *testing.T) {
 	tt := []struct {
 		str string
@@ -67,19 +93,19 @@ func Test_ParseBool(t *testing.T) {
 	})
 }
 
-func Test_asBool(t *testing.T) {
+func Test_createBool(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		// --- When ---
-		have, err := asBool(true, Options{})
+		have, err := createBool(true, Options{})
 
 		// --- Then ---
 		assert.NoError(t, err)
 		assert.True(t, have)
 	})
 
-	t.Run("nil value", func(t *testing.T) {
+	t.Run("error - nil value", func(t *testing.T) {
 		// --- When ---
-		have, err := asBool(nil, Options{})
+		have, err := createBool(nil, Options{})
 
 		// --- Then ---
 		assert.ErrorIs(t, ErrInvType, err)
@@ -88,7 +114,7 @@ func Test_asBool(t *testing.T) {
 
 	t.Run("error - invalid type", func(t *testing.T) {
 		// --- When ---
-		have, err := asBool(42, Options{})
+		have, err := createBool(42, Options{})
 
 		// --- Then ---
 		assert.ErrorIs(t, err, ErrInvType)
