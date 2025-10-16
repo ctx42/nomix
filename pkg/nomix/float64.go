@@ -27,7 +27,7 @@ func NewFloat64(name string, val float64) *Float64 {
 // value's type is not a supported numeric type.
 //
 // NOTE: For int64 values outside ±2^53 range, the result is undefined.
-// TODO(rz): Return an error when above happens.
+// TODO(rz): Return an error when the above happens.
 func CreateFloat64(name string, val any, _ ...Option) (*Float64, error) {
 	v, err := createFloat64(val, defaultOptions)
 	if err != nil {
@@ -56,7 +56,7 @@ func float64ToString(v float64) string {
 // type.
 //
 // NOTE: For int64 values outside ±2^53 range, the result is undefined.
-// TODO(rz): Return an error when above happens.
+// TODO(rz): Return an error when the above happens.
 func createFloat64(val any, _ Options) (float64, error) {
 	switch v := val.(type) {
 	case float64:

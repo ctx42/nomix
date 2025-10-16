@@ -20,4 +20,7 @@ var (
 
 	// ErrInvValue represents an invalid element value.
 	ErrInvValue = errors.New("invalid element value")
+
+	// ErrNoCreator represents a missing [TagCreator] for a type.
+	ErrNoCreator = errors.New("no creator for a type")
 )

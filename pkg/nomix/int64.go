@@ -54,9 +54,9 @@ func int64ToString(v int64) string { return strconv.FormatInt(v, 10) }
 // [ErrInvType] if the value is not a supported integer type.
 func createInt64(val any, _ Options) (int64, error) {
 	switch v := val.(type) {
-	case int:
-		return int64(v), nil
 	case byte:
+		return int64(v), nil
+	case int:
 		return int64(v), nil
 	case int8:
 		return int64(v), nil

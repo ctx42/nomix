@@ -99,3 +99,13 @@ type TagValueComparer interface {
 	// TagEqual returns true if both tags are having the same kind and value.
 	TagEqual(other Tag) bool
 }
+
+// TagCreator is a tag creator function that considers the value's type and
+// creates the appropriate [Tag] instance for it. It returns the [ErrNoCreator]
+// error if the value's type is not supported.
+type TagCreator func(name string, value any, opts ...Option) (Tag, error)
+
+// GenTagCreator is a generic tag creator function that considers the value's
+// type and creates the appropriate [Tag] implementation for it. It returns the
+// [ErrNoCreator] error if the value's type is not supported.
+type GenTagCreator[T any] func(name string, val any, opts ...Option) (T, error)

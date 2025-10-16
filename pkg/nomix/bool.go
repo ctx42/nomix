@@ -33,7 +33,8 @@ func CreateBool(name string, val any, _ ...Option) (*Bool, error) {
 }
 
 // ParseBool parses string representation of the boolean tag.
-func ParseBool(name, val string, _ ...Option) (Tag, error) {
+func ParseBool(name, val string, _ ...Option) (*Bool, error) {
+	// TODO(rz): maybe all of constructor functions like this can return concrete types?
 	vv, err := strconv.ParseBool(val)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", name, ErrInvFormat)
