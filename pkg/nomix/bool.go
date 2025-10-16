@@ -11,13 +11,23 @@ import (
 // Bool is a tag for a single bool value.
 type Bool = single[bool]
 
+// boolSpec defines the [KindSpec] for [Bool] type.
+var boolSpec = KindSpec{
+	knd: KindBool,
+	tcr: CreateFunc(CreateBool),
+	tpr: ParseFunc(ParseBool),
+}
+
+// BoolSpec returns a [KindSpec] for [Bool] type.
+func BoolSpec() KindSpec { return boolSpec }
+
 // NewBool returns a new instance of [Bool].
 func NewBool(name string, val bool) *Bool {
 	return &single[bool]{
 		name:     name,
 		value:    val,
 		kind:     KindBool,
-		stringer: boolToString,
+		stringer: strconv.FormatBool,
 	}
 }
 
@@ -32,19 +42,6 @@ func CreateBool(name string, val any, _ ...Option) (*Bool, error) {
 	return NewBool(name, v), nil
 }
 
-// ParseBool parses string representation of the boolean tag.
-func ParseBool(name, val string, _ ...Option) (*Bool, error) {
-	// TODO(rz): maybe all of constructor functions like this can return concrete types?
-	vv, err := strconv.ParseBool(val)
-	if err != nil {
-		return nil, fmt.Errorf("%s: %w", name, ErrInvFormat)
-	}
-	return NewBool(name, vv), nil
-}
-
-// boolToString converts bool to its string representation.
-func boolToString(v bool) string { return strconv.FormatBool(v) }
-
 // createBool casts the given value to bool. Returns the bool and nil error on
 // success. Returns false and [ErrInvType] if the value is not the bool type.
 func createBool(val any, _ Options) (bool, error) {
@@ -52,4 +49,13 @@ func createBool(val any, _ Options) (bool, error) {
 		return v, nil
 	}
 	return false, ErrInvType
+}
+
+// ParseBool parses string representation of the boolean tag.
+func ParseBool(name, val string, _ ...Option) (*Bool, error) {
+	vv, err := strconv.ParseBool(val)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", name, ErrInvFormat)
+	}
+	return NewBool(name, vv), nil
 }

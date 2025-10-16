@@ -9,6 +9,23 @@ import (
 	"github.com/ctx42/testing/pkg/assert"
 )
 
+func Test_ByteSliceSpec(t *testing.T) {
+	// --- When ---
+	have := ByteSliceSpec()
+
+	// --- Then ---
+	tag, err := have.TagCreate("name", []byte{42, 44})
+	assert.NoError(t, err)
+	assert.SameType(t, &ByteSlice{}, tag)
+	assert.Equal(t, "name", tag.TagName())
+	assert.Equal(t, []byte{42, 44}, tag.TagValue())
+	assert.Equal(t, KindByteSlice, tag.TagKind())
+
+	tag, err = have.TagParse("name", "[42, 44]")
+	assert.ErrorIs(t, ErrNotImpl, err)
+	assert.Nil(t, tag)
+}
+
 func Test_NewByteSlice(t *testing.T) {
 	// --- When ---
 	tag := NewByteSlice("name", 42, 44)
@@ -18,8 +35,7 @@ func Test_NewByteSlice(t *testing.T) {
 	assert.Equal(t, "name", tag.name)
 	assert.Equal(t, []byte{42, 44}, tag.value)
 	assert.Equal(t, KindByteSlice, tag.kind)
-	assert.NotNil(t, tag.stringer)
-	assert.Equal(t, "[42, 44]", tag.stringer([]byte{42, 44}))
+	assert.Equal(t, "[42, 44]", tag.String())
 }
 
 func Test_CreateByteSlice(t *testing.T) {
@@ -33,8 +49,7 @@ func Test_CreateByteSlice(t *testing.T) {
 		assert.Equal(t, "name", tag.name)
 		assert.Equal(t, []byte{42, 44}, tag.value)
 		assert.Equal(t, KindByteSlice, tag.kind)
-		assert.NotNil(t, tag.stringer)
-		assert.Equal(t, "[42, 44]", tag.stringer([]byte{42, 44}))
+		assert.Equal(t, "[42, 44]", tag.String())
 	})
 
 	t.Run("error - invalid type", func(t *testing.T) {

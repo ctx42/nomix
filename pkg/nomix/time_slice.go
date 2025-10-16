@@ -11,6 +11,18 @@ import (
 // TimeSlice is a tag for a slice of [time.Time] values.
 type TimeSlice = slice[time.Time]
 
+// timeSliceSpec defines the [KindSpec] for [TimeSlice] type.
+var timeSliceSpec = KindSpec{
+	knd: KindTimeSlice,
+	tcr: CreateFunc(CreateTimeSlice),
+	tpr: func(name string, val string, opts ...Option) (Tag, error) {
+		return nil, ErrNotImpl
+	},
+}
+
+// TimeSliceSpec returns a [KindSpec] for [TimeSlice] type.
+func TimeSliceSpec() KindSpec { return timeSliceSpec }
+
 // NewTimeSlice returns a new instance of [TimeSlice].
 func NewTimeSlice(name string, v []time.Time) *TimeSlice {
 	return &slice[time.Time]{
@@ -32,18 +44,6 @@ func CreateTimeSlice(name string, val any, _ ...Option) (*TimeSlice, error) {
 		return nil, fmt.Errorf("%s: %w", name, err)
 	}
 	return NewTimeSlice(name, v), nil
-}
-
-// timeSliceToString converts a [time.Time] slice to its string representation.
-func timeSliceToString(v []time.Time) string {
-	ret := "["
-	for i, val := range v {
-		if i > 0 {
-			ret += ", "
-		}
-		ret += `"` + val.Format(time.RFC3339Nano) + `"`
-	}
-	return ret + "]"
 }
 
 // createTimeSlice casts the value to []time.Time, or when the value is a
@@ -68,4 +68,16 @@ func createTimeSlice(val any, opts Options) ([]time.Time, error) {
 		}
 	}
 	return nil, ErrInvType
+}
+
+// timeSliceToString converts a [time.Time] slice to its string representation.
+func timeSliceToString(v []time.Time) string {
+	ret := "["
+	for i, val := range v {
+		if i > 0 {
+			ret += ", "
+		}
+		ret += `"` + val.Format(time.RFC3339Nano) + `"`
+	}
+	return ret + "]"
 }

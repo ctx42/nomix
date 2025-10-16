@@ -10,6 +10,26 @@ import (
 	"github.com/ctx42/testing/pkg/assert"
 )
 
+func Test_JSONSpec(t *testing.T) {
+	// --- When ---
+	have := JSONSpec()
+
+	// --- Then ---
+	tag, err := have.TagCreate("name", []byte(`{}`))
+	assert.NoError(t, err)
+	assert.SameType(t, &JSON{}, tag)
+	assert.Equal(t, "name", tag.TagName())
+	assert.Equal(t, []byte(`{}`), tag.TagValue())
+	assert.Equal(t, KindJSON, tag.TagKind())
+
+	tag, err = have.TagParse("name", `{}`)
+	assert.NoError(t, err)
+	assert.SameType(t, &JSON{}, tag)
+	assert.Equal(t, "name", tag.TagName())
+	assert.Equal(t, []byte(`{}`), tag.TagValue())
+	assert.Equal(t, KindJSON, tag.TagKind())
+}
+
 func Test_NewJSON(t *testing.T) {
 	// --- When ---
 	tag := NewJSON("name", []byte(`{}`))
@@ -19,8 +39,7 @@ func Test_NewJSON(t *testing.T) {
 	assert.Equal(t, "name", tag.name)
 	assert.Equal(t, []byte(`{}`), tag.value)
 	assert.Equal(t, KindJSON, tag.kind)
-	assert.NotNil(t, tag.stringer)
-	assert.Equal(t, `{}`, tag.stringer([]byte(`{}`)))
+	assert.Equal(t, `{}`, tag.String())
 }
 
 func Test_CreateJSON(t *testing.T) {
@@ -34,8 +53,7 @@ func Test_CreateJSON(t *testing.T) {
 		assert.Equal(t, "name", tag.name)
 		assert.Equal(t, []byte(`{}`), tag.value)
 		assert.Equal(t, KindJSON, tag.kind)
-		assert.NotNil(t, tag.stringer)
-		assert.Equal(t, `{}`, tag.stringer([]byte(`{}`)))
+		assert.Equal(t, `{}`, tag.String())
 	})
 
 	t.Run("error - invalid type", func(t *testing.T) {
@@ -46,6 +64,53 @@ func Test_CreateJSON(t *testing.T) {
 		assert.ErrorIs(t, ErrInvType, err)
 		assert.ErrorContain(t, "name: ", err)
 		assert.Nil(t, tag)
+	})
+}
+
+func Test_createJSON(t *testing.T) {
+	t.Run("valid json.RawMessage", func(t *testing.T) {
+		// --- When ---
+		have, err := createJSON(json.RawMessage(`{"A": 1}`), Options{})
+
+		// --- Then ---
+		assert.NoError(t, err)
+		assert.Equal(t, json.RawMessage(`{"A": 1}`), have)
+	})
+
+	t.Run("valid []byte", func(t *testing.T) {
+		// --- When ---
+		have, err := createJSON([]byte(`{"A": 1}`), Options{})
+
+		// --- Then ---
+		assert.NoError(t, err)
+		assert.Equal(t, json.RawMessage(`{"A": 1}`), have)
+	})
+
+	t.Run("error - invalid type", func(t *testing.T) {
+		// --- When ---
+		have, err := createJSON("abc", Options{})
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrInvType, err)
+		assert.Nil(t, have)
+	})
+
+	t.Run("error - invalid format", func(t *testing.T) {
+		// --- When ---
+		have, err := createJSON([]byte(`{!!!}`), Options{})
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrInvFormat, err)
+		assert.Nil(t, have)
+	})
+
+	t.Run("error - nil value", func(t *testing.T) {
+		// --- When ---
+		have, err := createJSON(nil, Options{})
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrInvType, err)
+		assert.Nil(t, have)
 	})
 }
 
@@ -99,52 +164,5 @@ func Test_ParseJSON(t *testing.T) {
 		assert.ErrorEqual(t, "name: invalid element format", err)
 		assert.ErrorIs(t, ErrInvFormat, err)
 		assert.Nil(t, tag)
-	})
-}
-
-func Test_createJSON(t *testing.T) {
-	t.Run("valid json.RawMessage", func(t *testing.T) {
-		// --- When ---
-		have, err := createJSON(json.RawMessage(`{"A": 1}`), Options{})
-
-		// --- Then ---
-		assert.NoError(t, err)
-		assert.Equal(t, json.RawMessage(`{"A": 1}`), have)
-	})
-
-	t.Run("valid []byte", func(t *testing.T) {
-		// --- When ---
-		have, err := createJSON([]byte(`{"A": 1}`), Options{})
-
-		// --- Then ---
-		assert.NoError(t, err)
-		assert.Equal(t, json.RawMessage(`{"A": 1}`), have)
-	})
-
-	t.Run("error - invalid type", func(t *testing.T) {
-		// --- When ---
-		have, err := createJSON("abc", Options{})
-
-		// --- Then ---
-		assert.ErrorIs(t, ErrInvType, err)
-		assert.Nil(t, have)
-	})
-
-	t.Run("error - invalid format", func(t *testing.T) {
-		// --- When ---
-		have, err := createJSON([]byte(`{!!!}`), Options{})
-
-		// --- Then ---
-		assert.ErrorIs(t, ErrInvFormat, err)
-		assert.Nil(t, have)
-	})
-
-	t.Run("error - nil value", func(t *testing.T) {
-		// --- When ---
-		have, err := createJSON(nil, Options{})
-
-		// --- Then ---
-		assert.ErrorIs(t, ErrInvType, err)
-		assert.Nil(t, have)
 	})
 }

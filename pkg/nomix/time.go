@@ -12,6 +12,16 @@ import (
 // Time is a tag for a single time.Time value.
 type Time = single[time.Time]
 
+// timeSpec defines the [KindSpec] for [Time] type.
+var timeSpec = KindSpec{
+	knd: KindTime,
+	tcr: CreateFunc(CreateTime),
+	tpr: ParseFunc(ParseTime),
+}
+
+// TimeSpec returns a [KindSpec] for [Time] type.
+func TimeSpec() KindSpec { return timeSpec }
+
 // NewTime returns a new instance of [Time].
 func NewTime(name string, v time.Time) *Time {
 	return &single[time.Time]{
@@ -26,12 +36,33 @@ func NewTime(name string, v time.Time) *Time {
 // parses it as [time.RFC3339Nano] time. Returns the [Time] instance with the
 // given name and nil error on success. Returns nil and error if the value's
 // type is not a supported type or the value is not a valid time representation.
-func CreateTime(name string, val any, _ ...Option) (*Time, error) {
-	v, err := createTime(val, defaultOptions)
+func CreateTime(name string, val any, opts ...Option) (*Time, error) {
+	def := defaultOptions
+	for _, opt := range opts {
+		opt(&def)
+	}
+	v, err := createTime(val, def)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", name, err)
 	}
 	return NewTime(name, v), nil
+}
+
+// createTime casts the value to [time.Time] or when the value is a string
+// parses it as time but only when [Options.timeFormat] is set. Returns the
+// time and nil error on success. Returns zero value time and error if the
+// value's type is not a supported type or the value is not a valid time
+// representation.
+func createTime(val any, opts Options) (time.Time, error) {
+	switch v := val.(type) {
+	case time.Time:
+		return v, nil
+	case string:
+		if opts.timeFormat != "" {
+			return parseTime(v, opts)
+		}
+	}
+	return time.Time{}, ErrInvType
 }
 
 // ParseTime parses string representation of the time tag. The time is always
@@ -78,20 +109,3 @@ func parseTime(val string, opts Options) (time.Time, error) {
 
 // timeToString converts [time.Time] to its string representation.
 func timeToString(v time.Time) string { return v.Format(time.RFC3339Nano) }
-
-// createTime casts the value to [time.Time] or when the value is a string
-// parses it as time but only when [Options.timeFormat] is set. Returns the
-// time and nil error on success. Returns zero value time and error if the
-// value's type is not a supported type or the value is not a valid time
-// representation.
-func createTime(val any, opts Options) (time.Time, error) {
-	switch v := val.(type) {
-	case time.Time:
-		return v, nil
-	case string:
-		if opts.timeFormat != "" {
-			return parseTime(v, opts)
-		}
-	}
-	return time.Time{}, ErrInvType
-}

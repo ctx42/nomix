@@ -9,6 +9,26 @@ import (
 	"github.com/ctx42/testing/pkg/assert"
 )
 
+func Test_StringSpec(t *testing.T) {
+	// --- When ---
+	have := StringSpec()
+
+	// --- Then ---
+	tag, err := have.TagCreate("name", "abc")
+	assert.NoError(t, err)
+	assert.SameType(t, &String{}, tag)
+	assert.Equal(t, "name", tag.TagName())
+	assert.Equal(t, "abc", tag.TagValue())
+	assert.Equal(t, KindString, tag.TagKind())
+
+	tag, err = have.TagParse("name", "abc")
+	assert.NoError(t, err)
+	assert.SameType(t, &String{}, tag)
+	assert.Equal(t, "name", tag.TagName())
+	assert.Equal(t, "abc", tag.TagValue())
+	assert.Equal(t, KindString, tag.TagKind())
+}
+
 func Test_NewString(t *testing.T) {
 	// --- When ---
 	tag := NewString("name", "abc")
@@ -18,8 +38,7 @@ func Test_NewString(t *testing.T) {
 	assert.Equal(t, "name", tag.name)
 	assert.Equal(t, "abc", tag.value)
 	assert.Equal(t, KindString, tag.kind)
-	assert.NotNil(t, tag.stringer)
-	assert.Equal(t, "44", tag.stringer("44"))
+	assert.Equal(t, "abc", tag.String())
 }
 
 func Test_CreateString(t *testing.T) {
@@ -33,8 +52,7 @@ func Test_CreateString(t *testing.T) {
 		assert.Equal(t, "name", tag.name)
 		assert.Equal(t, "abc", tag.value)
 		assert.Equal(t, KindString, tag.kind)
-		assert.NotNil(t, tag.stringer)
-		assert.Equal(t, "44", tag.stringer("44"))
+		assert.Equal(t, "abc", tag.String())
 	})
 
 	t.Run("error - invalid type", func(t *testing.T) {
@@ -46,27 +64,6 @@ func Test_CreateString(t *testing.T) {
 		assert.ErrorContain(t, "name: ", err)
 		assert.Nil(t, tag)
 	})
-}
-
-func Test_ParseString_tabular(t *testing.T) {
-	tt := []struct {
-		testN string
-
-		str string
-	}{
-		{"string", "abc"},
-	}
-
-	for _, tc := range tt {
-		t.Run(tc.str, func(t *testing.T) {
-			// --- When ---
-			tag, err := ParseString("name", tc.str)
-
-			// --- Then ---
-			assert.NoError(t, err)
-			assert.Equal(t, "abc", tag.TagValue())
-		})
-	}
 }
 
 func Test_createString(t *testing.T) {

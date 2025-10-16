@@ -9,6 +9,23 @@ import (
 	"github.com/ctx42/testing/pkg/assert"
 )
 
+func Test_StringSliceSpec(t *testing.T) {
+	// --- When ---
+	have := StringSliceSpec()
+
+	// --- Then ---
+	tag, err := have.TagCreate("name", []string{"abc", "xyz"})
+	assert.NoError(t, err)
+	assert.SameType(t, &StringSlice{}, tag)
+	assert.Equal(t, "name", tag.TagName())
+	assert.Equal(t, []string{"abc", "xyz"}, tag.TagValue())
+	assert.Equal(t, KindStringSlice, tag.TagKind())
+
+	tag, err = have.TagParse("name", `["abc", "xyz"]`)
+	assert.ErrorIs(t, ErrNotImpl, err)
+	assert.Nil(t, tag)
+}
+
 func Test_NewStringSlice(t *testing.T) {
 	// --- When ---
 	tag := NewStringSlice("name", "abc", "xyz")
@@ -18,8 +35,7 @@ func Test_NewStringSlice(t *testing.T) {
 	assert.Equal(t, "name", tag.name)
 	assert.Equal(t, []string{"abc", "xyz"}, tag.value)
 	assert.Equal(t, KindStringSlice, tag.kind)
-	assert.NotNil(t, tag.stringer)
-	assert.Equal(t, `["abc", "xyz"]`, tag.stringer([]string{"abc", "xyz"}))
+	assert.Equal(t, `["abc", "xyz"]`, tag.String())
 }
 
 func Test_CreateStringSlice(t *testing.T) {
@@ -33,13 +49,12 @@ func Test_CreateStringSlice(t *testing.T) {
 		assert.Equal(t, "name", tag.name)
 		assert.Equal(t, []string{"abc", "xyz"}, tag.value)
 		assert.Equal(t, KindStringSlice, tag.kind)
-		assert.NotNil(t, tag.stringer)
-		assert.Equal(t, `["abc", "xyz"]`, tag.stringer([]string{"abc", "xyz"}))
+		assert.Equal(t, `["abc", "xyz"]`, tag.String())
 	})
 
 	t.Run("error - invalid type", func(t *testing.T) {
 		// --- When ---
-		tag, err := CreateTime("name", 42)
+		tag, err := CreateStringSlice("name", 42)
 
 		// --- Then ---
 		assert.ErrorIs(t, ErrInvType, err)

@@ -4,6 +4,7 @@
 package nomix
 
 import (
+	"strconv"
 	"testing"
 
 	"github.com/ctx42/testing/pkg/assert"
@@ -190,7 +191,7 @@ func Test_generic_TagSame(t *testing.T) {
 
 func Test_generic_String(t *testing.T) {
 	// --- Given ---
-	tag := &single[int]{value: 42, stringer: intToString}
+	tag := &single[int]{value: 42, stringer: strconv.Itoa}
 
 	// --- When ---
 	have := tag.String()

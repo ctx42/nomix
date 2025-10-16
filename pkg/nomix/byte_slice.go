@@ -11,6 +11,18 @@ import (
 // ByteSlice is a tag for a slice of bytes.
 type ByteSlice = slice[byte]
 
+// byteSliceSpec defines the [KindSpec] for [ByteSlice] type.
+var byteSliceSpec = KindSpec{
+	knd: KindByteSlice,
+	tcr: CreateFunc(CreateByteSlice),
+	tpr: func(name string, val string, opts ...Option) (Tag, error) {
+		return nil, ErrNotImpl
+	},
+}
+
+// ByteSliceSpec returns a [KindSpec] for [ByteSlice] type.
+func ByteSliceSpec() KindSpec { return byteSliceSpec }
+
 // NewByteSlice returns a new instance of [ByteSlice].
 func NewByteSlice(name string, val ...byte) *ByteSlice {
 	return &slice[byte]{
@@ -32,6 +44,15 @@ func CreateByteSlice(name string, val any, _ ...Option) (*ByteSlice, error) {
 	return NewByteSlice(name, v...), nil
 }
 
+// createByteSlice casts the value to []byte. Returns the []byte and nil error
+// on success. Returns nil and [ErrInvType] if the value is not the []byte type.
+func createByteSlice(val any, _ Options) ([]byte, error) {
+	if v, ok := val.([]byte); ok {
+		return v, nil
+	}
+	return nil, ErrInvType
+}
+
 // byteSliceToString converts a byte slice to its string representation.
 func byteSliceToString(v []byte) string {
 	ret := "["
@@ -42,13 +63,4 @@ func byteSliceToString(v []byte) string {
 		ret += strconv.Itoa(int(val))
 	}
 	return ret + "]"
-}
-
-// createByteSlice casts the value to []byte. Returns the []byte and nil error
-// on success. Returns nil and [ErrInvType] if the value is not the []byte type.
-func createByteSlice(val any, _ Options) ([]byte, error) {
-	if v, ok := val.([]byte); ok {
-		return v, nil
-	}
-	return nil, ErrInvType
 }

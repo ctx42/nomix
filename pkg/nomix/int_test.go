@@ -9,6 +9,26 @@ import (
 	"github.com/ctx42/testing/pkg/assert"
 )
 
+func Test_IntSpec(t *testing.T) {
+	// --- When ---
+	have := IntSpec()
+
+	// --- Then ---
+	tag, err := have.TagCreate("name", 42)
+	assert.NoError(t, err)
+	assert.SameType(t, &Int{}, tag)
+	assert.Equal(t, "name", tag.TagName())
+	assert.Equal(t, 42, tag.TagValue())
+	assert.Equal(t, KindInt, tag.TagKind())
+
+	tag, err = have.TagParse("name", "42")
+	assert.NoError(t, err)
+	assert.SameType(t, &Int{}, tag)
+	assert.Equal(t, "name", tag.TagName())
+	assert.Equal(t, 42, tag.TagValue())
+	assert.Equal(t, KindInt, tag.TagKind())
+}
+
 func Test_NewInt(t *testing.T) {
 	// --- When ---
 	tag := NewInt("name", 42)
@@ -18,8 +38,7 @@ func Test_NewInt(t *testing.T) {
 	assert.Equal(t, "name", tag.name)
 	assert.Equal(t, 42, tag.value)
 	assert.Equal(t, KindInt, tag.kind)
-	assert.NotNil(t, tag.stringer)
-	assert.Equal(t, "44", tag.stringer(44))
+	assert.Equal(t, "42", tag.String())
 }
 
 func Test_CreateInt(t *testing.T) {
@@ -33,8 +52,7 @@ func Test_CreateInt(t *testing.T) {
 		assert.Equal(t, "name", tag.name)
 		assert.Equal(t, 42, tag.value)
 		assert.Equal(t, KindInt, tag.kind)
-		assert.NotNil(t, tag.stringer)
-		assert.Equal(t, "44", tag.stringer(44))
+		assert.Equal(t, "42", tag.String())
 	})
 
 	t.Run("error - invalid type", func(t *testing.T) {
@@ -48,13 +66,42 @@ func Test_CreateInt(t *testing.T) {
 	})
 }
 
+func Test_createInt(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		// --- When ---
+		have, err := createInt(42, Options{})
+
+		// --- Then ---
+		assert.NoError(t, err)
+		assert.Equal(t, 42, have)
+	})
+
+	t.Run("error - invalid type", func(t *testing.T) {
+		// --- When ---
+		have, err := createInt("abc", Options{})
+
+		// --- Then ---
+		assert.ErrorIs(t, err, ErrInvType)
+		assert.Empty(t, have)
+	})
+
+	t.Run("error - nil value", func(t *testing.T) {
+		// --- When ---
+		have, err := createInt(nil, Options{})
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrInvType, err)
+		assert.Equal(t, 0, have)
+	})
+}
+
 func Test_ParseInt_success_tabular(t *testing.T) {
 	tt := []struct {
 		testN string
 
 		str  string
 		opts []Option
-		exp  int64
+		exp  int
 	}{
 		{"negative", "-1", nil, -1},
 		{"zero", "0", nil, 0},
@@ -94,34 +141,5 @@ func Test_ParseInt(t *testing.T) {
 		assert.ErrorEqual(t, "name: invalid element format", err)
 		assert.ErrorIs(t, ErrInvFormat, err)
 		assert.Nil(t, tag)
-	})
-}
-
-func Test_createInt(t *testing.T) {
-	t.Run("success", func(t *testing.T) {
-		// --- When ---
-		have, err := createInt(42, Options{})
-
-		// --- Then ---
-		assert.NoError(t, err)
-		assert.Equal(t, 42, have)
-	})
-
-	t.Run("error - invalid type", func(t *testing.T) {
-		// --- When ---
-		have, err := createInt("abc", Options{})
-
-		// --- Then ---
-		assert.ErrorIs(t, err, ErrInvType)
-		assert.Empty(t, have)
-	})
-
-	t.Run("error - nil value", func(t *testing.T) {
-		// --- When ---
-		have, err := createInt(nil, Options{})
-
-		// --- Then ---
-		assert.ErrorIs(t, ErrInvType, err)
-		assert.Equal(t, 0, have)
 	})
 }

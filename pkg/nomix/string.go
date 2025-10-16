@@ -10,6 +10,18 @@ import (
 // String is a tag for a single byte value.
 type String = single[string]
 
+// stringSpec defines the [KindSpec] for [String] type.
+var stringSpec = KindSpec{
+	knd: KindString,
+	tcr: CreateFunc(CreateString),
+	tpr: func(name string, val string, opts ...Option) (Tag, error) {
+		return NewString(name, val), nil
+	},
+}
+
+// StringSpec returns a [KindSpec] for [String] type.
+func StringSpec() KindSpec { return stringSpec }
+
 // NewString returns a new instance of [String].
 func NewString(name, v string) *String {
 	return &single[string]{
@@ -31,14 +43,6 @@ func CreateString(name string, v any, _ ...Option) (*String, error) {
 	return NewString(name, vv), nil
 }
 
-// ParseString creates string type tag. Never returns an error.
-func ParseString(name, v string, _ ...Option) (*String, error) {
-	return NewString(name, v), nil
-}
-
-// stringToString converts string to string.
-func stringToString(v string) string { return v }
-
 // createString casts the value to a string. Returns the string and nil error
 // if the value is a string. Returns an empty string and [ErrInvType] if the
 // value is not the string type.
@@ -48,3 +52,6 @@ func createString(val any, _ Options) (string, error) {
 	}
 	return "", ErrInvType
 }
+
+// stringToString converts string to string.
+func stringToString(v string) string { return v }

@@ -11,6 +11,18 @@ import (
 // Float64Slice is a tag for a slice of float64 values.
 type Float64Slice = slice[float64]
 
+// float64SliceSpec defines the [KindSpec] for [Float64Slice] type.
+var float64SliceSpec = KindSpec{
+	knd: KindFloat64Slice,
+	tcr: CreateFunc(CreateFloat64Slice),
+	tpr: func(name string, val string, opts ...Option) (Tag, error) {
+		return nil, ErrNotImpl
+	},
+}
+
+// Float64SliceSpec returns a [KindSpec] for [Float64Slice] type.
+func Float64SliceSpec() KindSpec { return float64SliceSpec }
+
 // NewFloat64Slice returns a new instance of [Float64Slice].
 func NewFloat64Slice(name string, v ...float64) *Float64Slice {
 	return &slice[float64]{

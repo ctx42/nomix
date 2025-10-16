@@ -11,6 +11,16 @@ import (
 // Int64 is a tag for a single int64 value.
 type Int64 = single[int64]
 
+// int64Spec defines the [KindSpec] for [Int64] type.
+var int64Spec = KindSpec{
+	knd: KindInt64,
+	tcr: CreateFunc(CreateInt64),
+	tpr: ParseFunc(ParseInt64),
+}
+
+// Int64Spec returns a [KindSpec] for [Int64] type.
+func Int64Spec() KindSpec { return int64Spec }
+
 // NewInt64 returns a new instance of [Int64].
 func NewInt64(name string, v int64) *Int64 {
 	return &single[int64]{
@@ -25,29 +35,17 @@ func NewInt64(name string, v int64) *Int64 {
 // given name and nil error if the value is a byte, int, int8, int16, int32, or
 // int64. Returns nil and [ErrInvType] if the value's type is not a supported
 // numeric type.
-func CreateInt64(name string, val any, _ ...Option) (*Int64, error) {
-	v, err := createInt64(val, defaultOptions)
+func CreateInt64(name string, val any, opts ...Option) (*Int64, error) {
+	def := defaultOptions
+	for _, opt := range opts {
+		opt(&def)
+	}
+	v, err := createInt64(val, def)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", name, err)
 	}
 	return NewInt64(name, v), nil
 }
-
-// ParseInt64 parses string representation of the 64-bit integer tag.
-func ParseInt64(name, v string, opts ...Option) (*Int64, error) {
-	def := defaultOptions
-	for _, opt := range opts {
-		opt(&def)
-	}
-	val, err := strconv.ParseInt(v, def.intBase, 64)
-	if err != nil {
-		return nil, fmt.Errorf("%s: %w", name, ErrInvFormat)
-	}
-	return NewInt64(name, val), nil
-}
-
-// int64ToString converts int64 to its string representation.
-func int64ToString(v int64) string { return strconv.FormatInt(v, 10) }
 
 // createInt64 casts the value to int64. Returns the int64 and nil error if the
 // value is a byte, int, int8, int16, int32, or int64. Returns 0 and
@@ -69,3 +67,19 @@ func createInt64(val any, _ Options) (int64, error) {
 	}
 	return 0, ErrInvType
 }
+
+// ParseInt64 parses string representation of the 64-bit integer tag.
+func ParseInt64(name, v string, opts ...Option) (*Int64, error) {
+	def := defaultOptions
+	for _, opt := range opts {
+		opt(&def)
+	}
+	val, err := strconv.ParseInt(v, def.intBase, 64)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", name, ErrInvFormat)
+	}
+	return NewInt64(name, val), nil
+}
+
+// int64ToString converts int64 to its string representation.
+func int64ToString(v int64) string { return strconv.FormatInt(v, 10) }

@@ -10,6 +10,18 @@ import (
 // StringSlice is a tag for a slice of strings.
 type StringSlice = slice[string]
 
+// stringSliceSpec defines the [KindSpec] for [StringSlice] type.
+var stringSliceSpec = KindSpec{
+	knd: KindStringSlice,
+	tcr: CreateFunc(CreateStringSlice),
+	tpr: func(name string, val string, opts ...Option) (Tag, error) {
+		return nil, ErrNotImpl
+	},
+}
+
+// StringSliceSpec returns a [KindSpec] for [StringSlice] type.
+func StringSliceSpec() KindSpec { return stringSliceSpec }
+
 // NewStringSlice returns a new instance of [StringSlice].
 func NewStringSlice(name string, v ...string) *StringSlice {
 	return &slice[string]{
@@ -31,6 +43,16 @@ func CreateStringSlice(name string, val any, _ ...Option) (*StringSlice, error) 
 	return NewStringSlice(name, v...), nil
 }
 
+// createStringSlice casts the value to []string. Returns the []string and nil
+// error on success. Returns nil and [ErrInvType] if the value is not the
+// []string type.
+func createStringSlice(val any, _ Options) ([]string, error) {
+	if v, ok := val.([]string); ok {
+		return v, nil
+	}
+	return nil, ErrInvType
+}
+
 // stringSliceToString converts a string slice to its string representation.
 func stringSliceToString(v []string) string {
 	ret := "["
@@ -41,14 +63,4 @@ func stringSliceToString(v []string) string {
 		ret += `"` + val + `"`
 	}
 	return ret + "]"
-}
-
-// createStringSlice casts the value to []string. Returns the []string and nil
-// error on success. Returns nil and [ErrInvType] if the value is not the
-// []string type.
-func createStringSlice(val any, _ Options) ([]string, error) {
-	if v, ok := val.([]string); ok {
-		return v, nil
-	}
-	return nil, ErrInvType
 }

@@ -9,6 +9,23 @@ import (
 	"github.com/ctx42/testing/pkg/assert"
 )
 
+func Test_Int64SliceSpec(t *testing.T) {
+	// --- When ---
+	have := Int64SliceSpec()
+
+	// --- Then ---
+	tag, err := have.TagCreate("name", []int64{42, 44})
+	assert.NoError(t, err)
+	assert.SameType(t, &Int64Slice{}, tag)
+	assert.Equal(t, "name", tag.TagName())
+	assert.Equal(t, []int64{42, 44}, tag.TagValue())
+	assert.Equal(t, KindInt64Slice, tag.TagKind())
+
+	tag, err = have.TagParse("name", "[42, 44]")
+	assert.ErrorIs(t, ErrNotImpl, err)
+	assert.Nil(t, tag)
+}
+
 func Test_NewInt64Slice(t *testing.T) {
 	// --- When ---
 	tag := NewInt64Slice("name", 42, 44)
@@ -18,8 +35,7 @@ func Test_NewInt64Slice(t *testing.T) {
 	assert.Equal(t, "name", tag.name)
 	assert.Equal(t, []int64{42, 44}, tag.value)
 	assert.Equal(t, KindInt64Slice, tag.kind)
-	assert.NotNil(t, tag.stringer)
-	assert.Equal(t, "[42, 44]", tag.stringer([]int64{42, 44}))
+	assert.Equal(t, "[42, 44]", tag.String())
 }
 
 func Test_CreateInt64Slice(t *testing.T) {
@@ -33,8 +49,7 @@ func Test_CreateInt64Slice(t *testing.T) {
 		assert.Equal(t, "name", tag.name)
 		assert.Equal(t, []int64{42, 44}, tag.value)
 		assert.Equal(t, KindInt64Slice, tag.kind)
-		assert.NotNil(t, tag.stringer)
-		assert.Equal(t, "[42, 44]", tag.stringer([]int64{42, 44}))
+		assert.Equal(t, "[42, 44]", tag.String())
 	})
 
 	t.Run("error - invalid type", func(t *testing.T) {
@@ -46,17 +61,6 @@ func Test_CreateInt64Slice(t *testing.T) {
 		assert.ErrorContain(t, "name: ", err)
 		assert.Nil(t, tag)
 	})
-}
-
-func Test_toInt64Slice(t *testing.T) {
-	// --- Given ---
-	i32s := []int32{42, 44}
-
-	// --- When ---
-	have := toInt64Slice(i32s, Options{})
-
-	// --- Then ---
-	assert.Equal(t, []int64{42, 44}, have)
 }
 
 func Test_createInt64Slice(t *testing.T) {
@@ -88,7 +92,7 @@ func Test_createInt64Slice(t *testing.T) {
 	})
 }
 
-func Test_asInt64Slice_success_tabular(t *testing.T) {
+func Test_createInt64Slice_success_tabular(t *testing.T) {
 	tt := []struct {
 		testN string
 
@@ -112,4 +116,15 @@ func Test_asInt64Slice_success_tabular(t *testing.T) {
 			assert.Equal(t, tc.want, have)
 		})
 	}
+}
+
+func Test_toInt64Slice(t *testing.T) {
+	// --- Given ---
+	i32s := []int32{42, 44}
+
+	// --- When ---
+	have := toInt64Slice(i32s, Options{})
+
+	// --- Then ---
+	assert.Equal(t, []int64{42, 44}, have)
 }

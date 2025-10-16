@@ -9,6 +9,23 @@ import (
 	"github.com/ctx42/testing/pkg/assert"
 )
 
+func Test_BoolSliceSpec(t *testing.T) {
+	// --- When ---
+	have := BoolSliceSpec()
+
+	// --- Then ---
+	tag, err := have.TagCreate("name", []bool{true, false})
+	assert.NoError(t, err)
+	assert.SameType(t, &BoolSlice{}, tag)
+	assert.Equal(t, "name", tag.TagName())
+	assert.Equal(t, []bool{true, false}, tag.TagValue())
+	assert.Equal(t, KindBoolSlice, tag.TagKind())
+
+	tag, err = have.TagParse("name", "[true, false]")
+	assert.ErrorIs(t, ErrNotImpl, err)
+	assert.Nil(t, tag)
+}
+
 func Test_NewBoolSlice(t *testing.T) {
 	// --- When ---
 	tag := NewBoolSlice("name", true, false)
@@ -18,8 +35,7 @@ func Test_NewBoolSlice(t *testing.T) {
 	assert.Equal(t, "name", tag.name)
 	assert.Equal(t, []bool{true, false}, tag.value)
 	assert.Equal(t, KindBoolSlice, tag.kind)
-	assert.NotNil(t, tag.stringer)
-	assert.Equal(t, "[true, false]", tag.stringer([]bool{true, false}))
+	assert.Equal(t, "[true, false]", tag.String())
 }
 
 func Test_CreateBoolSlice(t *testing.T) {
@@ -33,8 +49,7 @@ func Test_CreateBoolSlice(t *testing.T) {
 		assert.Equal(t, "name", tag.name)
 		assert.Equal(t, []bool{true, false}, tag.value)
 		assert.Equal(t, KindBoolSlice, tag.kind)
-		assert.NotNil(t, tag.stringer)
-		assert.Equal(t, "[true, false]", tag.stringer([]bool{true, false}))
+		assert.Equal(t, "[true, false]", tag.String())
 	})
 
 	t.Run("error - invalid type", func(t *testing.T) {

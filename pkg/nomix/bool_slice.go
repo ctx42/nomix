@@ -11,6 +11,18 @@ import (
 // BoolSlice is a tag for a slice of bool values.
 type BoolSlice = slice[bool]
 
+// boolSliceSpec defines the [KindSpec] for [BoolSlice] type.
+var boolSliceSpec = KindSpec{
+	knd: KindBoolSlice,
+	tcr: CreateFunc(CreateBoolSlice),
+	tpr: func(name string, val string, opts ...Option) (Tag, error) {
+		return nil, ErrNotImpl
+	},
+}
+
+// BoolSliceSpec returns a [KindSpec] for [BoolSlice] type.
+func BoolSliceSpec() KindSpec { return boolSliceSpec }
+
 // NewBoolSlice returns a new instance of [BoolSlice].
 func NewBoolSlice(name string, val ...bool) *BoolSlice {
 	return &slice[bool]{
@@ -32,6 +44,15 @@ func CreateBoolSlice(name string, val any, _ ...Option) (*BoolSlice, error) {
 	return NewBoolSlice(name, v...), nil
 }
 
+// createBoolSlice casts the value to []bool. Returns the []bool and nil error
+// on success. Returns nil and [ErrInvType] if the value is not the []bool type.
+func createBoolSlice(val any, _ Options) ([]bool, error) {
+	if v, ok := val.([]bool); ok {
+		return v, nil
+	}
+	return nil, ErrInvType
+}
+
 // boolSliceToString converts a bool slice to its string representation.
 func boolSliceToString(v []bool) string {
 	ret := "["
@@ -42,13 +63,4 @@ func boolSliceToString(v []bool) string {
 		ret += strconv.FormatBool(val)
 	}
 	return ret + "]"
-}
-
-// createBoolSlice casts the value to []bool. Returns the []bool and nil error
-// on success. Returns nil and [ErrInvType] if the value is not the []bool type.
-func createBoolSlice(val any, _ Options) ([]bool, error) {
-	if v, ok := val.([]bool); ok {
-		return v, nil
-	}
-	return nil, ErrInvType
 }

@@ -9,6 +9,23 @@ import (
 	"github.com/ctx42/testing/pkg/assert"
 )
 
+func Test_IntSliceSpec(t *testing.T) {
+	// --- When ---
+	have := IntSliceSpec()
+
+	// --- Then ---
+	tag, err := have.TagCreate("name", []int{42, 44})
+	assert.NoError(t, err)
+	assert.SameType(t, &IntSlice{}, tag)
+	assert.Equal(t, "name", tag.TagName())
+	assert.Equal(t, []int{42, 44}, tag.TagValue())
+	assert.Equal(t, KindIntSlice, tag.TagKind())
+
+	tag, err = have.TagParse("name", "[42, 44]")
+	assert.ErrorIs(t, ErrNotImpl, err)
+	assert.Nil(t, tag)
+}
+
 func Test_NewIntSlice(t *testing.T) {
 	// --- When ---
 	tag := NewIntSlice("name", 42, 44)
@@ -18,8 +35,7 @@ func Test_NewIntSlice(t *testing.T) {
 	assert.Equal(t, "name", tag.name)
 	assert.Equal(t, []int{42, 44}, tag.value)
 	assert.Equal(t, KindIntSlice, tag.kind)
-	assert.NotNil(t, tag.stringer)
-	assert.Equal(t, "[42, 44]", tag.stringer([]int{42, 44}))
+	assert.Equal(t, "[42, 44]", tag.String())
 }
 
 func Test_CreateIntSlice(t *testing.T) {
@@ -33,8 +49,7 @@ func Test_CreateIntSlice(t *testing.T) {
 		assert.Equal(t, "name", tag.name)
 		assert.Equal(t, []int{42, 44}, tag.value)
 		assert.Equal(t, KindIntSlice, tag.kind)
-		assert.NotNil(t, tag.stringer)
-		assert.Equal(t, "[42, 44]", tag.stringer([]int{42, 44}))
+		assert.Equal(t, "[42, 44]", tag.String())
 	})
 
 	t.Run("error - invalid type", func(t *testing.T) {

@@ -16,6 +16,44 @@ type TagType interface {
 // TagKind describes the type of [Tag] value.
 type TagKind uint16
 
+// String implements [fmt.Stringer].
+//
+// nolint: cyclop
+func (tk TagKind) String() string {
+	switch tk {
+	case KindString:
+		return "KindString"
+	case KindInt64:
+		return "KindInt64"
+	case KindFloat64:
+		return "KindFloat64"
+	case KindTime:
+		return "KindTime"
+	case KindJSON:
+		return "KindJSON"
+	case KindBool:
+		return "KindBool"
+	case KindInt:
+		return "KindInt"
+	case KindByteSlice:
+		return "KindByteSlice"
+	case KindStringSlice:
+		return "KindStringSlice"
+	case KindInt64Slice:
+		return "KindInt64Slice"
+	case KindFloat64Slice:
+		return "KindFloat64Slice"
+	case KindTimeSlice:
+		return "KindTimeSlice"
+	case KindBoolSlice:
+		return "KindBoolSlice"
+	case KindIntSlice:
+		return "KindIntSlice"
+	default:
+		return "KindUnknown"
+	}
+}
+
 // Base [Tag] kinds.
 const (
 	KindString  TagKind = 0b00000000_00000010
@@ -100,15 +138,63 @@ type TagValueComparer interface {
 	TagEqual(other Tag) bool
 }
 
-// TagCreator is an interface providing function for creating tag instances.
+// TagCreator is an interface for creating [Tag] instances.
 type TagCreator interface {
+	// TagCreate creates the appropriate [Tag] instance based on the value's
+	// type. It returns the [ErrNoCreator] error if the value's type is not
+	// supported. The name must be set by the implementer.
+	TagCreate(value any, opts ...Option) (Tag, error)
+}
+
+// TagNamedCreator is an interface for creating named [Tag] instances.
+type TagNamedCreator interface {
 	// TagCreate creates the appropriate [Tag] instance based on the value's
 	// type. It returns the [ErrNoCreator] error if the value's type is not
 	// supported.
 	TagCreate(name string, value any, opts ...Option) (Tag, error)
 }
 
-// GenTagCreator is a generic tag creator function that considers the value's
-// type and creates the appropriate [Tag] implementation for it. It returns the
-// [ErrNoCreator] error if the value's type is not supported.
-type GenTagCreator[T any] func(name string, val any, opts ...Option) (T, error)
+// TagParser is an interface for creating [Tag] instances from their string
+// representation.
+type TagParser interface {
+	TagParse(name string, val string, opts ...Option) (Tag, error)
+}
+
+// TagNamedParser is an interface for creating named [Tag] instances from their
+// string representation. The name must be set by the implementer.
+type TagNamedParser interface {
+	TagParse(val string, opts ...Option) (Tag, error)
+}
+
+// TagCreateFunc function signature for creating [Tag] instances.
+type TagCreateFunc func(name string, val any, opts ...Option) (Tag, error)
+
+// TagParseFunc function signature for creating [Tag] instances from their
+// string representation.
+type TagParseFunc func(name, val string, opts ...Option) (Tag, error)
+
+// CreateFunc creates a [TagCreateFunc] from a function that creates concrete
+// tag instances.
+//
+// Examples:
+//
+//	CreateFunc(CreateBool)
+//	CreateFunc(CreateInt64)
+func CreateFunc[T Tag](fn func(name string, val any, opts ...Option) (T, error)) TagCreateFunc {
+	return func(name string, val any, opts ...Option) (Tag, error) {
+		return fn(name, val, opts...)
+	}
+}
+
+// ParseFunc creates a [TagParseFunc] from a function that creates concrete
+// tag instances from their string representation.
+//
+// Examples:
+//
+//	ParseFunc(ParseBool)
+//	ParseFunc(ParseInt64)
+func ParseFunc[T Tag](fn func(name string, val string, opts ...Option) (T, error)) TagParseFunc {
+	return func(name string, val string, opts ...Option) (Tag, error) {
+		return fn(name, val, opts...)
+	}
+}

@@ -10,6 +10,26 @@ import (
 	"github.com/ctx42/testing/pkg/assert"
 )
 
+func Test_TimeSliceSpec(t *testing.T) {
+	// --- When ---
+	have := TimeSliceSpec()
+
+	// --- Then ---
+	tim0 := time.Date(2000, 1, 2, 3, 4, 5, 0, time.UTC)
+	tim1 := time.Date(2001, 1, 2, 3, 4, 5, 0, time.UTC)
+	tag, err := have.TagCreate("name", []time.Time{tim0, tim1})
+	assert.NoError(t, err)
+	assert.SameType(t, &TimeSlice{}, tag)
+	assert.Equal(t, "name", tag.TagName())
+	assert.Equal(t, []time.Time{tim0, tim1}, tag.TagValue())
+	assert.Equal(t, KindTimeSlice, tag.TagKind())
+
+	data := `["2000-01-02T03:04:05Z", "2001-01-02T03:04:05Z"]`
+	tag, err = have.TagParse("name", data)
+	assert.ErrorIs(t, ErrNotImpl, err)
+	assert.Nil(t, tag)
+}
+
 func Test_NewTimeSlice(t *testing.T) {
 	// --- Given ---
 	tim0 := time.Date(2000, 1, 2, 3, 4, 5, 0, time.UTC)
@@ -23,8 +43,7 @@ func Test_NewTimeSlice(t *testing.T) {
 	assert.Equal(t, "name", tag.name)
 	assert.Equal(t, []time.Time{tim0, tim1}, tag.value)
 	assert.Equal(t, KindTimeSlice, tag.kind)
-	assert.NotNil(t, tag.stringer)
-	have := tag.stringer([]time.Time{tim0, tim1})
+	have := tag.String()
 	assert.Equal(t, `["2000-01-02T03:04:05Z", "2001-01-02T03:04:05Z"]`, have)
 }
 
@@ -43,9 +62,9 @@ func Test_CreateTimeSlice(t *testing.T) {
 		assert.Equal(t, "name", tag.name)
 		assert.Equal(t, []time.Time{tim0, tim1}, tag.value)
 		assert.Equal(t, KindTimeSlice, tag.kind)
-		assert.NotNil(t, tag.stringer)
-		have := tag.stringer([]time.Time{tim0, tim1})
-		assert.Equal(t, `["2000-01-02T03:04:05Z", "2001-01-02T03:04:05Z"]`, have)
+		have := tag.String()
+		want := `["2000-01-02T03:04:05Z", "2001-01-02T03:04:05Z"]`
+		assert.Equal(t, want, have)
 	})
 
 	t.Run("error - invalid type", func(t *testing.T) {
@@ -59,7 +78,7 @@ func Test_CreateTimeSlice(t *testing.T) {
 	})
 }
 
-func Test_asTimeSlice(t *testing.T) {
+func Test_createTimeSlice(t *testing.T) {
 	t.Run("error - not supported type", func(t *testing.T) {
 		// --- When ---
 		have, err := createTimeSlice(42, Options{})

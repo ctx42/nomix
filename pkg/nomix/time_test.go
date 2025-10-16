@@ -12,6 +12,27 @@ import (
 	"github.com/ctx42/testing/pkg/must"
 )
 
+func Test_TimeSpec(t *testing.T) {
+	// --- When ---
+	have := TimeSpec()
+
+	// --- Then ---
+	tim := time.Date(2000, 1, 2, 3, 4, 5, 0, time.UTC)
+	tag, err := have.TagCreate("name", tim)
+	assert.NoError(t, err)
+	assert.SameType(t, &Time{}, tag)
+	assert.Equal(t, "name", tag.TagName())
+	assert.Exact(t, tim, tag.TagValue())
+	assert.Equal(t, KindTime, tag.TagKind())
+
+	tag, err = have.TagParse("name", "2000-01-02T03:04:05Z")
+	assert.NoError(t, err)
+	assert.SameType(t, &Time{}, tag)
+	assert.Equal(t, "name", tag.TagName())
+	assert.Exact(t, tim, tag.TagValue())
+	assert.Equal(t, KindTime, tag.TagKind())
+}
+
 func Test_NewTime(t *testing.T) {
 	// --- When ---
 	tag := NewTime("name", time.Date(2000, 1, 2, 3, 4, 5, 0, time.UTC))
@@ -21,16 +42,16 @@ func Test_NewTime(t *testing.T) {
 	assert.Equal(t, "name", tag.name)
 	assert.Exact(t, time.Date(2000, 1, 2, 3, 4, 5, 0, time.UTC), tag.value)
 	assert.Equal(t, KindTime, tag.kind)
-	assert.NotNil(t, tag.stringer)
-
-	tim := time.Date(2000, 1, 1, 0, 0, 0, 0, time.UTC)
-	assert.Equal(t, "2000-01-01T00:00:00Z", tag.stringer(tim))
+	assert.Exact(t, "2000-01-02T03:04:05Z", tag.String())
 }
 
 func Test_CreateTime(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
+		// --- Given ---
+		tim := time.Date(2000, 1, 2, 3, 4, 5, 0, time.UTC)
+
 		// --- When ---
-		tag, err := CreateTime("name", time.Date(2000, 1, 2, 3, 4, 5, 0, time.UTC))
+		tag, err := CreateTime("name", tim)
 
 		// --- Then ---
 		assert.NoError(t, err)
@@ -38,10 +59,23 @@ func Test_CreateTime(t *testing.T) {
 		assert.Equal(t, "name", tag.name)
 		assert.Exact(t, time.Date(2000, 1, 2, 3, 4, 5, 0, time.UTC), tag.value)
 		assert.Equal(t, KindTime, tag.kind)
-		assert.NotNil(t, tag.stringer)
+		assert.Exact(t, "2000-01-02T03:04:05Z", tag.String())
+	})
 
-		tim := time.Date(2000, 1, 1, 0, 0, 0, 0, time.UTC)
-		assert.Equal(t, "2000-01-01T00:00:00Z", tag.stringer(tim))
+	t.Run("options passed", func(t *testing.T) {
+		// --- Given ---
+		opt := WithTimeFormat("2006-01-02")
+
+		// --- When ---
+		tag, err := CreateTime("name", "2000-01-02", opt)
+
+		// --- Then ---
+		assert.NoError(t, err)
+		assert.SameType(t, &Time{}, tag)
+		assert.Equal(t, "name", tag.name)
+		assert.Exact(t, time.Date(2000, 1, 2, 0, 0, 0, 0, time.UTC), tag.value)
+		assert.Equal(t, KindTime, tag.kind)
+		assert.Exact(t, "2000-01-02T00:00:00Z", tag.String())
 	})
 
 	t.Run("error - invalid type", func(t *testing.T) {
@@ -53,6 +87,69 @@ func Test_CreateTime(t *testing.T) {
 		assert.ErrorContain(t, "name: ", err)
 		assert.Nil(t, tag)
 	})
+}
+
+func Test_createTime(t *testing.T) {
+	t.Run("error - invalid type", func(t *testing.T) {
+		// --- When ---
+		have, err := createTime(42, Options{})
+
+		// --- Then ---
+		assert.ErrorIs(t, err, ErrInvType)
+		assert.Empty(t, have)
+	})
+
+	t.Run("error - by default sting is not supported", func(t *testing.T) {
+		// --- When ---
+		have, err := createTime("2000-01-02T03:04:05Z", Options{})
+
+		// --- Then ---
+		assert.ErrorIs(t, err, ErrInvType)
+		assert.Empty(t, have)
+	})
+
+	t.Run("error - nil value", func(t *testing.T) {
+		// --- When ---
+		have, err := createTime(nil, Options{})
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrInvType, err)
+		assert.Zero(t, have)
+	})
+}
+
+func Test_createTime_success_tabular(t *testing.T) {
+	tt := []struct {
+		testN string
+
+		have any
+		want time.Time
+	}{
+		{
+			"time.Time",
+			time.Date(2000, 1, 2, 3, 4, 5, 0, time.UTC),
+			time.Date(2000, 1, 2, 3, 4, 5, 0, time.UTC),
+		},
+		{
+			"string",
+			"2000-01-02T03:04:05Z",
+			time.Date(2000, 1, 2, 3, 4, 5, 0, time.UTC),
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.testN, func(t *testing.T) {
+			// --- Given ---
+			opts := Options{timeFormat: time.RFC3339}
+
+			// --- When ---
+			have, err := createTime(tc.have, opts)
+
+			// --- Then ---
+			assert.NoError(t, err)
+			assert.Equal(t, tc.want, have)
+		})
+	}
 }
 
 func Test_ParseTime_success_tabular(t *testing.T) {
@@ -70,7 +167,7 @@ func Test_ParseTime_success_tabular(t *testing.T) {
 			time.Date(2022, 3, 4, 5, 6, 7, 0, time.UTC),
 		},
 		{
-			"date",
+			"format option passed to parser",
 			"2022-03-04",
 			[]Option{WithTimeFormat("2006-01-02")},
 			time.Date(2022, 3, 4, 0, 0, 0, 0, time.UTC),
@@ -203,67 +300,4 @@ func Test_parseTime(t *testing.T) {
 		assert.ErrorIs(t, ErrInvFormat, err)
 		assert.Zero(t, have)
 	})
-}
-
-func Test_createTime(t *testing.T) {
-	t.Run("error - invalid type", func(t *testing.T) {
-		// --- When ---
-		have, err := createTime(42, Options{})
-
-		// --- Then ---
-		assert.ErrorIs(t, err, ErrInvType)
-		assert.Empty(t, have)
-	})
-
-	t.Run("error - by default sting is not supported", func(t *testing.T) {
-		// --- When ---
-		have, err := createTime("2000-01-02T03:04:05Z", Options{})
-
-		// --- Then ---
-		assert.ErrorIs(t, err, ErrInvType)
-		assert.Empty(t, have)
-	})
-
-	t.Run("error - nil value", func(t *testing.T) {
-		// --- When ---
-		have, err := createTime(nil, Options{})
-
-		// --- Then ---
-		assert.ErrorIs(t, ErrInvType, err)
-		assert.Zero(t, have)
-	})
-}
-
-func Test_asTime_success_tabular(t *testing.T) {
-	tt := []struct {
-		testN string
-
-		have any
-		want time.Time
-	}{
-		{
-			"time.Time",
-			time.Date(2000, 1, 2, 3, 4, 5, 0, time.UTC),
-			time.Date(2000, 1, 2, 3, 4, 5, 0, time.UTC),
-		},
-		{
-			"string",
-			"2000-01-02T03:04:05Z",
-			time.Date(2000, 1, 2, 3, 4, 5, 0, time.UTC),
-		},
-	}
-
-	for _, tc := range tt {
-		t.Run(tc.testN, func(t *testing.T) {
-			// --- Given ---
-			opts := Options{timeFormat: time.RFC3339}
-
-			// --- When ---
-			have, err := createTime(tc.have, opts)
-
-			// --- Then ---
-			assert.NoError(t, err)
-			assert.Equal(t, tc.want, have)
-		})
-	}
 }
