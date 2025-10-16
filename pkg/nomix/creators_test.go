@@ -29,7 +29,7 @@ func Test_Creators_Register(t *testing.T) {
 		}
 
 		// --- When ---
-		have := reg.Register(42i+44, tcr)
+		have := reg.Register(42i+44, CreateFunc(tcr))
 
 		// --- Then ---
 		assert.Nil(t, have)
@@ -41,7 +41,7 @@ func Test_Creators_Register(t *testing.T) {
 
 	t.Run("register existing", func(t *testing.T) {
 		// --- Given ---
-		tcrInt := AsTagCreator(CreateInt)
+		tcrInt := CreateFunc(CreateInt)
 		reg := NewCreators()
 		reg.Register(42, tcrInt)
 
@@ -52,7 +52,7 @@ func Test_Creators_Register(t *testing.T) {
 		}
 
 		// --- When ---
-		have := reg.Register(42, tcr)
+		have := reg.Register(42, CreateFunc(tcr))
 
 		// --- Then ---
 		assert.Same(t, tcrInt, have)
