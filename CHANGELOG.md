@@ -1,3 +1,6 @@
+## v0.4.0 (Fri, 17 Oct 2025 19:56:52 UTC)
+- Changes to tag validation logic.
+
 ## v0.3.0 (Fri, 17 Oct 2025 14:56:59 UTC)
 - feat: Add the ability to define validation rules for a tag `Definition`.
 
