@@ -12,7 +12,7 @@ type KindSpec struct {
 
 // NewKindSpec creates a new [KindSpec] instance.
 func NewKindSpec(knd TagKind, tcr TagCreateFunc, tpr TagParseFunc) KindSpec {
-	return KindSpec{knd, tcr, tpr}
+	return KindSpec{knd: knd, tcr: tcr, tpr: tpr}
 }
 
 // TagCreate creates a new [Tag] matching the [tagKind] in the spec.

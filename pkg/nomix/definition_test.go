@@ -5,15 +5,33 @@ import (
 	"time"
 
 	"github.com/ctx42/testing/pkg/assert"
+	"github.com/ctx42/verax/pkg/verax"
 )
 
 func Test_Define(t *testing.T) {
-	// --- When ---
-	have := Define("name", stringSpec)
+	t.Run("no rules", func(t *testing.T) {
+		// --- When ---
+		have := Define("name", stringSpec)
 
-	// --- Then ---
-	assert.Equal(t, "name", have.name)
-	assert.Equal(t, stringSpec, have.spec)
+		// --- Then ---
+		assert.Equal(t, "name", have.name)
+		assert.Equal(t, stringSpec, have.spec)
+		assert.Nil(t, have.rule)
+	})
+
+	t.Run("with rules", func(t *testing.T) {
+		// --- Given ---
+		rMin := verax.Min(42)
+		rMax := verax.Max(42)
+
+		// --- When ---
+		have := Define("name", intSpec, rMin, rMax)
+
+		// --- Then ---
+		assert.Equal(t, "name", have.name)
+		assert.Equal(t, intSpec, have.spec)
+		assert.NotNil(t, have.rule)
+	})
 }
 
 func Test_Definition_TagName(t *testing.T) {
@@ -126,5 +144,48 @@ func Test_Definition_TagParse(t *testing.T) {
 		assert.ErrorEqual(t, "name: invalid element format", err)
 		assert.ErrorIs(t, ErrInvFormat, err)
 		assert.Nil(t, have)
+	})
+}
+
+func Test_Definition_Validate(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		// --- Given ---
+		rMin := verax.Min(42)
+		rMax := verax.Max(44)
+		def := Define("name", int64Spec, rMin, rMax)
+
+		// --- When ---
+		err := def.Validate(42)
+
+		// --- Then ---
+		assert.NoError(t, err)
+	})
+
+	t.Run("success with a non-primary type", func(t *testing.T) {
+		// --- Given ---
+		rMin := verax.Min(42)
+		rMax := verax.Max(44)
+		def := Define("name", int64Spec, rMin, rMax)
+
+		// --- When ---
+		err := def.Validate(uint8(42))
+
+		// --- Then ---
+		assert.NoError(t, err)
+	})
+
+	t.Run("error", func(t *testing.T) {
+		// --- Given ---
+		rMin := verax.Min(42)
+		rMax := verax.Max(44)
+		def := Define("name", int64Spec, rMin, rMax)
+
+		// --- When ---
+		errMin := def.Validate(40)
+		errMax := def.Validate(88)
+
+		// --- Then ---
+		assert.ErrorEqual(t, "name: must be no less than 42", errMin)
+		assert.ErrorEqual(t, "name: must be no greater than 44", errMax)
 	})
 }

@@ -69,6 +69,25 @@ func Test_Registry_Register(t *testing.T) {
 	})
 }
 
+func Test_Register_Spec(t *testing.T) {
+	t.Run("existing", func(t *testing.T) {
+		// --- When ---
+		have := GetSpec(42)
+
+		// --- Then ---
+		assert.False(t, have.IsZero())
+		assert.Equal(t, intSpec, have)
+	})
+
+	t.Run("existing", func(t *testing.T) {
+		// --- When ---
+		have := GetSpec(42i + 44)
+
+		// --- Then ---
+		assert.True(t, have.IsZero())
+	})
+}
+
 func Test_Registry_Create(t *testing.T) {
 	t.Run("error - not registered type", func(t *testing.T) {
 		// --- Given ---

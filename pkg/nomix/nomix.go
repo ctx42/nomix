@@ -24,6 +24,9 @@ var (
 	// ErrNoCreator represents a missing tag creator for a type.
 	ErrNoCreator = errors.New("creator not found")
 
+	// ErrNoSpec represents a missing tag spec for a type.
+	ErrNoSpec = errors.New("spec not found")
+
 	// ErrNotImpl represents a missing method implementation or
 	// functionality for a type.
 	ErrNotImpl = errors.New("not implemented")

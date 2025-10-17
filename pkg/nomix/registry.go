@@ -7,29 +7,50 @@ import (
 	"encoding/json"
 	"fmt"
 	"reflect"
+	"sync"
 	"time"
 )
 
 // specs is the global registry of [KindSpec]s.
 var specs Registry
 
+// mxSpecs protects the [specs] variable.
+var mxSpecs sync.RWMutex
+
 // RegisterSpec registers a tag creator for the given type. If the type
 // already exists, it is overwritten.
-func RegisterSpec(typ any, spec KindSpec) { specs.Register(typ, spec) }
+func RegisterSpec(typ any, spec KindSpec) {
+	mxSpecs.Lock()
+	specs.Register(typ, spec)
+	mxSpecs.Unlock()
+}
+
+// GetSpec returns the [KindSpec] for the given type.
+func GetSpec(typ any) KindSpec {
+	mxSpecs.RLock()
+	defer mxSpecs.RUnlock()
+	return specs.Spec(typ)
+}
 
 // CreateTag creates a new [Tag] for the given name and value. The value's type
 // must be first registered with [RegisterSpec].
 func CreateTag(name string, val any) (Tag, error) {
+	mxSpecs.RLock()
+	defer mxSpecs.RUnlock()
 	return specs.Create(name, val)
 }
 
 // CreatorForKind returns the [TagCreateFunc] for the given [TagKind].
 func CreatorForKind(knd TagKind) (TagCreateFunc, error) {
+	mxSpecs.RLock()
+	defer mxSpecs.RUnlock()
 	return specs.CreatorForKind(knd)
 }
 
 // CreatorForType returns the [TagCreateFunc] for the given type.
 func CreatorForType(typ any) (TagCreateFunc, error) {
+	mxSpecs.RLock()
+	defer mxSpecs.RUnlock()
 	return specs.CreatorForType(typ)
 }
 
@@ -84,6 +105,11 @@ func (reg Registry) Register(typ any, spec KindSpec) KindSpec {
 	have := reg.specs[rt]
 	reg.specs[rt] = spec
 	return have
+}
+
+// Spec returns the [KindSpec] for the given type.
+func (reg Registry) Spec(typ any) KindSpec {
+	return reg.specs[reflect.TypeOf(typ)]
 }
 
 // Create creates a new [Tag] for the given value. The value's type must be
