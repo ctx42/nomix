@@ -3,6 +3,11 @@
 
 package nomix
 
+import (
+	"github.com/ctx42/verax/pkg/verax"
+	"github.com/ctx42/xrr/pkg/xrr"
+)
+
 // Compile time checks.
 var (
 	_ Tag              = &single[int]{}
@@ -54,3 +59,10 @@ func (tag *single[T]) TagSame(other Tag) bool {
 }
 
 func (tag *single[T]) String() string { return tag.stringer(tag.value) }
+
+func (tag *single[T]) ValidateWith(rule verax.Rule) error {
+	if err := rule.Validate(tag.value); err != nil {
+		return xrr.FieldError(tag.name, err)
+	}
+	return nil
+}

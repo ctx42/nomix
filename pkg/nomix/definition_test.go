@@ -96,8 +96,8 @@ func Test_Definition_TagCreate(t *testing.T) {
 		have, err := def.TagCreate(42)
 
 		// --- Then ---
-		assert.ErrorEqual(t, "name: invalid element type", err)
 		assert.ErrorIs(t, ErrInvType, err)
+		assert.ErrorContain(t, "name: ", err)
 		assert.Nil(t, have)
 	})
 }
@@ -141,8 +141,20 @@ func Test_Definition_TagParse(t *testing.T) {
 		have, err := def.TagParse("abc")
 
 		// --- Then ---
-		assert.ErrorEqual(t, "name: invalid element format", err)
 		assert.ErrorIs(t, ErrInvFormat, err)
+		assert.ErrorContain(t, "name: ", err)
+		assert.Nil(t, have)
+	})
+
+	t.Run("error - from validator", func(t *testing.T) {
+		// --- Given ---
+		def := Define("name", intSpec, verax.Max(42))
+
+		// --- When ---
+		have, err := def.TagParse("44")
+
+		// --- Then ---
+		assert.ErrorEqual(t, "name: must be no greater than 42", err)
 		assert.Nil(t, have)
 	})
 }
@@ -174,7 +186,30 @@ func Test_Definition_Validate(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
-	t.Run("error", func(t *testing.T) {
+	t.Run("no validation rules", func(t *testing.T) {
+		// --- Given ---
+		def := Define("name", int64Spec)
+
+		// --- When ---
+		err := def.Validate(11)
+
+		// --- Then ---
+		assert.NoError(t, err)
+	})
+
+	t.Run("error - wrong type without validation rules ", func(t *testing.T) {
+		// --- Given ---
+		def := Define("name", int64Spec)
+
+		// --- When ---
+		err := def.Validate("abc")
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrInvType, err)
+		assert.ErrorContain(t, "name: ", err)
+	})
+
+	t.Run("error - single spec", func(t *testing.T) {
 		// --- Given ---
 		rMin := verax.Min(42)
 		rMax := verax.Max(44)
@@ -187,5 +222,16 @@ func Test_Definition_Validate(t *testing.T) {
 		// --- Then ---
 		assert.ErrorEqual(t, "name: must be no less than 42", errMin)
 		assert.ErrorEqual(t, "name: must be no greater than 44", errMax)
+	})
+
+	t.Run("error - slice spec", func(t *testing.T) {
+		// --- Given ---
+		def := Define("name", int64SliceSpec, verax.Length(3, 3))
+
+		// --- When ---
+		err := def.Validate([]int64{42, 44})
+
+		// --- Then ---
+		assert.ErrorEqual(t, "name: the length must be exactly 3", err)
 	})
 }

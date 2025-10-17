@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: (c) 2025 Rafal Zajac <rzajac@gmail.com>
 // SPDX-License-Identifier: MIT
 
+// Package nomix provides a set of types and functions for handling tags and
+// metadata in a generic way.
 package nomix
 
 import (

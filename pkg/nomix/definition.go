@@ -29,17 +29,33 @@ func Define(name string, spec KindSpec, rules ...verax.Rule) *Definition {
 }
 
 // TagName returns the tag definition name.
-func (td *Definition) TagName() string { return td.name }
+func (def *Definition) TagName() string { return def.name }
 
 // TagKind returns the tag definition kind.
-func (td *Definition) TagKind() TagKind { return td.spec.knd }
+func (def *Definition) TagKind() TagKind { return def.spec.knd }
 
-func (td *Definition) TagCreate(val any, opts ...Option) (Tag, error) {
-	return td.spec.TagCreate(td.name, val, opts...)
+// TagCreate creates a new [Tag] matching the definition. It does not validate
+// the value.
+func (def *Definition) TagCreate(val any, opts ...Option) (Tag, error) {
+	tag, err := def.spec.TagCreate(def.name, val, opts...)
+	if err != nil {
+		return nil, err
+	}
+	if err = def.validate(tag.TagValue()); err != nil {
+		return nil, err
+	}
+	return tag, nil
 }
 
-func (td *Definition) TagParse(val string, opts ...Option) (Tag, error) {
-	return td.spec.TagParse(td.name, val, opts...)
+func (def *Definition) TagParse(val string, opts ...Option) (Tag, error) {
+	tag, err := def.spec.TagParse(def.name, val, opts...)
+	if err != nil {
+		return nil, err
+	}
+	if err = def.validate(tag.TagValue()); err != nil {
+		return nil, err
+	}
+	return tag, nil
 }
 
 // Validate validates the given value against the definition.
@@ -47,13 +63,17 @@ func (td *Definition) TagParse(val string, opts ...Option) (Tag, error) {
 // NOTE: The [TagCreator] is first used to create a [Tag] instance with the
 // provided value this means that all supported by [TagCreator] types are
 // supported.
-func (td *Definition) Validate(val any) error {
-	tag, err := td.TagCreate(val)
-	if err != nil {
-		return xrr.FieldError(td.name, err)
+func (def *Definition) Validate(val any) error {
+	_, err := def.TagCreate(val) // Also does validation.
+	return err
+}
+
+func (def *Definition) validate(val any) error {
+	if def.rule == nil {
+		return nil
 	}
-	if err = td.rule.Validate(tag.TagValue()); err != nil {
-		return xrr.FieldError(td.name, err)
+	if err := def.rule.Validate(val); err != nil {
+		return xrr.FieldError(def.name, err)
 	}
 	return nil
 }

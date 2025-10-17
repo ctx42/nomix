@@ -8,9 +8,10 @@ import (
 	"testing"
 
 	"github.com/ctx42/testing/pkg/assert"
+	"github.com/ctx42/verax/pkg/verax"
 )
 
-func Test_array_TagName(t *testing.T) {
+func Test_slice_TagName(t *testing.T) {
 	tag := &slice[int]{name: "name"}
 
 	// --- When ---
@@ -20,7 +21,7 @@ func Test_array_TagName(t *testing.T) {
 	assert.Equal(t, "name", have)
 }
 
-func Test_array_TagKind(t *testing.T) {
+func Test_slice_TagKind(t *testing.T) {
 	tag := &slice[int]{kind: KindIntSlice}
 
 	// --- When ---
@@ -30,7 +31,7 @@ func Test_array_TagKind(t *testing.T) {
 	assert.Equal(t, KindIntSlice, have)
 }
 
-func Test_array_TagValue(t *testing.T) {
+func Test_slice_TagValue(t *testing.T) {
 	tag := &slice[int]{value: []int{42, 44}}
 
 	// --- When ---
@@ -40,7 +41,7 @@ func Test_array_TagValue(t *testing.T) {
 	assert.Equal(t, []int{42, 44}, have)
 }
 
-func Test_array_Value(t *testing.T) {
+func Test_slice_Value(t *testing.T) {
 	tag := &slice[int]{value: []int{42, 44}}
 
 	// --- When ---
@@ -50,7 +51,7 @@ func Test_array_Value(t *testing.T) {
 	assert.Equal(t, []int{42, 44}, have)
 }
 
-func Test_array_Set(t *testing.T) {
+func Test_slice_Set(t *testing.T) {
 	// --- Given ---
 	tag := &slice[int]{value: []int{42, 44}}
 
@@ -61,7 +62,7 @@ func Test_array_Set(t *testing.T) {
 	assert.Equal(t, []int{52, 54}, tag.value)
 }
 
-func Test_array_TagSet(t *testing.T) {
+func Test_slice_TagSet(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		// --- Given ---
 		tag := &slice[int]{value: []int{42, 44}}
@@ -87,7 +88,7 @@ func Test_array_TagSet(t *testing.T) {
 	})
 }
 
-func Test_array_TagEqual(t *testing.T) {
+func Test_slice_TagEqual(t *testing.T) {
 	tt := []struct {
 		testN string
 
@@ -150,7 +151,7 @@ func Test_array_TagEqual(t *testing.T) {
 	}
 }
 
-func Test_array_TagSame(t *testing.T) {
+func Test_slice_TagSame(t *testing.T) {
 	tt := []struct {
 		testN string
 
@@ -213,7 +214,7 @@ func Test_array_TagSame(t *testing.T) {
 	}
 }
 
-func Test_array_String(t *testing.T) {
+func Test_slice_String(t *testing.T) {
 	t.Run("error - nil value", func(t *testing.T) {
 		// --- Given ---
 		tag := &slice[int]{
@@ -254,5 +255,43 @@ func Test_array_String(t *testing.T) {
 
 		// --- Then ---
 		assert.Equal(t, "[42 44]", have)
+	})
+}
+
+func Test_slice_ValidateWith(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		// --- Given ---
+		rule := verax.Each(verax.Max(44))
+		tag := &slice[int]{name: "name", value: []int{42, 44}}
+
+		// --- When ---
+		err := tag.ValidateWith(rule)
+
+		// --- Then ---
+		assert.NoError(t, err)
+	})
+
+	t.Run("error - slice", func(t *testing.T) {
+		// --- Given ---
+		rule := verax.Length(3, 3)
+		tag := &slice[int]{name: "name", value: []int{42, 44}}
+
+		// --- When ---
+		err := tag.ValidateWith(rule)
+
+		// --- Then ---
+		assert.ErrorEqual(t, "name: the length must be exactly 3", err)
+	})
+
+	t.Run("error - element", func(t *testing.T) {
+		// --- Given ---
+		rule := verax.Each(verax.Max(42))
+		tag := &slice[int]{name: "name", value: []int{42, 44}}
+
+		// --- When ---
+		err := tag.ValidateWith(rule)
+
+		// --- Then ---
+		assert.ErrorEqual(t, "name.1: must be no greater than 42", err)
 	})
 }

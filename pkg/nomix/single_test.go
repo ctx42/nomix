@@ -8,9 +8,10 @@ import (
 	"testing"
 
 	"github.com/ctx42/testing/pkg/assert"
+	"github.com/ctx42/verax/pkg/verax"
 )
 
-func Test_generic_TagName(t *testing.T) {
+func Test_single_TagName(t *testing.T) {
 	tag := &single[int]{name: "name"}
 
 	// --- When ---
@@ -20,7 +21,7 @@ func Test_generic_TagName(t *testing.T) {
 	assert.Equal(t, "name", have)
 }
 
-func Test_generic_TagKind(t *testing.T) {
+func Test_single_TagKind(t *testing.T) {
 	tag := &single[int]{kind: KindInt}
 
 	// --- When ---
@@ -30,7 +31,7 @@ func Test_generic_TagKind(t *testing.T) {
 	assert.Equal(t, KindInt, have)
 }
 
-func Test_generic_TagValue(t *testing.T) {
+func Test_single_TagValue(t *testing.T) {
 	tag := &single[int]{value: 42}
 
 	// --- When ---
@@ -40,7 +41,7 @@ func Test_generic_TagValue(t *testing.T) {
 	assert.Equal(t, 42, have)
 }
 
-func Test_generic_Value(t *testing.T) {
+func Test_single_Value(t *testing.T) {
 	tag := &single[int]{value: 42}
 
 	// --- When ---
@@ -50,7 +51,7 @@ func Test_generic_Value(t *testing.T) {
 	assert.Equal(t, 42, have)
 }
 
-func Test_generic_Set(t *testing.T) {
+func Test_single_Set(t *testing.T) {
 	// --- Given ---
 	tag := &single[int]{value: 42}
 
@@ -61,7 +62,7 @@ func Test_generic_Set(t *testing.T) {
 	assert.Equal(t, 44, tag.value)
 }
 
-func Test_generic_TagSet(t *testing.T) {
+func Test_single_TagSet(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		// --- Given ---
 		tag := &single[int]{value: 42}
@@ -87,7 +88,7 @@ func Test_generic_TagSet(t *testing.T) {
 	})
 }
 
-func Test_generic_TagEqual(t *testing.T) {
+func Test_single_TagEqual(t *testing.T) {
 	tt := []struct {
 		testN string
 
@@ -138,7 +139,7 @@ func Test_generic_TagEqual(t *testing.T) {
 	}
 }
 
-func Test_generic_TagSame(t *testing.T) {
+func Test_single_TagSame(t *testing.T) {
 	tt := []struct {
 		testN string
 
@@ -189,7 +190,7 @@ func Test_generic_TagSame(t *testing.T) {
 	}
 }
 
-func Test_generic_String(t *testing.T) {
+func Test_single_String(t *testing.T) {
 	// --- Given ---
 	tag := &single[int]{value: 42, stringer: strconv.Itoa}
 
@@ -198,4 +199,28 @@ func Test_generic_String(t *testing.T) {
 
 	// --- Then ---
 	assert.Equal(t, "42", have)
+}
+
+func Test_single_ValidateWith(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		// --- Given ---
+		tag := &single[int]{name: "name", value: 42}
+
+		// --- When ---
+		err := tag.ValidateWith(verax.Max(42))
+
+		// --- Then ---
+		assert.NoError(t, err)
+	})
+
+	t.Run("error", func(t *testing.T) {
+		// --- Given ---
+		tag := &single[int]{name: "name", value: 44}
+
+		// --- When ---
+		err := tag.ValidateWith(verax.Max(42))
+
+		// --- Then ---
+		assert.ErrorEqual(t, "name: must be no greater than 42", err)
+	})
 }

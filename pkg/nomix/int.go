@@ -34,12 +34,8 @@ func NewInt(name string, v int) *Int {
 // CreateInt casts the value to int. Returns the [Int] instance with the given
 // type and nil error on success. Returns nil and [ErrInvType] if the value is
 // not the int type.
-func CreateInt(name string, val any, opts ...Option) (*Int, error) {
-	def := defaultOptions
-	for _, opt := range opts {
-		opt(&def)
-	}
-	v, err := createInt(val, def)
+func CreateInt(name string, val any, _ ...Option) (*Int, error) {
+	v, err := createInt(val, defaultOptions)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", name, err)
 	}

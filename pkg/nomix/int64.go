@@ -35,12 +35,8 @@ func NewInt64(name string, v int64) *Int64 {
 // given name and nil error if the value is a byte, int, int8, int16, int32, or
 // int64. Returns nil and [ErrInvType] if the value's type is not a supported
 // numeric type.
-func CreateInt64(name string, val any, opts ...Option) (*Int64, error) {
-	def := defaultOptions
-	for _, opt := range opts {
-		opt(&def)
-	}
-	v, err := createInt64(val, def)
+func CreateInt64(name string, val any, _ ...Option) (*Int64, error) {
+	v, err := createInt64(val, defaultOptions)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", name, err)
 	}
