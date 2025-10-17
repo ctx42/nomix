@@ -1,3 +1,6 @@
+## v0.3.0 (Fri, 17 Oct 2025 14:56:59 UTC)
+- feat: Add the ability to define validation rules for a tag `Definition`.
+
 ## v0.2.0 (Fri, 17 Oct 2025 10:24:41 UTC)
 - style: Rename method arguments in `nomix.MetaSet`.
 - feat: Develop helper functions to cast `any` to other wanted types.
