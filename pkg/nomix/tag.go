@@ -61,6 +61,7 @@ const (
 	KindFloat64 TagKind = 0b00000000_00001000
 	KindTime    TagKind = 0b00000000_00010000
 	KindJSON    TagKind = 0b00000000_00100000
+	KindUUID    TagKind = 0b00000000_01000000
 )
 
 // Derived [Tag] kinds.
@@ -82,7 +83,7 @@ const (
 )
 
 // KindSlice is a [TagKind] type modifier indicating it is a slice.
-const KindSlice TagKind = 0b01000000_00000000
+const KindSlice TagKind = 0b00000000_10000000
 
 // Tag is an interface representing a tag.
 //
