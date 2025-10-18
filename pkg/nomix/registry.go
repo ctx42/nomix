@@ -17,12 +17,23 @@ var specs Registry
 // mxSpecs protects the [specs] variable.
 var mxSpecs sync.RWMutex
 
-// RegisterSpec registers a tag creator for the given type. If the type
-// already exists, it is overwritten.
-func RegisterSpec(typ any, spec KindSpec) {
+// RegisterKind registers a [KindSpec] for the given [TagKind]. Returns nil if
+// successful, or an error if the kind is already registered. Each kind can
+// have only one spec. Must be called before associating Go types with a
+// [KindSpec].
+func RegisterKind(spec KindSpec) error {
 	mxSpecs.Lock()
-	specs.Register(typ, spec)
-	mxSpecs.Unlock()
+	defer mxSpecs.Unlock()
+	return specs.Register(spec)
+}
+
+// AssociateType links a Go type to the given [TagKind], overwriting any
+// existing association. Returns the previous kind association or TagKind(0) if
+// none. Returns an error if no [KindSpec] is registered for the kind.
+func AssociateType(typ any, knd TagKind) (TagKind, error) {
+	mxSpecs.Lock()
+	defer mxSpecs.Unlock()
+	return specs.Associate(typ, knd)
 }
 
 // GetSpec returns the [KindSpec] for the given type.
@@ -33,7 +44,7 @@ func GetSpec(typ any) KindSpec {
 }
 
 // CreateTag creates a new [Tag] for the given name and value. The value's type
-// must be first registered with [RegisterSpec].
+// must be first registered with [AssociateType].
 func CreateTag(name string, val any) (Tag, error) {
 	mxSpecs.RLock()
 	defer mxSpecs.RUnlock()
@@ -57,54 +68,87 @@ func CreatorForType(typ any) (TagCreateFunc, error) {
 func init() {
 	specs = NewRegistry()
 
-	RegisterSpec(byte(1), int64Spec)
-	RegisterSpec(int(1), intSpec)
-	RegisterSpec(int8(1), int64Spec)
-	RegisterSpec(int16(1), int64Spec)
-	RegisterSpec(int32(1), int64Spec)
-	RegisterSpec(int64(1), int64Spec)
-	RegisterSpec(float32(1), float64Spec)
-	RegisterSpec(float64(1), float64Spec)
+	mustRegisterKind(int64Spec)
+	mustRegisterKind(intSpec)
+	mustRegisterKind(float64Spec)
+	mustRegisterKind(boolSpec)
+	mustRegisterKind(stringSpec)
+	mustRegisterKind(timeSpec)
+	mustRegisterKind(jsonSpec)
+	mustRegisterKind(byteSliceSpec)
+	mustRegisterKind(intSliceSpec)
+	mustRegisterKind(int64SliceSpec)
+	mustRegisterKind(float64SliceSpec)
+	mustRegisterKind(boolSliceSpec)
+	mustRegisterKind(stringSliceSpec)
+	mustRegisterKind(timeSliceSpec)
 
-	RegisterSpec(true, boolSpec)
-	RegisterSpec("string", stringSpec)
-	RegisterSpec(time.Time{}, timeSpec)
-	RegisterSpec(json.RawMessage{}, jsonSpec)
+	mustAssociateType(int(1), KindInt)
+	mustAssociateType(int8(1), KindInt64)
+	mustAssociateType(int16(1), KindInt64)
+	mustAssociateType(int32(1), KindInt64)
+	mustAssociateType(int64(1), KindInt64)
+	mustAssociateType(float32(1), KindFloat64)
+	mustAssociateType(float64(1), KindFloat64)
 
-	RegisterSpec([]byte{}, byteSliceSpec)
-	RegisterSpec([]int{}, intSliceSpec)
-	RegisterSpec([]int8{}, int64SliceSpec)
-	RegisterSpec([]int16{}, int64SliceSpec)
-	RegisterSpec([]int32{}, int64SliceSpec)
-	RegisterSpec([]int64{}, int64SliceSpec)
-	RegisterSpec([]float32{}, float64SliceSpec)
-	RegisterSpec([]float64{}, float64SliceSpec)
+	mustAssociateType(true, KindBool)
+	mustAssociateType("string", KindString)
+	mustAssociateType(time.Time{}, KindTime)
+	mustAssociateType(json.RawMessage{}, KindJSON)
 
-	RegisterSpec([]bool{}, boolSliceSpec)
-	RegisterSpec([]string{}, stringSliceSpec)
-	RegisterSpec([]time.Time{}, timeSliceSpec)
+	mustAssociateType([]byte{}, KindByteSlice)
+	mustAssociateType([]int{}, KindIntSlice)
+	mustAssociateType([]int8{}, KindInt64Slice)
+	mustAssociateType([]int16{}, KindInt64Slice)
+	mustAssociateType([]int32{}, KindInt64Slice)
+	mustAssociateType([]int64{}, KindInt64Slice)
+	mustAssociateType([]float32{}, KindFloat64Slice)
+	mustAssociateType([]float64{}, KindFloat64Slice)
+
+	mustAssociateType([]bool{}, KindBoolSlice)
+	mustAssociateType([]string{}, KindStringSlice)
+	mustAssociateType([]time.Time{}, KindTimeSlice)
 }
 
 // Registry represents a collection of [KindSpec]s.
 type Registry struct {
+	kinds map[TagKind]KindSpec
 	specs map[reflect.Type]KindSpec
 }
 
 // NewRegistry returns a new [Registry] instance.
 func NewRegistry() Registry {
 	return Registry{
+		kinds: make(map[TagKind]KindSpec),
 		specs: make(map[reflect.Type]KindSpec),
 	}
 }
 
-// Register registers a tag creator for the given type. If the type already
-// exists, it is overwritten. Returns the previous creator function when the
-// type was already registered, nil otherwise.
-func (reg Registry) Register(typ any, spec KindSpec) KindSpec {
+// Register registers a [KindSpec] for the given [TagKind]. Returns nil if
+// successful, or an error if the kind is already registered. Each kind can
+// have only one spec. Must be called before associating Go types with a
+// [KindSpec].
+func (reg Registry) Register(spec KindSpec) error {
+	if _, ok := reg.kinds[spec.knd]; ok {
+		format := "KindSpec for %[1]s(%[1]d) already registered"
+		return fmt.Errorf(format, spec.knd)
+	}
+	reg.kinds[spec.knd] = spec
+	return nil
+}
+
+// Associate links a Go type to the given [TagKind], overwriting any existing
+// association. Returns the previous kind association or TagKind(0) if none.
+// Returns an error if no [KindSpec] is registered for the kind.
+func (reg Registry) Associate(typ any, knd TagKind) (TagKind, error) {
+	spec, ok := reg.kinds[knd]
+	if !ok {
+		return 0, fmt.Errorf("no spec for %[1]s(%[1]d)", knd)
+	}
 	rt := reflect.TypeOf(typ)
-	have := reg.specs[rt]
+	was := reg.specs[rt]
 	reg.specs[rt] = spec
-	return have
+	return was.knd, nil
 }
 
 // Spec returns the [KindSpec] for the given type.
@@ -140,4 +184,20 @@ func (reg Registry) CreatorForType(typ any) (TagCreateFunc, error) {
 		return tcr.tcr, nil
 	}
 	return nil, fmt.Errorf("%w: for type %T", ErrNoCreator, typ)
+}
+
+// mustRegisterKind is like [RegisterKind], but panics if there is an error.
+func mustRegisterKind(spec KindSpec) {
+	if err := RegisterKind(spec); err != nil {
+		panic(err)
+	}
+}
+
+// mustAssociateType is like [AssociateType], but panics if there is an error.
+func mustAssociateType(typ any, knd TagKind) TagKind {
+	was, err := AssociateType(typ, knd)
+	if err != nil {
+		panic(err)
+	}
+	return was
 }

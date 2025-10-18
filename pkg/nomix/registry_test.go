@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/ctx42/testing/pkg/assert"
+	"github.com/ctx42/testing/pkg/must"
 )
 
 func Test_NewRegistry(t *testing.T) {
@@ -16,6 +17,8 @@ func Test_NewRegistry(t *testing.T) {
 	reg := NewRegistry()
 
 	// --- Then ---
+	assert.NotNil(t, reg.kinds)
+	assert.Len(t, 0, reg.kinds)
 	assert.NotNil(t, reg.specs)
 	assert.Len(t, 0, reg.specs)
 }
@@ -25,47 +28,76 @@ func Test_Registry_Register(t *testing.T) {
 		// --- Given ---
 		reg := NewRegistry()
 
-		var called bool
-		ks := KindSpec{
-			tcr: func(name string, value any, _ ...Option) (Tag, error) {
-				called = true
-				return nil, nil
-			},
-		}
-
 		// --- When ---
-		have := reg.Register(42i+44, ks)
+		err := reg.Register(stringSpec)
 
 		// --- Then ---
-		_, err := reg.Create("name", 42i+44)
 		assert.NoError(t, err)
-		assert.True(t, called)
-		assert.Zero(t, have)
+		assert.HasKey(t, stringSpec.knd, reg.kinds)
+		assert.Len(t, 0, reg.specs)
 	})
 
 	t.Run("register existing", func(t *testing.T) {
 		// --- Given ---
-		spec := IntSpec()
 		reg := NewRegistry()
-		reg.Register(42, spec)
-
-		var called bool
-		ks := KindSpec{
-			knd: KindInt,
-			tcr: func(name string, value any, _ ...Option) (Tag, error) {
-				called = true
-				return nil, nil
-			},
-		}
+		_ = reg.Register(stringSpec)
 
 		// --- When ---
-		have := reg.Register(42, ks)
+		err := reg.Register(stringSpec)
 
 		// --- Then ---
-		_, err := reg.Create("name", 42)
+		wMsg := "KindSpec for KindString(2) already registered"
+		assert.ErrorEqual(t, wMsg, err)
+		assert.Len(t, 1, reg.kinds)
+		assert.Len(t, 0, reg.specs)
+	})
+}
+
+func Test_Registry_Associate(t *testing.T) {
+	t.Run("associate with existing kind", func(t *testing.T) {
+		// --- Given ---
+		reg := NewRegistry()
+		must.Nil(reg.Register(intSpec))
+
+		// --- When ---
+		have, err := reg.Associate(42, KindInt)
+
+		// --- Then ---
 		assert.NoError(t, err)
-		assert.True(t, called)
-		assert.Equal(t, spec, have)
+		assert.Equal(t, TagKind(0), have)
+		assert.Len(t, 1, reg.specs)
+		assert.Len(t, 1, reg.kinds)
+	})
+
+	t.Run("associate with a different kind", func(t *testing.T) {
+		// --- Given ---
+		reg := NewRegistry()
+		must.Nil(reg.Register(intSpec))
+		must.Nil(reg.Register(int64Spec))
+		must.Value(reg.Associate(42, KindInt))
+
+		// --- When ---
+		have, err := reg.Associate(42, KindInt64)
+
+		// --- Then ---
+		assert.NoError(t, err)
+		assert.Equal(t, KindInt, have)
+		assert.Len(t, 1, reg.specs)
+		assert.Len(t, 2, reg.kinds)
+	})
+
+	t.Run("error - associate unknown kind", func(t *testing.T) {
+		// --- Given ---
+		reg := NewRegistry()
+
+		// --- When ---
+		have, err := reg.Associate(42, KindInt64)
+
+		// --- Then ---
+		assert.ErrorEqual(t, "no spec for KindInt64(4)", err)
+		assert.Equal(t, TagKind(0), have)
+		assert.Len(t, 0, reg.specs)
+		assert.Len(t, 0, reg.kinds)
 	})
 }
 
@@ -110,7 +142,6 @@ func Test_Registry_Create_tabular(t *testing.T) {
 		kind      TagKind
 		wantValue any
 	}{
-		{"byte", byte(42), KindInt64, int64(42)},
 		{"int", int(42), KindInt, int(42)},
 		{"int8", int8(42), KindInt64, int64(42)},
 		{"int16", int16(42), KindInt64, int64(42)},
