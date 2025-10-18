@@ -36,11 +36,21 @@ func AssociateType(typ any, knd TagKind) (TagKind, error) {
 	return specs.Associate(typ, knd)
 }
 
-// GetSpec returns the [KindSpec] for the given type.
-func GetSpec(typ any) KindSpec {
+// SpecForType retrieves the [KindSpec] for the given type. Requires prior type
+// association with a [KindSpec]. Use [KindSpec.IsZero] to check if a spec is
+// available for the type.
+func SpecForType(typ any) KindSpec {
 	mxSpecs.RLock()
 	defer mxSpecs.RUnlock()
-	return specs.Spec(typ)
+	return specs.SpecForType(typ)
+}
+
+// SpecForKind retrieves the [KindSpec] for the given [TagKind]. Use
+// [KindSpec.IsZero] to check if a spec exists for the kind.
+func SpecForKind(knd TagKind) KindSpec {
+	mxSpecs.RLock()
+	defer mxSpecs.RUnlock()
+	return specs.SpecForKind(knd)
 }
 
 // CreateTag creates a new [Tag] for the given name and value. The value's type
@@ -49,20 +59,6 @@ func CreateTag(name string, val any) (Tag, error) {
 	mxSpecs.RLock()
 	defer mxSpecs.RUnlock()
 	return specs.Create(name, val)
-}
-
-// CreatorForKind returns the [TagCreateFunc] for the given [TagKind].
-func CreatorForKind(knd TagKind) (TagCreateFunc, error) {
-	mxSpecs.RLock()
-	defer mxSpecs.RUnlock()
-	return specs.CreatorForKind(knd)
-}
-
-// CreatorForType returns the [TagCreateFunc] for the given type.
-func CreatorForType(typ any) (TagCreateFunc, error) {
-	mxSpecs.RLock()
-	defer mxSpecs.RUnlock()
-	return specs.CreatorForType(typ)
 }
 
 func init() {
@@ -151,39 +147,27 @@ func (reg Registry) Associate(typ any, knd TagKind) (TagKind, error) {
 	return was.knd, nil
 }
 
-// Spec returns the [KindSpec] for the given type.
-func (reg Registry) Spec(typ any) KindSpec {
+// SpecForType retrieves the [KindSpec] for the given type. Requires prior type
+// association with a [KindSpec]. Use [KindSpec.IsZero] to check if a spec is
+// available for the type.
+func (reg Registry) SpecForType(typ any) KindSpec {
 	return reg.specs[reflect.TypeOf(typ)]
+}
+
+// SpecForKind retrieves the [KindSpec] for the given [TagKind]. Use
+// [KindSpec.IsZero] to check if a spec exists for the kind.
+func (reg Registry) SpecForKind(knd TagKind) KindSpec {
+	return reg.kinds[knd]
 }
 
 // Create creates a new [Tag] for the given value. The value's type must be
 // registered.
 func (reg Registry) Create(name string, val any, opts ...Option) (Tag, error) {
 	valTyp := reflect.TypeOf(val)
-	for typ, spec := range reg.specs {
-		if typ == valTyp {
-			return spec.tcr(name, val, opts...)
-		}
+	if spec := reg.specs[valTyp]; !spec.IsZero() {
+		return spec.tcr(name, val, opts...)
 	}
 	return nil, fmt.Errorf("%w for %s of type %T", ErrNoCreator, name, val)
-}
-
-// CreatorForKind returns the [TagCreateFunc] for the given [TagKind].
-func (reg Registry) CreatorForKind(knd TagKind) (TagCreateFunc, error) {
-	for _, spec := range reg.specs {
-		if spec.knd == knd {
-			return spec.tcr, nil
-		}
-	}
-	return nil, fmt.Errorf("%w: %s (%d)", ErrNoCreator, knd.String(), knd)
-}
-
-// CreatorForType returns the [TagCreateFunc] for the given type.
-func (reg Registry) CreatorForType(typ any) (TagCreateFunc, error) {
-	if tcr, ok := reg.specs[reflect.TypeOf(typ)]; ok {
-		return tcr.tcr, nil
-	}
-	return nil, fmt.Errorf("%w: for type %T", ErrNoCreator, typ)
 }
 
 // mustRegisterKind is like [RegisterKind], but panics if there is an error.

@@ -101,19 +101,38 @@ func Test_Registry_Associate(t *testing.T) {
 	})
 }
 
-func Test_Register_Spec(t *testing.T) {
+func Test_Register_SpecForType(t *testing.T) {
 	t.Run("existing", func(t *testing.T) {
 		// --- When ---
-		have := GetSpec(42)
+		have := SpecForType(42)
 
 		// --- Then ---
 		assert.False(t, have.IsZero())
 		assert.Equal(t, intSpec, have)
 	})
 
+	t.Run("not existing", func(t *testing.T) {
+		// --- When ---
+		have := SpecForType(42i + 44)
+
+		// --- Then ---
+		assert.True(t, have.IsZero())
+	})
+}
+
+func Test_Register_SpecForKind(t *testing.T) {
 	t.Run("existing", func(t *testing.T) {
 		// --- When ---
-		have := GetSpec(42i + 44)
+		have := SpecForKind(KindInt)
+
+		// --- Then ---
+		assert.False(t, have.IsZero())
+		assert.Equal(t, intSpec, have)
+	})
+
+	t.Run("not existing", func(t *testing.T) {
+		// --- When ---
+		have := SpecForKind(0)
 
 		// --- Then ---
 		assert.True(t, have.IsZero())
@@ -191,46 +210,4 @@ func Test_Registry_Create_tabular(t *testing.T) {
 			assert.Equal(t, tc.wantValue, tag.TagValue())
 		})
 	}
-}
-
-func Test_Registry_CreatorForKind(t *testing.T) {
-	t.Run("registered kind", func(t *testing.T) {
-		// --- When ---
-		have, err := CreatorForKind(KindInt)
-
-		// --- Then ---
-		assert.NoError(t, err)
-		assert.Same(t, intSpec.tcr, have)
-	})
-
-	t.Run("not existing kind", func(t *testing.T) {
-		// --- When ---
-		have, err := CreatorForKind(123)
-
-		// --- Then ---
-		assert.ErrorEqual(t, "creator not found: KindUnknown (123)", err)
-		assert.ErrorIs(t, ErrNoCreator, err)
-		assert.Nil(t, have)
-	})
-}
-
-func Test_Registry_CreatorForType(t *testing.T) {
-	t.Run("registered kind", func(t *testing.T) {
-		// --- When ---
-		have, err := CreatorForType(1)
-
-		// --- Then ---
-		assert.NoError(t, err)
-		assert.Same(t, intSpec.tcr, have)
-	})
-
-	t.Run("not existing kind", func(t *testing.T) {
-		// --- When ---
-		have, err := CreatorForType(4i + 2)
-
-		// --- Then ---
-		assert.ErrorIs(t, ErrNoCreator, err)
-		assert.ErrorEqual(t, "creator not found: for type complex128", err)
-		assert.Nil(t, have)
-	})
 }
