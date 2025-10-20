@@ -119,9 +119,9 @@ Anything can become a set of tags by implementing the `Tagger` interface.
 // instances (set). The implementations must not allow for nil values to be
 // stored in the set.
 type Tagger interface {
-	// TagGet retrieves from the set a [Tag] by its name. If the name doesn't
+	// Get retrieves from the set a [Tag] by its name. If the name doesn't
 	// exist in the set, it returns nil.
-	TagGet(name string) Tag
+	Get(name string) Tag
 
 	// TagSet adds instances of [Tag] to the set. If the tag name already
 	// exists in the set, it will be overwritten. The nil instances are ignored.
@@ -142,9 +142,9 @@ set := NewTagSet()
 set.TagSet(NewInt("A", 42), NewBool("B", true), NewString("C", "foo"))
 
 fmt.Printf("There are %d tags in the set:\n", set.TagCount())
-fmt.Printf("- A: %v\n", set.TagGet("A").TagValue())
-fmt.Printf("- B: %v\n", set.TagGet("B").TagValue())
-fmt.Printf("- C: %v\n", set.TagGet("C").TagValue())
+fmt.Printf("- A: %v\n", set.Get("A").TagValue())
+fmt.Printf("- B: %v\n", set.Get("B").TagValue())
+fmt.Printf("- C: %v\n", set.Get("C").TagValue())
 
 fmt.Printf("\nGetting typed tags:\n")
 

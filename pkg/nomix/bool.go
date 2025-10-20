@@ -4,6 +4,7 @@
 package nomix
 
 import (
+	"database/sql/driver"
 	"fmt"
 	"strconv"
 )
@@ -24,10 +25,11 @@ func BoolSpec() KindSpec { return boolSpec }
 // NewBool returns a new instance of [Bool].
 func NewBool(name string, val bool) *Bool {
 	return &single[bool]{
-		name:     name,
-		value:    val,
-		kind:     KindBool,
-		stringer: strconv.FormatBool,
+		name:      name,
+		value:     val,
+		kind:      KindBool,
+		stringer:  strconv.FormatBool,
+		sqlValuer: sqlValueBool,
 	}
 }
 
@@ -58,4 +60,13 @@ func ParseBool(name, val string, _ ...Option) (*Bool, error) {
 		return nil, fmt.Errorf("%s: %w", name, ErrInvFormat)
 	}
 	return NewBool(name, vv), nil
+}
+
+// sqlValueBool converts bool to int64 according to [KindBool] base type. Never
+// returns an error.
+func sqlValueBool(val bool) (driver.Value, error) {
+	if val {
+		return int64(1), nil
+	}
+	return int64(0), nil
 }

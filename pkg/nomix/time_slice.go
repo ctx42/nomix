@@ -24,7 +24,7 @@ var timeSliceSpec = KindSpec{
 func TimeSliceSpec() KindSpec { return timeSliceSpec }
 
 // NewTimeSlice returns a new instance of [TimeSlice].
-func NewTimeSlice(name string, v []time.Time) *TimeSlice {
+func NewTimeSlice(name string, v ...time.Time) *TimeSlice {
 	return &slice[time.Time]{
 		name:     name,
 		value:    v,
@@ -43,7 +43,7 @@ func CreateTimeSlice(name string, val any, _ ...Option) (*TimeSlice, error) {
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", name, err)
 	}
-	return NewTimeSlice(name, v), nil
+	return NewTimeSlice(name, v...), nil
 }
 
 // createTimeSlice casts the value to []time.Time, or when the value is a

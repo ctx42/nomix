@@ -4,6 +4,8 @@
 package nomix
 
 import (
+	"database/sql/driver"
+
 	"github.com/ctx42/verax/pkg/verax"
 	"github.com/ctx42/xrr/pkg/xrr"
 )
@@ -17,25 +19,34 @@ var (
 
 // String represents string tag.
 type single[T TagType] struct {
-	name     string
-	value    T
-	kind     TagKind
-	stringer func(T) string
+	name      string
+	value     T
+	kind      TagKind
+	stringer  func(T) string
+	sqlValuer func(T) (driver.Value, error)
 }
 
 func (tag *single[T]) TagName() string  { return tag.name }
 func (tag *single[T]) TagKind() TagKind { return tag.kind }
 func (tag *single[T]) TagValue() any    { return tag.value }
-
-func (tag *single[T]) Value() T { return tag.value }
-func (tag *single[T]) Set(v T)  { tag.value = v }
-
 func (tag *single[T]) TagSet(v any) error {
 	if v, ok := v.(T); ok {
 		tag.value = v
 		return nil
 	}
 	return ErrInvType
+}
+
+func (tag *single[T]) Get() T  { return tag.value }
+func (tag *single[T]) Set(v T) { tag.value = v }
+
+// Value implements [driver.Valuer] interface. When the type has no sqlValuer
+// defined, then it returns the value directly and never returns an error.
+func (tag *single[T]) Value() (driver.Value, error) {
+	if tag.sqlValuer == nil {
+		return tag.value, nil
+	}
+	return tag.sqlValuer(tag.value)
 }
 
 func (tag *single[T]) TagEqual(other Tag) bool {

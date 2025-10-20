@@ -39,6 +39,10 @@ func Test_NewInt64(t *testing.T) {
 	assert.Equal(t, int64(42), tag.value)
 	assert.Equal(t, KindInt64, tag.kind)
 	assert.Equal(t, "42", tag.String())
+
+	val, err := tag.Value()
+	assert.NoError(t, err)
+	assert.Equal(t, int64(42), val)
 }
 
 func Test_CreateInt64(t *testing.T) {
@@ -171,4 +175,12 @@ func Test_ParseInt64_error(t *testing.T) {
 		assert.ErrorIs(t, ErrInvFormat, err)
 		assert.Nil(t, tag)
 	})
+}
+
+func Test_stringValueInt64(t *testing.T) {
+	// --- When ---
+	have := stringValueInt64(42)
+
+	// --- Then ---
+	assert.Equal(t, "42", have)
 }

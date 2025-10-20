@@ -4,6 +4,7 @@
 package nomix
 
 import (
+	"database/sql/driver"
 	"fmt"
 	"strconv"
 )
@@ -24,10 +25,11 @@ func IntSpec() KindSpec { return intSpec }
 // NewInt returns a new instance of [Int].
 func NewInt(name string, v int) *Int {
 	return &single[int]{
-		name:     name,
-		value:    v,
-		kind:     KindInt,
-		stringer: strconv.Itoa,
+		name:      name,
+		value:     v,
+		kind:      KindInt,
+		stringer:  strconv.Itoa,
+		sqlValuer: sqlValueInt,
 	}
 }
 
@@ -63,3 +65,6 @@ func ParseInt(name, v string, opts ...Option) (*Int, error) {
 	}
 	return NewInt(name, int(val)), nil
 }
+
+// sqlValueInt converts int to its int64 representation. Never returns an error.
+func sqlValueInt(val int) (driver.Value, error) { return int64(val), nil }

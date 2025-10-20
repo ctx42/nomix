@@ -43,6 +43,10 @@ func Test_NewTime(t *testing.T) {
 	assert.Exact(t, time.Date(2000, 1, 2, 3, 4, 5, 0, time.UTC), tag.value)
 	assert.Equal(t, KindTime, tag.kind)
 	assert.Exact(t, "2000-01-02T03:04:05Z", tag.String())
+
+	val, err := tag.Value()
+	assert.NoError(t, err)
+	assert.Exact(t, time.Date(2000, 1, 2, 3, 4, 5, 0, time.UTC), val)
 }
 
 func Test_CreateTime(t *testing.T) {
@@ -300,4 +304,13 @@ func Test_parseTime(t *testing.T) {
 		assert.ErrorIs(t, ErrInvFormat, err)
 		assert.Zero(t, have)
 	})
+}
+
+func Test_sqlValueTime(t *testing.T) {
+	// --- When ---
+	have, err := sqlValueTime(time.Date(2000, 1, 2, 3, 4, 5, 0, time.UTC))
+
+	// --- Then ---
+	assert.NoError(t, err)
+	assert.Exact(t, time.Date(2000, 1, 2, 3, 4, 5, 0, time.UTC), have)
 }

@@ -4,6 +4,8 @@
 package nomix
 
 import (
+	"database/sql/driver"
+	"errors"
 	"fmt"
 	"testing"
 
@@ -41,27 +43,6 @@ func Test_slice_TagValue(t *testing.T) {
 	assert.Equal(t, []int{42, 44}, have)
 }
 
-func Test_slice_Value(t *testing.T) {
-	tag := &slice[int]{value: []int{42, 44}}
-
-	// --- When ---
-	have := tag.Value()
-
-	// --- Then ---
-	assert.Equal(t, []int{42, 44}, have)
-}
-
-func Test_slice_Set(t *testing.T) {
-	// --- Given ---
-	tag := &slice[int]{value: []int{42, 44}}
-
-	// --- When ---
-	tag.Set([]int{52, 54})
-
-	// --- Then ---
-	assert.Equal(t, []int{52, 54}, tag.value)
-}
-
 func Test_slice_TagSet(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		// --- Given ---
@@ -85,6 +66,74 @@ func Test_slice_TagSet(t *testing.T) {
 		// --- Then ---
 		assert.ErrorIs(t, ErrInvType, err)
 		assert.Equal(t, []int{42, 44}, tag.value)
+	})
+}
+
+func Test_slice_Get(t *testing.T) {
+	tag := &slice[int]{value: []int{42, 44}}
+
+	// --- When ---
+	have := tag.Get()
+
+	// --- Then ---
+	assert.Equal(t, []int{42, 44}, have)
+}
+
+func Test_slice_Set(t *testing.T) {
+	// --- Given ---
+	tag := &slice[int]{value: []int{42, 44}}
+
+	// --- When ---
+	tag.Set([]int{52, 54})
+
+	// --- Then ---
+	assert.Equal(t, []int{52, 54}, tag.value)
+}
+
+func Test_slice_Value(t *testing.T) {
+	t.Run("default", func(t *testing.T) {
+		// --- Given ---
+		tag := &slice[int]{value: []int{42, 44}}
+
+		// --- When ---
+		have, err := tag.Value()
+
+		// --- Then ---
+		assert.NoError(t, err)
+		assert.Equal(t, []int{42, 44}, have)
+	})
+
+	t.Run("custom", func(t *testing.T) {
+		// --- Given ---
+		sqlValuer := func(vs []int) (driver.Value, error) {
+			for i := range vs {
+				vs[i] += 1
+			}
+			return vs, nil
+		}
+		tag := &slice[int]{value: []int{42, 44}, sqlValuer: sqlValuer}
+
+		// --- When ---
+		have, err := tag.Value()
+
+		// --- Then ---
+		assert.NoError(t, err)
+		assert.Equal(t, []int{43, 45}, have)
+	})
+
+	t.Run("error", func(t *testing.T) {
+		// --- Given ---
+		sqlValuer := func(v []int) (driver.Value, error) {
+			return nil, errors.New("test error")
+		}
+		tag := &slice[int]{value: []int{42, 44}, sqlValuer: sqlValuer}
+
+		// --- When ---
+		have, err := tag.Value()
+
+		// --- Then ---
+		assert.ErrorEqual(t, "test error", err)
+		assert.Nil(t, have)
 	})
 }
 

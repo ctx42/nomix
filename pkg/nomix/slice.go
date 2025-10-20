@@ -4,6 +4,8 @@
 package nomix
 
 import (
+	"database/sql/driver"
+
 	"github.com/ctx42/verax/pkg/verax"
 	"github.com/ctx42/xrr/pkg/xrr"
 )
@@ -17,25 +19,32 @@ var (
 
 // String represents string tag.
 type slice[T TagType] struct {
-	name     string
-	value    []T
-	kind     TagKind
-	stringer func([]T) string
+	name      string
+	value     []T
+	kind      TagKind
+	stringer  func([]T) string
+	sqlValuer func([]T) (driver.Value, error)
 }
 
 func (tag *slice[T]) TagName() string  { return tag.name }
 func (tag *slice[T]) TagKind() TagKind { return tag.kind }
 func (tag *slice[T]) TagValue() any    { return tag.value }
-
-func (tag *slice[T]) Value() []T { return tag.value }
-func (tag *slice[T]) Set(v []T)  { tag.value = v }
-
 func (tag *slice[T]) TagSet(v any) error {
 	if v, ok := v.([]T); ok {
 		tag.value = v
 		return nil
 	}
 	return ErrInvType
+}
+
+func (tag *slice[T]) Get() []T  { return tag.value }
+func (tag *slice[T]) Set(v []T) { tag.value = v }
+
+func (tag *slice[T]) Value() (driver.Value, error) {
+	if tag.sqlValuer == nil {
+		return tag.value, nil
+	}
+	return tag.sqlValuer(tag.value)
 }
 
 func (tag *slice[T]) TagEqual(other Tag) bool {

@@ -27,7 +27,7 @@ func NewInt64(name string, v int64) *Int64 {
 		name:     name,
 		value:    v,
 		kind:     KindInt64,
-		stringer: int64ToString,
+		stringer: stringValueInt64,
 	}
 }
 
@@ -77,5 +77,5 @@ func ParseInt64(name, v string, opts ...Option) (*Int64, error) {
 	return NewInt64(name, val), nil
 }
 
-// int64ToString converts int64 to its string representation.
-func int64ToString(v int64) string { return strconv.FormatInt(v, 10) }
+// stringValueInt64 converts int64 to its string representation.
+func stringValueInt64(v int64) string { return strconv.FormatInt(v, 10) }

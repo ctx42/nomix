@@ -36,7 +36,7 @@ func Test_NewTimeSlice(t *testing.T) {
 	tim1 := time.Date(2001, 1, 2, 3, 4, 5, 0, time.UTC)
 
 	// --- When ---
-	tag := NewTimeSlice("name", []time.Time{tim0, tim1})
+	tag := NewTimeSlice("name", tim0, tim1)
 
 	// --- Then ---
 	assert.SameType(t, &TimeSlice{}, tag)

@@ -39,6 +39,10 @@ func Test_NewInt(t *testing.T) {
 	assert.Equal(t, 42, tag.value)
 	assert.Equal(t, KindInt, tag.kind)
 	assert.Equal(t, "42", tag.String())
+
+	val, err := tag.Value()
+	assert.NoError(t, err)
+	assert.Equal(t, int64(42), val)
 }
 
 func Test_CreateInt(t *testing.T) {
@@ -142,4 +146,13 @@ func Test_ParseInt(t *testing.T) {
 		assert.ErrorIs(t, ErrInvFormat, err)
 		assert.Nil(t, tag)
 	})
+}
+
+func Test_sqlValueInt(t *testing.T) {
+	// --- When ---
+	have, err := sqlValueInt(42)
+
+	// --- Then ---
+	assert.NoError(t, err)
+	assert.Equal(t, int64(42), have)
 }

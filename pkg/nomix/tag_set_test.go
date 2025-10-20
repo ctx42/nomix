@@ -623,7 +623,7 @@ func Test_TagSet_TagGetTimeSlice(t *testing.T) {
 		// --- Given ---
 		set := TagSet{
 			m: map[string]Tag{
-				"A": NewTimeSlice("A", []time.Time{tim0, tim1}),
+				"A": NewTimeSlice("A", tim0, tim1),
 			},
 		}
 
@@ -632,7 +632,7 @@ func Test_TagSet_TagGetTimeSlice(t *testing.T) {
 
 		// --- Then ---
 		assert.NoError(t, err)
-		want := NewTimeSlice("A", []time.Time{tim0, tim1})
+		want := NewTimeSlice("A", tim0, tim1)
 		exactTime := check.WithTypeChecker(time.Time{}, check.Exact)
 		assert.Equal(t, want, have, exactTime)
 	})
@@ -641,7 +641,7 @@ func Test_TagSet_TagGetTimeSlice(t *testing.T) {
 		// --- Given ---
 		set := TagSet{
 			m: map[string]Tag{
-				"A": NewTimeSlice("A", []time.Time{tim0, tim1}),
+				"A": NewTimeSlice("A", tim0, tim1),
 			},
 		}
 

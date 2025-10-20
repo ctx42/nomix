@@ -30,15 +30,37 @@ func Test_BoolSpec(t *testing.T) {
 }
 
 func Test_NewBool(t *testing.T) {
-	// --- When ---
-	tag := NewBool("name", true)
+	t.Run("true", func(t *testing.T) {
+		// --- When ---
+		tag := NewBool("name", true)
 
-	// --- Then ---
-	assert.SameType(t, &Bool{}, tag)
-	assert.Equal(t, "name", tag.name)
-	assert.Equal(t, true, tag.value)
-	assert.Equal(t, KindBool, tag.kind)
-	assert.Equal(t, "true", tag.String())
+		// --- Then ---
+		assert.SameType(t, &Bool{}, tag)
+		assert.Equal(t, "name", tag.name)
+		assert.Equal(t, true, tag.value)
+		assert.Equal(t, KindBool, tag.kind)
+		assert.Equal(t, "true", tag.String())
+
+		val, err := tag.Value()
+		assert.NoError(t, err)
+		assert.Equal(t, int64(1), val)
+	})
+
+	t.Run("false", func(t *testing.T) {
+		// --- When ---
+		tag := NewBool("name", false)
+
+		// --- Then ---
+		assert.SameType(t, &Bool{}, tag)
+		assert.Equal(t, "name", tag.name)
+		assert.Equal(t, false, tag.value)
+		assert.Equal(t, KindBool, tag.kind)
+		assert.Equal(t, "false", tag.String())
+
+		val, err := tag.Value()
+		assert.NoError(t, err)
+		assert.Equal(t, int64(0), val)
+	})
 }
 
 func Test_CreateBool(t *testing.T) {
@@ -138,4 +160,27 @@ func Test_ParseBool(t *testing.T) {
 		assert.ErrorIs(t, ErrInvFormat, err)
 		assert.Nil(t, tag)
 	})
+}
+
+func Test_sqlValueBool_tabular(t *testing.T) {
+	tt := []struct {
+		testN string
+
+		have bool
+		want any
+	}{
+		{"true", true, int64(1)},
+		{"false", false, int64(0)},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.testN, func(t *testing.T) {
+			// --- When ---
+			have, err := sqlValueBool(tc.have)
+
+			// --- Then ---
+			assert.NoError(t, err)
+			assert.Equal(t, tc.want, have)
+		})
+	}
 }

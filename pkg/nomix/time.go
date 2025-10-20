@@ -4,6 +4,7 @@
 package nomix
 
 import (
+	"database/sql/driver"
 	"fmt"
 	"slices"
 	"time"
@@ -25,10 +26,11 @@ func TimeSpec() KindSpec { return timeSpec }
 // NewTime returns a new instance of [Time].
 func NewTime(name string, v time.Time) *Time {
 	return &single[time.Time]{
-		name:     name,
-		value:    v,
-		kind:     KindTime,
-		stringer: timeToString,
+		name:      name,
+		value:     v,
+		kind:      KindTime,
+		stringer:  stringValueTime,
+		sqlValuer: sqlValueTime,
 	}
 }
 
@@ -107,5 +109,8 @@ func parseTime(val string, opts Options) (time.Time, error) {
 	return tim, nil
 }
 
-// timeToString converts [time.Time] to its string representation.
-func timeToString(v time.Time) string { return v.Format(time.RFC3339Nano) }
+// stringValueTime converts [time.Time] to its string representation.
+func stringValueTime(v time.Time) string { return v.Format(time.RFC3339Nano) }
+
+// sqlValueTime returns the value as is. Never returns an error.
+func sqlValueTime(v time.Time) (driver.Value, error) { return v, nil }

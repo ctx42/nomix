@@ -4,6 +4,8 @@
 package nomix
 
 import (
+	"database/sql/driver"
+	"errors"
 	"strconv"
 	"testing"
 
@@ -41,27 +43,6 @@ func Test_single_TagValue(t *testing.T) {
 	assert.Equal(t, 42, have)
 }
 
-func Test_single_Value(t *testing.T) {
-	tag := &single[int]{value: 42}
-
-	// --- When ---
-	have := tag.Value()
-
-	// --- Then ---
-	assert.Equal(t, 42, have)
-}
-
-func Test_single_Set(t *testing.T) {
-	// --- Given ---
-	tag := &single[int]{value: 42}
-
-	// --- When ---
-	tag.Set(44)
-
-	// --- Then ---
-	assert.Equal(t, 44, tag.value)
-}
-
 func Test_single_TagSet(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		// --- Given ---
@@ -85,6 +66,71 @@ func Test_single_TagSet(t *testing.T) {
 		// --- Then ---
 		assert.ErrorIs(t, ErrInvType, err)
 		assert.Equal(t, 42, tag.value)
+	})
+}
+
+func Test_single_Get(t *testing.T) {
+	tag := &single[int]{value: 42}
+
+	// --- When ---
+	have := tag.Get()
+
+	// --- Then ---
+	assert.Equal(t, 42, have)
+}
+
+func Test_single_Set(t *testing.T) {
+	// --- Given ---
+	tag := &single[int]{value: 42}
+
+	// --- When ---
+	tag.Set(44)
+
+	// --- Then ---
+	assert.Equal(t, 44, tag.value)
+}
+
+func Test_single_Value(t *testing.T) {
+	t.Run("default", func(t *testing.T) {
+		// --- Given ---
+		tag := &single[int]{value: 42}
+
+		// --- When ---
+		have, err := tag.Value()
+
+		// --- Then ---
+		assert.NoError(t, err)
+		assert.Equal(t, 42, have)
+	})
+
+	t.Run("custom", func(t *testing.T) {
+		// --- Given ---
+		sqlValuer := func(v int) (driver.Value, error) {
+			return float64(v), nil
+		}
+		tag := &single[int]{value: 42, sqlValuer: sqlValuer}
+
+		// --- When ---
+		have, err := tag.Value()
+
+		// --- Then ---
+		assert.NoError(t, err)
+		assert.Equal(t, float64(42), have)
+	})
+
+	t.Run("error", func(t *testing.T) {
+		// --- Given ---
+		sqlValuer := func(v int) (driver.Value, error) {
+			return 0, errors.New("test error")
+		}
+		tag := &single[int]{value: 42, sqlValuer: sqlValuer}
+
+		// --- When ---
+		have, err := tag.Value()
+
+		// --- Then ---
+		assert.ErrorEqual(t, "test error", err)
+		assert.Equal(t, 0, have)
 	})
 }
 

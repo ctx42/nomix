@@ -39,6 +39,10 @@ func Test_NewString(t *testing.T) {
 	assert.Equal(t, "abc", tag.value)
 	assert.Equal(t, KindString, tag.kind)
 	assert.Equal(t, "abc", tag.String())
+
+	val, err := tag.Value()
+	assert.NoError(t, err)
+	assert.Equal(t, "abc", val)
 }
 
 func Test_CreateString(t *testing.T) {
@@ -93,4 +97,12 @@ func Test_createString(t *testing.T) {
 		assert.ErrorIs(t, ErrInvType, err)
 		assert.Empty(t, have)
 	})
+}
+
+func Test_stringValueString(t *testing.T) {
+	// --- When ---
+	have := stringValueString("abc")
+
+	// --- Then ---
+	assert.Equal(t, "abc", have)
 }

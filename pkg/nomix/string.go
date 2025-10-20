@@ -28,7 +28,7 @@ func NewString(name, v string) *String {
 		name:     name,
 		value:    v,
 		kind:     KindString,
-		stringer: stringToString,
+		stringer: stringValueString,
 	}
 }
 
@@ -53,5 +53,5 @@ func createString(val any, _ Options) (string, error) {
 	return "", ErrInvType
 }
 
-// stringToString converts string to string.
-func stringToString(v string) string { return v }
+// stringValueString returns the string as is.
+func stringValueString(v string) string { return v }
