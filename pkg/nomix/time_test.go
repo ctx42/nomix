@@ -35,16 +35,16 @@ func Test_TimeSpec(t *testing.T) {
 
 func Test_NewTime(t *testing.T) {
 	// --- When ---
-	tag := NewTime("name", time.Date(2000, 1, 2, 3, 4, 5, 0, time.UTC))
+	have := NewTime("name", time.Date(2000, 1, 2, 3, 4, 5, 0, time.UTC))
 
 	// --- Then ---
-	assert.SameType(t, &Time{}, tag)
-	assert.Equal(t, "name", tag.name)
-	assert.Exact(t, time.Date(2000, 1, 2, 3, 4, 5, 0, time.UTC), tag.value)
-	assert.Equal(t, KindTime, tag.kind)
-	assert.Exact(t, "2000-01-02T03:04:05Z", tag.String())
+	assert.SameType(t, &Time{}, have)
+	assert.Equal(t, "name", have.name)
+	assert.Exact(t, time.Date(2000, 1, 2, 3, 4, 5, 0, time.UTC), have.value)
+	assert.Equal(t, KindTime, have.kind)
+	assert.Exact(t, "2000-01-02T03:04:05Z", have.String())
 
-	val, err := tag.Value()
+	val, err := have.Value()
 	assert.NoError(t, err)
 	assert.Exact(t, time.Date(2000, 1, 2, 3, 4, 5, 0, time.UTC), val)
 }
@@ -55,15 +55,15 @@ func Test_CreateTime(t *testing.T) {
 		tim := time.Date(2000, 1, 2, 3, 4, 5, 0, time.UTC)
 
 		// --- When ---
-		tag, err := CreateTime("name", tim)
+		have, err := CreateTime("name", tim)
 
 		// --- Then ---
 		assert.NoError(t, err)
-		assert.SameType(t, &Time{}, tag)
-		assert.Equal(t, "name", tag.name)
-		assert.Exact(t, time.Date(2000, 1, 2, 3, 4, 5, 0, time.UTC), tag.value)
-		assert.Equal(t, KindTime, tag.kind)
-		assert.Exact(t, "2000-01-02T03:04:05Z", tag.String())
+		assert.SameType(t, &Time{}, have)
+		assert.Equal(t, "name", have.name)
+		assert.Exact(t, time.Date(2000, 1, 2, 3, 4, 5, 0, time.UTC), have.value)
+		assert.Equal(t, KindTime, have.kind)
+		assert.Exact(t, "2000-01-02T03:04:05Z", have.String())
 	})
 
 	t.Run("options passed", func(t *testing.T) {
@@ -71,25 +71,25 @@ func Test_CreateTime(t *testing.T) {
 		opt := WithTimeFormat("2006-01-02")
 
 		// --- When ---
-		tag, err := CreateTime("name", "2000-01-02", opt)
+		have, err := CreateTime("name", "2000-01-02", opt)
 
 		// --- Then ---
 		assert.NoError(t, err)
-		assert.SameType(t, &Time{}, tag)
-		assert.Equal(t, "name", tag.name)
-		assert.Exact(t, time.Date(2000, 1, 2, 0, 0, 0, 0, time.UTC), tag.value)
-		assert.Equal(t, KindTime, tag.kind)
-		assert.Exact(t, "2000-01-02T00:00:00Z", tag.String())
+		assert.SameType(t, &Time{}, have)
+		assert.Equal(t, "name", have.name)
+		assert.Exact(t, time.Date(2000, 1, 2, 0, 0, 0, 0, time.UTC), have.value)
+		assert.Equal(t, KindTime, have.kind)
+		assert.Exact(t, "2000-01-02T00:00:00Z", have.String())
 	})
 
 	t.Run("error - invalid type", func(t *testing.T) {
 		// --- When ---
-		tag, err := CreateTime("name", 42)
+		have, err := CreateTime("name", 42)
 
 		// --- Then ---
 		assert.ErrorIs(t, ErrInvType, err)
 		assert.ErrorContain(t, "name: ", err)
-		assert.Nil(t, tag)
+		assert.Nil(t, have)
 	})
 }
 
@@ -180,8 +180,6 @@ func Test_ParseTime_success_tabular(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.str, func(t *testing.T) {
-			t.Parallel()
-
 			// --- When ---
 			have, err := ParseTime("name", tc.str, tc.opts...)
 

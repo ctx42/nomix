@@ -33,7 +33,7 @@ func NewFloat64Slice(name string, val ...float64) *Float64Slice {
 // []int16, []int32, []int64, []float32, or []float64. Returns nil and
 // [ErrInvType] if the value's type is not a supported numeric slice type.
 func CreateFloat64Slice(name string, val any, _ ...Option) (*Float64Slice, error) {
-	v, err := createFloat64Slice(val, defaultOptions)
+	v, err := createFloat64Slice(val, Options{})
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", name, err)
 	}

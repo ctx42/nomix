@@ -31,7 +31,7 @@ func NewString(name, val string) *String {
 // the given name and nil error on success. Returns nil and [ErrInvType] if the
 // value is not the string type.
 func CreateString(name string, v any, _ ...Option) (*String, error) {
-	vv, err := createString(v, defaultOptions)
+	vv, err := createString(v, Options{})
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", name, err)
 	}

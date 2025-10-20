@@ -31,7 +31,7 @@ func NewBool(name string, val bool) *Bool {
 // the given name and nil error on success. Returns nil and [ErrInvType] if the
 // value is not the bool type.
 func CreateBool(name string, val any, _ ...Option) (*Bool, error) {
-	v, err := createBool(val, defaultOptions)
+	v, err := createBool(val, Options{})
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", name, err)
 	}

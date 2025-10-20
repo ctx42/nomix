@@ -34,7 +34,7 @@ func NewFloat64(name string, val float64) *Float64 {
 // NOTE: For int64 values outside ±2^53 range, the result is undefined.
 // TODO(rz): Return an error when the above happens.
 func CreateFloat64(name string, val any, _ ...Option) (*Float64, error) {
-	v, err := createFloat64(val, defaultOptions)
+	v, err := createFloat64(val, Options{})
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", name, err)
 	}

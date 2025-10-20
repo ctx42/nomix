@@ -33,7 +33,7 @@ func NewInt64Slice(name string, val ...int64) *Int64Slice {
 // []int16, []int32, or []int64. Returns nil and [ErrInvType] if the value's
 // type is not a supported numeric slice type.
 func CreateInt64Slice(name string, val any, _ ...Option) (*Int64Slice, error) {
-	v, err := createInt64Slice(val, defaultOptions)
+	v, err := createInt64Slice(val, Options{})
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", name, err)
 	}

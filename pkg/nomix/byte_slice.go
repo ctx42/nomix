@@ -32,7 +32,7 @@ func NewByteSlice(name string, val ...byte) *ByteSlice {
 // with the given name and nil error on success. Returns nil and [ErrInvType]
 // if the value is not the []byte type.
 func CreateByteSlice(name string, val any, _ ...Option) (*ByteSlice, error) {
-	v, err := createByteSlice(val, defaultOptions)
+	v, err := createByteSlice(val, Options{})
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", name, err)
 	}

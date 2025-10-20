@@ -31,7 +31,7 @@ func NewStringSlice(name string, val ...string) *StringSlice {
 // instance with the given name and nil error on success. Returns nil and
 // [ErrInvType] if the value is not the []string type.
 func CreateStringSlice(name string, val any, _ ...Option) (*StringSlice, error) {
-	v, err := createStringSlice(val, defaultOptions)
+	v, err := createStringSlice(val, Options{})
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", name, err)
 	}

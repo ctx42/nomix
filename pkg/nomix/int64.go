@@ -31,7 +31,7 @@ func NewInt64(name string, val int64) *Int64 {
 // int64. Returns nil and [ErrInvType] if the value's type is not a supported
 // numeric type.
 func CreateInt64(name string, val any, _ ...Option) (*Int64, error) {
-	v, err := createInt64(val, defaultOptions)
+	v, err := createInt64(val, Options{})
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", name, err)
 	}

@@ -32,7 +32,7 @@ func NewIntSlice(name string, val ...int) *IntSlice {
 // with the given name and nil error on success. Returns nil and [ErrInvType]
 // if the value is not []int type.
 func CreateIntSlice(name string, val any, _ ...Option) (*IntSlice, error) {
-	v, err := createIntSlice(val, defaultOptions)
+	v, err := createIntSlice(val, Options{})
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", name, err)
 	}

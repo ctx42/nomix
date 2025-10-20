@@ -31,7 +31,7 @@ func NewInt(name string, val int) *Int {
 // type and nil error on success. Returns nil and [ErrInvType] if the value is
 // not the int type.
 func CreateInt(name string, val any, _ ...Option) (*Int, error) {
-	v, err := createInt(val, defaultOptions)
+	v, err := createInt(val, Options{})
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", name, err)
 	}

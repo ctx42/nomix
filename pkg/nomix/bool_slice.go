@@ -32,7 +32,7 @@ func NewBoolSlice(name string, val ...bool) *BoolSlice {
 // with the given name and nil error on success. Returns nil and [ErrInvType]
 // if the value is the []bool type.
 func CreateBoolSlice(name string, val any, _ ...Option) (*BoolSlice, error) {
-	v, err := createBoolSlice(val, defaultOptions)
+	v, err := createBoolSlice(val, Options{})
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", name, err)
 	}
