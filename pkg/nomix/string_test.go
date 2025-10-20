@@ -99,9 +99,9 @@ func Test_createString(t *testing.T) {
 	})
 }
 
-func Test_stringValueString(t *testing.T) {
+func Test_strValueString(t *testing.T) {
 	// --- When ---
-	have := stringValueString("abc")
+	have := strValueString("abc")
 
 	// --- Then ---
 	assert.Equal(t, "abc", have)

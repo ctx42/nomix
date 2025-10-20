@@ -12,24 +12,43 @@ import (
 
 // Compile time checks.
 var (
-	_ Tag              = &slice[int]{}
-	_ TagValueComparer = &slice[int]{}
-	_ TagComparer      = &slice[int]{}
+	_ Tag              = &Slice[int]{}
+	_ TagValueComparer = &Slice[int]{}
+	_ TagComparer      = &Slice[int]{}
 )
 
-// String represents string tag.
-type slice[T TagType] struct {
-	name      string
-	value     []T
-	kind      TagKind
-	stringer  func([]T) string
-	sqlValuer func([]T) (driver.Value, error)
+// Slice is a generic type for multi value [Tag].
+type Slice[T comparable] struct {
+	name      string                          // Tag name.
+	value     []T                             // Tag value.
+	kind      TagKind                         // Tag kind.
+	strValuer func([]T) string                // T to string function.
+	sqlValuer func([]T) (driver.Value, error) // T to SQL value function.
 }
 
-func (tag *slice[T]) TagName() string  { return tag.name }
-func (tag *slice[T]) TagKind() TagKind { return tag.kind }
-func (tag *slice[T]) TagValue() any    { return tag.value }
-func (tag *slice[T]) TagSet(v any) error {
+// NewSlice returns a new instance of [Slice].
+func NewSlice[T comparable](
+	name string,
+	val []T,
+	kind TagKind,
+	strValuer func([]T) string,
+	sqlValuer func([]T) (driver.Value, error),
+) *Slice[T] {
+
+	return &Slice[T]{
+		name:      name,
+		value:     val,
+		kind:      kind,
+		strValuer: strValuer,
+		sqlValuer: sqlValuer,
+	}
+}
+
+func (tag *Slice[T]) TagName() string  { return tag.name }
+func (tag *Slice[T]) TagKind() TagKind { return tag.kind }
+func (tag *Slice[T]) TagValue() any    { return tag.value }
+
+func (tag *Slice[T]) TagSet(v any) error {
 	if v, ok := v.([]T); ok {
 		tag.value = v
 		return nil
@@ -37,21 +56,21 @@ func (tag *slice[T]) TagSet(v any) error {
 	return ErrInvType
 }
 
-func (tag *slice[T]) Get() []T  { return tag.value }
-func (tag *slice[T]) Set(v []T) { tag.value = v }
+func (tag *Slice[T]) Get() []T  { return tag.value }
+func (tag *Slice[T]) Set(v []T) { tag.value = v }
 
-func (tag *slice[T]) Value() (driver.Value, error) {
+func (tag *Slice[T]) Value() (driver.Value, error) {
 	if tag.sqlValuer == nil {
 		return tag.value, nil
 	}
 	return tag.sqlValuer(tag.value)
 }
 
-func (tag *slice[T]) TagEqual(other Tag) bool {
+func (tag *Slice[T]) TagEqual(other Tag) bool {
 	if other == nil {
 		return false
 	}
-	o, ok := other.(*slice[T])
+	o, ok := other.(*Slice[T])
 	if !ok {
 		return false
 	}
@@ -66,11 +85,11 @@ func (tag *slice[T]) TagEqual(other Tag) bool {
 	return true
 }
 
-func (tag *slice[T]) TagSame(other Tag) bool {
+func (tag *Slice[T]) TagSame(other Tag) bool {
 	if other == nil {
 		return false
 	}
-	o, ok := other.(*slice[T])
+	o, ok := other.(*Slice[T])
 	if !ok {
 		return false
 	}
@@ -88,9 +107,9 @@ func (tag *slice[T]) TagSame(other Tag) bool {
 	return true
 }
 
-func (tag *slice[T]) String() string { return tag.stringer(tag.value) }
+func (tag *Slice[T]) String() string { return tag.strValuer(tag.value) }
 
-func (tag *slice[T]) ValidateWith(rule verax.Rule) error {
+func (tag *Slice[T]) ValidateWith(rule verax.Rule) error {
 	if err := rule.Validate(tag.value); err != nil {
 		return xrr.FieldError(tag.name, err)
 	}

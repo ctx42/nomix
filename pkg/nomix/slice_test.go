@@ -13,8 +13,24 @@ import (
 	"github.com/ctx42/verax/pkg/verax"
 )
 
-func Test_slice_TagName(t *testing.T) {
-	tag := &slice[int]{name: "name"}
+func Test_NewSlice(t *testing.T) {
+	// --- Given ---
+	strValuer := func(v []int) string { return fmt.Sprint(v) }
+	sqlValuer := func(v []int) (driver.Value, error) { return v, nil }
+
+	// --- When ---
+	have := NewSlice[int]("name", []int{42, 44}, KindInt, strValuer, sqlValuer)
+
+	// --- Then ---
+	assert.Equal(t, "name", have.name)
+	assert.Equal(t, []int{42, 44}, have.value)
+	assert.Equal(t, KindInt, have.kind)
+	assert.Same(t, strValuer, have.strValuer)
+	assert.Same(t, sqlValuer, have.sqlValuer)
+}
+
+func Test_Slice_TagName(t *testing.T) {
+	tag := &Slice[int]{name: "name"}
 
 	// --- When ---
 	have := tag.TagName()
@@ -23,8 +39,8 @@ func Test_slice_TagName(t *testing.T) {
 	assert.Equal(t, "name", have)
 }
 
-func Test_slice_TagKind(t *testing.T) {
-	tag := &slice[int]{kind: KindIntSlice}
+func Test_Slice_TagKind(t *testing.T) {
+	tag := &Slice[int]{kind: KindIntSlice}
 
 	// --- When ---
 	have := tag.TagKind()
@@ -33,8 +49,8 @@ func Test_slice_TagKind(t *testing.T) {
 	assert.Equal(t, KindIntSlice, have)
 }
 
-func Test_slice_TagValue(t *testing.T) {
-	tag := &slice[int]{value: []int{42, 44}}
+func Test_Slice_TagValue(t *testing.T) {
+	tag := &Slice[int]{value: []int{42, 44}}
 
 	// --- When ---
 	have := tag.TagValue()
@@ -43,10 +59,10 @@ func Test_slice_TagValue(t *testing.T) {
 	assert.Equal(t, []int{42, 44}, have)
 }
 
-func Test_slice_TagSet(t *testing.T) {
+func Test_Slice_TagSet(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		// --- Given ---
-		tag := &slice[int]{value: []int{42, 44}}
+		tag := &Slice[int]{value: []int{42, 44}}
 
 		// --- When ---
 		err := tag.TagSet([]int{52, 54})
@@ -58,7 +74,7 @@ func Test_slice_TagSet(t *testing.T) {
 
 	t.Run("error - invalid type", func(t *testing.T) {
 		// --- Given ---
-		tag := &slice[int]{value: []int{42, 44}}
+		tag := &Slice[int]{value: []int{42, 44}}
 
 		// --- When ---
 		err := tag.TagSet(true)
@@ -69,8 +85,8 @@ func Test_slice_TagSet(t *testing.T) {
 	})
 }
 
-func Test_slice_Get(t *testing.T) {
-	tag := &slice[int]{value: []int{42, 44}}
+func Test_Slice_Get(t *testing.T) {
+	tag := &Slice[int]{value: []int{42, 44}}
 
 	// --- When ---
 	have := tag.Get()
@@ -79,9 +95,9 @@ func Test_slice_Get(t *testing.T) {
 	assert.Equal(t, []int{42, 44}, have)
 }
 
-func Test_slice_Set(t *testing.T) {
+func Test_Slice_Set(t *testing.T) {
 	// --- Given ---
-	tag := &slice[int]{value: []int{42, 44}}
+	tag := &Slice[int]{value: []int{42, 44}}
 
 	// --- When ---
 	tag.Set([]int{52, 54})
@@ -90,10 +106,10 @@ func Test_slice_Set(t *testing.T) {
 	assert.Equal(t, []int{52, 54}, tag.value)
 }
 
-func Test_slice_Value(t *testing.T) {
+func Test_Slice_Value(t *testing.T) {
 	t.Run("default", func(t *testing.T) {
 		// --- Given ---
-		tag := &slice[int]{value: []int{42, 44}}
+		tag := &Slice[int]{value: []int{42, 44}}
 
 		// --- When ---
 		have, err := tag.Value()
@@ -111,7 +127,7 @@ func Test_slice_Value(t *testing.T) {
 			}
 			return vs, nil
 		}
-		tag := &slice[int]{value: []int{42, 44}, sqlValuer: sqlValuer}
+		tag := &Slice[int]{value: []int{42, 44}, sqlValuer: sqlValuer}
 
 		// --- When ---
 		have, err := tag.Value()
@@ -126,7 +142,7 @@ func Test_slice_Value(t *testing.T) {
 		sqlValuer := func(v []int) (driver.Value, error) {
 			return nil, errors.New("test error")
 		}
-		tag := &slice[int]{value: []int{42, 44}, sqlValuer: sqlValuer}
+		tag := &Slice[int]{value: []int{42, 44}, sqlValuer: sqlValuer}
 
 		// --- When ---
 		have, err := tag.Value()
@@ -137,7 +153,7 @@ func Test_slice_Value(t *testing.T) {
 	})
 }
 
-func Test_slice_TagEqual(t *testing.T) {
+func Test_Slice_TagEqual(t *testing.T) {
 	tt := []struct {
 		testN string
 
@@ -147,43 +163,43 @@ func Test_slice_TagEqual(t *testing.T) {
 	}{
 		{
 			"same",
-			&slice[int]{value: []int{42, 44}},
-			&slice[int]{value: []int{42, 44}},
+			&Slice[int]{value: []int{42, 44}},
+			&Slice[int]{value: []int{42, 44}},
 			true,
 		},
 		{
 			"diff values",
-			&slice[int]{value: []int{42, 44}},
-			&slice[int]{value: []int{52, 45}},
+			&Slice[int]{value: []int{42, 44}},
+			&Slice[int]{value: []int{52, 45}},
 			false,
 		},
 		{
 			"diff value",
-			&slice[int]{value: []int{42, 44}},
-			&slice[int]{value: []int{42, 45}},
+			&Slice[int]{value: []int{42, 44}},
+			&Slice[int]{value: []int{42, 45}},
 			false,
 		},
 		{
 			"diff lengths",
-			&slice[int]{value: []int{42, 44}},
-			&slice[int]{value: []int{42}},
+			&Slice[int]{value: []int{42, 44}},
+			&Slice[int]{value: []int{42}},
 			false,
 		},
 		{
 			"diff name",
-			&slice[int]{name: "name0", value: []int{42, 44}},
-			&slice[int]{name: "name1", value: []int{42, 44}},
+			&Slice[int]{name: "name0", value: []int{42, 44}},
+			&Slice[int]{name: "name1", value: []int{42, 44}},
 			true,
 		},
 		{
 			"diff kind",
-			&slice[int]{value: []int{42, 44}},
-			&slice[string]{value: []string{"abc"}},
+			&Slice[int]{value: []int{42, 44}},
+			&Slice[string]{value: []string{"abc"}},
 			false,
 		},
 		{
 			"other nil",
-			&slice[int]{value: []int{42, 44}},
+			&Slice[int]{value: []int{42, 44}},
 			nil,
 			false,
 		},
@@ -200,7 +216,7 @@ func Test_slice_TagEqual(t *testing.T) {
 	}
 }
 
-func Test_slice_TagSame(t *testing.T) {
+func Test_Slice_TagSame(t *testing.T) {
 	tt := []struct {
 		testN string
 
@@ -210,43 +226,43 @@ func Test_slice_TagSame(t *testing.T) {
 	}{
 		{
 			"same",
-			&slice[int]{name: "name", value: []int{42, 44}},
-			&slice[int]{name: "name", value: []int{42, 44}},
+			&Slice[int]{name: "name", value: []int{42, 44}},
+			&Slice[int]{name: "name", value: []int{42, 44}},
 			true,
 		},
 		{
 			"diff values",
-			&slice[int]{name: "name", value: []int{42, 44}},
-			&slice[int]{name: "name", value: []int{52, 54}},
+			&Slice[int]{name: "name", value: []int{42, 44}},
+			&Slice[int]{name: "name", value: []int{52, 54}},
 			false,
 		},
 		{
 			"diff value",
-			&slice[int]{name: "name", value: []int{42, 44}},
-			&slice[int]{name: "name", value: []int{42, 54}},
+			&Slice[int]{name: "name", value: []int{42, 44}},
+			&Slice[int]{name: "name", value: []int{42, 54}},
 			false,
 		},
 		{
 			"diff lengths",
-			&slice[int]{value: []int{42, 44}},
-			&slice[int]{value: []int{42}},
+			&Slice[int]{value: []int{42, 44}},
+			&Slice[int]{value: []int{42}},
 			false,
 		},
 		{
 			"diff name",
-			&slice[int]{name: "name0", value: []int{42, 44}},
-			&slice[int]{name: "name1", value: []int{42, 44}},
+			&Slice[int]{name: "name0", value: []int{42, 44}},
+			&Slice[int]{name: "name1", value: []int{42, 44}},
 			false,
 		},
 		{
 			"diff kind",
-			&slice[int]{name: "name", value: []int{42, 44}},
-			&slice[string]{name: "name", value: []string{"abc"}},
+			&Slice[int]{name: "name", value: []int{42, 44}},
+			&Slice[string]{name: "name", value: []string{"abc"}},
 			false,
 		},
 		{
 			"other nil",
-			&slice[int]{name: "name", value: []int{42, 44}},
+			&Slice[int]{name: "name", value: []int{42, 44}},
 			nil,
 			false,
 		},
@@ -263,12 +279,12 @@ func Test_slice_TagSame(t *testing.T) {
 	}
 }
 
-func Test_slice_String(t *testing.T) {
+func Test_Slice_String(t *testing.T) {
 	t.Run("error - nil value", func(t *testing.T) {
 		// --- Given ---
-		tag := &slice[int]{
-			value:    nil,
-			stringer: func(v []int) string { return fmt.Sprint(v) },
+		tag := &Slice[int]{
+			value:     nil,
+			strValuer: func(v []int) string { return fmt.Sprint(v) },
 		}
 
 		// --- When ---
@@ -280,9 +296,9 @@ func Test_slice_String(t *testing.T) {
 
 	t.Run("single value", func(t *testing.T) {
 		// --- Given ---
-		tag := &slice[int]{
-			value:    []int{42},
-			stringer: func(v []int) string { return fmt.Sprint(v) },
+		tag := &Slice[int]{
+			value:     []int{42},
+			strValuer: func(v []int) string { return fmt.Sprint(v) },
 		}
 
 		// --- When ---
@@ -294,9 +310,9 @@ func Test_slice_String(t *testing.T) {
 
 	t.Run("two values", func(t *testing.T) {
 		// --- Given ---
-		tag := &slice[int]{
-			value:    []int{42, 44},
-			stringer: func(v []int) string { return fmt.Sprint(v) },
+		tag := &Slice[int]{
+			value:     []int{42, 44},
+			strValuer: func(v []int) string { return fmt.Sprint(v) },
 		}
 
 		// --- When ---
@@ -307,11 +323,11 @@ func Test_slice_String(t *testing.T) {
 	})
 }
 
-func Test_slice_ValidateWith(t *testing.T) {
+func Test_Slice_ValidateWith(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		// --- Given ---
 		rule := verax.Each(verax.Max(44))
-		tag := &slice[int]{name: "name", value: []int{42, 44}}
+		tag := &Slice[int]{name: "name", value: []int{42, 44}}
 
 		// --- When ---
 		err := tag.ValidateWith(rule)
@@ -323,7 +339,7 @@ func Test_slice_ValidateWith(t *testing.T) {
 	t.Run("error - slice", func(t *testing.T) {
 		// --- Given ---
 		rule := verax.Length(3, 3)
-		tag := &slice[int]{name: "name", value: []int{42, 44}}
+		tag := &Slice[int]{name: "name", value: []int{42, 44}}
 
 		// --- When ---
 		err := tag.ValidateWith(rule)
@@ -335,7 +351,7 @@ func Test_slice_ValidateWith(t *testing.T) {
 	t.Run("error - element", func(t *testing.T) {
 		// --- Given ---
 		rule := verax.Each(verax.Max(42))
-		tag := &slice[int]{name: "name", value: []int{42, 44}}
+		tag := &Slice[int]{name: "name", value: []int{42, 44}}
 
 		// --- When ---
 		err := tag.ValidateWith(rule)

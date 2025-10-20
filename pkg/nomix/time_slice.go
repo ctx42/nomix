@@ -9,7 +9,7 @@ import (
 )
 
 // TimeSlice is a tag for a slice of [time.Time] values.
-type TimeSlice = slice[time.Time]
+type TimeSlice = Slice[time.Time]
 
 // timeSliceSpec defines the [KindSpec] for [TimeSlice] type.
 var timeSliceSpec = KindSpec{
@@ -24,13 +24,8 @@ var timeSliceSpec = KindSpec{
 func TimeSliceSpec() KindSpec { return timeSliceSpec }
 
 // NewTimeSlice returns a new instance of [TimeSlice].
-func NewTimeSlice(name string, v ...time.Time) *TimeSlice {
-	return &slice[time.Time]{
-		name:     name,
-		value:    v,
-		kind:     KindTimeSlice,
-		stringer: timeSliceToString,
-	}
+func NewTimeSlice(name string, val ...time.Time) *TimeSlice {
+	return NewSlice(name, val, KindTimeSlice, strValueTimeSlice, nil)
 }
 
 // CreateTimeSlice casts the value to []time.Time, or when the value is a
@@ -70,8 +65,8 @@ func createTimeSlice(val any, opts Options) ([]time.Time, error) {
 	return nil, ErrInvType
 }
 
-// timeSliceToString converts a [time.Time] slice to its string representation.
-func timeSliceToString(v []time.Time) string {
+// strValueTimeSlice converts a [time.Time] slice to its string representation.
+func strValueTimeSlice(v []time.Time) string {
 	ret := "["
 	for i, val := range v {
 		if i > 0 {

@@ -9,7 +9,7 @@ import (
 )
 
 // Float64 is a tag for a single float64 value.
-type Float64 = single[float64]
+type Float64 = Single[float64]
 
 // float64Spec defines the [KindSpec] for [Float64] type.
 var float64Spec = KindSpec{
@@ -23,12 +23,7 @@ func Float64Spec() KindSpec { return float64Spec }
 
 // NewFloat64 returns a new instance of [Float64].
 func NewFloat64(name string, val float64) *Float64 {
-	return &single[float64]{
-		name:     name,
-		value:    val,
-		kind:     KindFloat64,
-		stringer: float64ToString,
-	}
+	return NewSingle(name, val, KindFloat64, float64ToString, nil)
 }
 
 // CreateFloat64 casts the value to float64. Returns the [Float64] instance

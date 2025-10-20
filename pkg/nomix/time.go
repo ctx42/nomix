@@ -11,7 +11,7 @@ import (
 )
 
 // Time is a tag for a single time.Time value.
-type Time = single[time.Time]
+type Time = Single[time.Time]
 
 // timeSpec defines the [KindSpec] for [Time] type.
 var timeSpec = KindSpec{
@@ -24,14 +24,8 @@ var timeSpec = KindSpec{
 func TimeSpec() KindSpec { return timeSpec }
 
 // NewTime returns a new instance of [Time].
-func NewTime(name string, v time.Time) *Time {
-	return &single[time.Time]{
-		name:      name,
-		value:     v,
-		kind:      KindTime,
-		stringer:  stringValueTime,
-		sqlValuer: sqlValueTime,
-	}
+func NewTime(name string, val time.Time) *Time {
+	return NewSingle(name, val, KindTime, strValueTime, sqlValueTime)
 }
 
 // CreateTime casts the value to [time.Time], or when the value is a string, it
@@ -109,8 +103,8 @@ func parseTime(val string, opts Options) (time.Time, error) {
 	return tim, nil
 }
 
-// stringValueTime converts [time.Time] to its string representation.
-func stringValueTime(v time.Time) string { return v.Format(time.RFC3339Nano) }
+// strValueTime converts [time.Time] to its string representation.
+func strValueTime(v time.Time) string { return v.Format(time.RFC3339Nano) }
 
 // sqlValueTime returns the value as is. Never returns an error.
 func sqlValueTime(v time.Time) (driver.Value, error) { return v, nil }

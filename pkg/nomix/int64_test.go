@@ -177,9 +177,9 @@ func Test_ParseInt64_error(t *testing.T) {
 	})
 }
 
-func Test_stringValueInt64(t *testing.T) {
+func Test_strValueInt64(t *testing.T) {
 	// --- When ---
-	have := stringValueInt64(42)
+	have := strValueInt64(42)
 
 	// --- Then ---
 	assert.Equal(t, "42", have)

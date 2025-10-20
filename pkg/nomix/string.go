@@ -8,7 +8,7 @@ import (
 )
 
 // String is a tag for a single byte value.
-type String = single[string]
+type String = Single[string]
 
 // stringSpec defines the [KindSpec] for [String] type.
 var stringSpec = KindSpec{
@@ -23,13 +23,8 @@ var stringSpec = KindSpec{
 func StringSpec() KindSpec { return stringSpec }
 
 // NewString returns a new instance of [String].
-func NewString(name, v string) *String {
-	return &single[string]{
-		name:     name,
-		value:    v,
-		kind:     KindString,
-		stringer: stringValueString,
-	}
+func NewString(name, val string) *String {
+	return NewSingle(name, val, KindString, strValueString, nil)
 }
 
 // CreateString casts the value to a string. Returns the [String] instance with
@@ -53,5 +48,5 @@ func createString(val any, _ Options) (string, error) {
 	return "", ErrInvType
 }
 
-// stringValueString returns the string as is.
-func stringValueString(v string) string { return v }
+// strValueString returns the string as is.
+func strValueString(v string) string { return v }

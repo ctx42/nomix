@@ -3,16 +3,6 @@
 
 package nomix
 
-import (
-	"time"
-)
-
-// TagType represents supported tag types.
-type TagType interface {
-	byte | string | int64 | float64 | time.Time |
-		int | bool | time.Duration
-}
-
 // TagKind describes the type of [Tag] value.
 type TagKind uint16
 
@@ -29,6 +19,8 @@ func (tk TagKind) String() string {
 		return "KindFloat64"
 	case KindTime:
 		return "KindTime"
+	case KindUUID:
+		return "KindUUID"
 	case KindJSON:
 		return "KindJSON"
 	case KindBool:
@@ -45,6 +37,8 @@ func (tk TagKind) String() string {
 		return "KindFloat64Slice"
 	case KindTimeSlice:
 		return "KindTimeSlice"
+	case KindUUIDSlice:
+		return "KindUUIDSlice"
 	case KindBoolSlice:
 		return "KindBoolSlice"
 	case KindIntSlice:
@@ -78,6 +72,7 @@ const (
 	KindInt64Slice   = KindInt64 | KindSlice
 	KindFloat64Slice = KindFloat64 | KindSlice
 	KindTimeSlice    = KindTime | KindSlice
+	KindUUIDSlice    = KindUUID | KindSlice
 	KindBoolSlice    = KindBool | KindSlice
 	KindIntSlice     = KindInt | KindSlice
 )

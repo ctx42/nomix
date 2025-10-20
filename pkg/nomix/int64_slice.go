@@ -9,7 +9,7 @@ import (
 )
 
 // Int64Slice is a tag for a slice of int64 values.
-type Int64Slice = slice[int64]
+type Int64Slice = Slice[int64]
 
 // int64SliceSpec defines the [KindSpec] for [Int64Slice] type.
 var int64SliceSpec = KindSpec{
@@ -24,13 +24,8 @@ var int64SliceSpec = KindSpec{
 func Int64SliceSpec() KindSpec { return int64SliceSpec }
 
 // NewInt64Slice returns a new instance of [Int64Slice].
-func NewInt64Slice(name string, v ...int64) *Int64Slice {
-	return &slice[int64]{
-		name:     name,
-		value:    v,
-		kind:     KindInt64Slice,
-		stringer: int64SliceToString,
-	}
+func NewInt64Slice(name string, val ...int64) *Int64Slice {
+	return NewSlice(name, val, KindInt64Slice, strValueInt64Slice, nil)
 }
 
 // CreateInt64Slice casts the value to []int64. Returns the [Int64Slice]
@@ -81,8 +76,8 @@ func toInt64Slice[T convertableToInt64](v []T, _ Options) []int64 {
 	return upgraded
 }
 
-// int64SliceToString converts an int64 slice to its string representation.
-func int64SliceToString(v []int64) string {
+// strValueInt64Slice converts an int64 slice to its string representation.
+func strValueInt64Slice(v []int64) string {
 	ret := "["
 	for i, val := range v {
 		if i > 0 {

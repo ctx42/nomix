@@ -8,7 +8,7 @@ import (
 )
 
 // StringSlice is a tag for a slice of strings.
-type StringSlice = slice[string]
+type StringSlice = Slice[string]
 
 // stringSliceSpec defines the [KindSpec] for [StringSlice] type.
 var stringSliceSpec = KindSpec{
@@ -23,13 +23,8 @@ var stringSliceSpec = KindSpec{
 func StringSliceSpec() KindSpec { return stringSliceSpec }
 
 // NewStringSlice returns a new instance of [StringSlice].
-func NewStringSlice(name string, v ...string) *StringSlice {
-	return &slice[string]{
-		name:     name,
-		value:    v,
-		kind:     KindStringSlice,
-		stringer: stringSliceToString,
-	}
+func NewStringSlice(name string, val ...string) *StringSlice {
+	return NewSlice(name, val, KindStringSlice, strValueStringSlice, nil)
 }
 
 // CreateStringSlice casts the value to []string. Returns the [StringSlice]
@@ -53,8 +48,8 @@ func createStringSlice(val any, _ Options) ([]string, error) {
 	return nil, ErrInvType
 }
 
-// stringSliceToString converts a string slice to its string representation.
-func stringSliceToString(v []string) string {
+// strValueStringSlice converts a string slice to its string representation.
+func strValueStringSlice(v []string) string {
 	ret := "["
 	for i, val := range v {
 		if i > 0 {

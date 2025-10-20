@@ -9,7 +9,7 @@ import (
 )
 
 // JSON is a tag for a [json.RawMessage] value.
-type JSON = slice[byte]
+type JSON = Slice[byte]
 
 // jsonSpec defines the [KindSpec] for [JSON] type.
 var jsonSpec = KindSpec{
@@ -23,12 +23,7 @@ func JSONSpec() KindSpec { return jsonSpec }
 
 // NewJSON returns a new instance of [JSON].
 func NewJSON(name string, v json.RawMessage) *JSON {
-	return &slice[byte]{
-		name:     name,
-		value:    v,
-		kind:     KindJSON,
-		stringer: jsonToString,
-	}
+	return NewSlice(name, v, KindJSON, strValueJSON, nil)
 }
 
 // CreateJSON casts the value to [json.RawMessage]. Returns the [JSON] with the
@@ -63,8 +58,8 @@ func createJSON(val any, _ Options) (json.RawMessage, error) {
 	return vv, nil
 }
 
-// jsonToString converts [json.RawMessage] to its string representation.
-func jsonToString(v []byte) string {
+// strValueJSON converts [json.RawMessage] to its string representation.
+func strValueJSON(v []byte) string {
 	return string(v)
 }
 

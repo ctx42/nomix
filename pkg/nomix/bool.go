@@ -10,7 +10,7 @@ import (
 )
 
 // Bool is a tag for a single bool value.
-type Bool = single[bool]
+type Bool = Single[bool]
 
 // boolSpec defines the [KindSpec] for [Bool] type.
 var boolSpec = KindSpec{
@@ -24,13 +24,7 @@ func BoolSpec() KindSpec { return boolSpec }
 
 // NewBool returns a new instance of [Bool].
 func NewBool(name string, val bool) *Bool {
-	return &single[bool]{
-		name:      name,
-		value:     val,
-		kind:      KindBool,
-		stringer:  strconv.FormatBool,
-		sqlValuer: sqlValueBool,
-	}
+	return NewSingle(name, val, KindBool, strconv.FormatBool, sqlValueBool)
 }
 
 // CreateBool casts the given value to bool. Returns the [Bool] instance with

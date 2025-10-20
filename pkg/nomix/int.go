@@ -10,7 +10,7 @@ import (
 )
 
 // Int is a tag for a single int value.
-type Int = single[int]
+type Int = Single[int]
 
 // intSpec defines the [KindSpec] for [Int] type.
 var intSpec = KindSpec{
@@ -23,14 +23,8 @@ var intSpec = KindSpec{
 func IntSpec() KindSpec { return intSpec }
 
 // NewInt returns a new instance of [Int].
-func NewInt(name string, v int) *Int {
-	return &single[int]{
-		name:      name,
-		value:     v,
-		kind:      KindInt,
-		stringer:  strconv.Itoa,
-		sqlValuer: sqlValueInt,
-	}
+func NewInt(name string, val int) *Int {
+	return NewSingle(name, val, KindInt, strconv.Itoa, sqlValueInt)
 }
 
 // CreateInt casts the value to int. Returns the [Int] instance with the given

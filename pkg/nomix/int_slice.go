@@ -9,7 +9,7 @@ import (
 )
 
 // IntSlice is a tag for a slice of int values.
-type IntSlice = slice[int]
+type IntSlice = Slice[int]
 
 // intSliceSpec defines the [KindSpec] for [IntSlice] type.
 var intSliceSpec = KindSpec{
@@ -24,13 +24,8 @@ var intSliceSpec = KindSpec{
 func IntSliceSpec() KindSpec { return intSliceSpec }
 
 // NewIntSlice returns a new instance of [IntSlice].
-func NewIntSlice(name string, v ...int) *IntSlice {
-	return &slice[int]{
-		name:     name,
-		value:    v,
-		kind:     KindIntSlice,
-		stringer: intSliceToString,
-	}
+func NewIntSlice(name string, val ...int) *IntSlice {
+	return NewSlice(name, val, KindIntSlice, strValueIntSlice, nil)
 }
 
 // CreateIntSlice casts the value to []int. Returns the [IntSlice] instance
@@ -53,8 +48,8 @@ func createIntSlice(val any, _ Options) ([]int, error) {
 	return nil, ErrInvType
 }
 
-// intSliceToString converts an int slice to its string representation.
-func intSliceToString(v []int) string {
+// strValueIntSlice converts an int slice to its string representation.
+func strValueIntSlice(v []int) string {
 	ret := "["
 	for i, val := range v {
 		if i > 0 {

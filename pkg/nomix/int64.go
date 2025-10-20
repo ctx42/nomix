@@ -9,7 +9,7 @@ import (
 )
 
 // Int64 is a tag for a single int64 value.
-type Int64 = single[int64]
+type Int64 = Single[int64]
 
 // int64Spec defines the [KindSpec] for [Int64] type.
 var int64Spec = KindSpec{
@@ -22,13 +22,8 @@ var int64Spec = KindSpec{
 func Int64Spec() KindSpec { return int64Spec }
 
 // NewInt64 returns a new instance of [Int64].
-func NewInt64(name string, v int64) *Int64 {
-	return &single[int64]{
-		name:     name,
-		value:    v,
-		kind:     KindInt64,
-		stringer: stringValueInt64,
-	}
+func NewInt64(name string, val int64) *Int64 {
+	return NewSingle(name, val, KindInt64, strValueInt64, nil)
 }
 
 // CreateInt64 casts the value to int64. Returns the [Int64] instance with the
@@ -77,5 +72,5 @@ func ParseInt64(name, v string, opts ...Option) (*Int64, error) {
 	return NewInt64(name, val), nil
 }
 
-// stringValueInt64 converts int64 to its string representation.
-func stringValueInt64(v int64) string { return strconv.FormatInt(v, 10) }
+// strValueInt64 converts int64 to its string representation.
+func strValueInt64(v int64) string { return strconv.FormatInt(v, 10) }

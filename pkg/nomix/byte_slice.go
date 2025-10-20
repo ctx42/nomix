@@ -9,7 +9,7 @@ import (
 )
 
 // ByteSlice is a tag for a slice of bytes.
-type ByteSlice = slice[byte]
+type ByteSlice = Slice[byte]
 
 // byteSliceSpec defines the [KindSpec] for [ByteSlice] type.
 var byteSliceSpec = KindSpec{
@@ -25,12 +25,7 @@ func ByteSliceSpec() KindSpec { return byteSliceSpec }
 
 // NewByteSlice returns a new instance of [ByteSlice].
 func NewByteSlice(name string, val ...byte) *ByteSlice {
-	return &slice[byte]{
-		name:     name,
-		value:    val,
-		kind:     KindByteSlice,
-		stringer: byteSliceToString,
-	}
+	return NewSlice(name, val, KindByteSlice, strValueByteSlice, nil)
 }
 
 // CreateByteSlice casts the value to []byte. Returns the [ByteSlice] instance
@@ -53,8 +48,8 @@ func createByteSlice(val any, _ Options) ([]byte, error) {
 	return nil, ErrInvType
 }
 
-// byteSliceToString converts a byte slice to its string representation.
-func byteSliceToString(v []byte) string {
+// strValueByteSlice converts a byte slice to its string representation.
+func strValueByteSlice(v []byte) string {
 	ret := "["
 	for i, val := range v {
 		if i > 0 {

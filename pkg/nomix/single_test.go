@@ -13,8 +13,23 @@ import (
 	"github.com/ctx42/verax/pkg/verax"
 )
 
-func Test_single_TagName(t *testing.T) {
-	tag := &single[int]{name: "name"}
+func Test_NewSingle(t *testing.T) {
+	// --- Given ---
+	sqlValuer := func(v int) (driver.Value, error) { return v, nil }
+
+	// --- When ---
+	have := NewSingle[int]("name", 42, KindInt, strconv.Itoa, sqlValuer)
+
+	// --- Then ---
+	assert.Equal(t, "name", have.name)
+	assert.Equal(t, 42, have.value)
+	assert.Equal(t, KindInt, have.kind)
+	assert.Same(t, strconv.Itoa, have.strValuer)
+	assert.Same(t, sqlValuer, have.sqlValuer)
+}
+
+func Test_Single_TagName(t *testing.T) {
+	tag := &Single[int]{name: "name"}
 
 	// --- When ---
 	have := tag.TagName()
@@ -23,8 +38,8 @@ func Test_single_TagName(t *testing.T) {
 	assert.Equal(t, "name", have)
 }
 
-func Test_single_TagKind(t *testing.T) {
-	tag := &single[int]{kind: KindInt}
+func Test_Single_TagKind(t *testing.T) {
+	tag := &Single[int]{kind: KindInt}
 
 	// --- When ---
 	have := tag.TagKind()
@@ -33,8 +48,8 @@ func Test_single_TagKind(t *testing.T) {
 	assert.Equal(t, KindInt, have)
 }
 
-func Test_single_TagValue(t *testing.T) {
-	tag := &single[int]{value: 42}
+func Test_Single_TagValue(t *testing.T) {
+	tag := &Single[int]{value: 42}
 
 	// --- When ---
 	have := tag.TagValue()
@@ -43,10 +58,10 @@ func Test_single_TagValue(t *testing.T) {
 	assert.Equal(t, 42, have)
 }
 
-func Test_single_TagSet(t *testing.T) {
+func Test_Single_TagSet(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		// --- Given ---
-		tag := &single[int]{value: 42}
+		tag := &Single[int]{value: 42}
 
 		// --- When ---
 		err := tag.TagSet(44)
@@ -58,7 +73,7 @@ func Test_single_TagSet(t *testing.T) {
 
 	t.Run("error - invalid type", func(t *testing.T) {
 		// --- Given ---
-		tag := &single[int]{value: 42}
+		tag := &Single[int]{value: 42}
 
 		// --- When ---
 		err := tag.TagSet(true)
@@ -69,8 +84,8 @@ func Test_single_TagSet(t *testing.T) {
 	})
 }
 
-func Test_single_Get(t *testing.T) {
-	tag := &single[int]{value: 42}
+func Test_Single_Get(t *testing.T) {
+	tag := &Single[int]{value: 42}
 
 	// --- When ---
 	have := tag.Get()
@@ -79,9 +94,9 @@ func Test_single_Get(t *testing.T) {
 	assert.Equal(t, 42, have)
 }
 
-func Test_single_Set(t *testing.T) {
+func Test_Single_Set(t *testing.T) {
 	// --- Given ---
-	tag := &single[int]{value: 42}
+	tag := &Single[int]{value: 42}
 
 	// --- When ---
 	tag.Set(44)
@@ -90,10 +105,10 @@ func Test_single_Set(t *testing.T) {
 	assert.Equal(t, 44, tag.value)
 }
 
-func Test_single_Value(t *testing.T) {
+func Test_Single_Value(t *testing.T) {
 	t.Run("default", func(t *testing.T) {
 		// --- Given ---
-		tag := &single[int]{value: 42}
+		tag := &Single[int]{value: 42}
 
 		// --- When ---
 		have, err := tag.Value()
@@ -108,7 +123,7 @@ func Test_single_Value(t *testing.T) {
 		sqlValuer := func(v int) (driver.Value, error) {
 			return float64(v), nil
 		}
-		tag := &single[int]{value: 42, sqlValuer: sqlValuer}
+		tag := &Single[int]{value: 42, sqlValuer: sqlValuer}
 
 		// --- When ---
 		have, err := tag.Value()
@@ -123,7 +138,7 @@ func Test_single_Value(t *testing.T) {
 		sqlValuer := func(v int) (driver.Value, error) {
 			return 0, errors.New("test error")
 		}
-		tag := &single[int]{value: 42, sqlValuer: sqlValuer}
+		tag := &Single[int]{value: 42, sqlValuer: sqlValuer}
 
 		// --- When ---
 		have, err := tag.Value()
@@ -134,7 +149,7 @@ func Test_single_Value(t *testing.T) {
 	})
 }
 
-func Test_single_TagEqual(t *testing.T) {
+func Test_Single_TagEqual(t *testing.T) {
 	tt := []struct {
 		testN string
 
@@ -144,31 +159,31 @@ func Test_single_TagEqual(t *testing.T) {
 	}{
 		{
 			"same",
-			&single[int]{value: 42},
-			&single[int]{value: 42},
+			&Single[int]{value: 42},
+			&Single[int]{value: 42},
 			true,
 		},
 		{
 			"diff value",
-			&single[int]{value: 42},
-			&single[int]{value: 44},
+			&Single[int]{value: 42},
+			&Single[int]{value: 44},
 			false,
 		},
 		{
 			"diff name",
-			&single[int]{name: "name0", value: 42},
-			&single[int]{name: "name1", value: 42},
+			&Single[int]{name: "name0", value: 42},
+			&Single[int]{name: "name1", value: 42},
 			true,
 		},
 		{
 			"diff kind",
-			&single[int]{value: 42},
-			&single[string]{value: "abc"},
+			&Single[int]{value: 42},
+			&Single[string]{value: "abc"},
 			false,
 		},
 		{
 			"other nil",
-			&single[int]{value: 42},
+			&Single[int]{value: 42},
 			nil,
 			false,
 		},
@@ -185,7 +200,7 @@ func Test_single_TagEqual(t *testing.T) {
 	}
 }
 
-func Test_single_TagSame(t *testing.T) {
+func Test_Single_TagSame(t *testing.T) {
 	tt := []struct {
 		testN string
 
@@ -195,31 +210,31 @@ func Test_single_TagSame(t *testing.T) {
 	}{
 		{
 			"same",
-			&single[int]{name: "name", value: 42},
-			&single[int]{name: "name", value: 42},
+			&Single[int]{name: "name", value: 42},
+			&Single[int]{name: "name", value: 42},
 			true,
 		},
 		{
 			"diff value",
-			&single[int]{name: "name", value: 42},
-			&single[int]{name: "name", value: 44},
+			&Single[int]{name: "name", value: 42},
+			&Single[int]{name: "name", value: 44},
 			false,
 		},
 		{
 			"diff name",
-			&single[int]{name: "name0", value: 42},
-			&single[int]{name: "name1", value: 42},
+			&Single[int]{name: "name0", value: 42},
+			&Single[int]{name: "name1", value: 42},
 			false,
 		},
 		{
 			"diff kind",
-			&single[int]{name: "name", value: 42},
-			&single[string]{name: "name", value: "abc"},
+			&Single[int]{name: "name", value: 42},
+			&Single[string]{name: "name", value: "abc"},
 			false,
 		},
 		{
 			"other nil",
-			&single[int]{name: "name", value: 42},
+			&Single[int]{name: "name", value: 42},
 			nil,
 			false,
 		},
@@ -236,9 +251,9 @@ func Test_single_TagSame(t *testing.T) {
 	}
 }
 
-func Test_single_String(t *testing.T) {
+func Test_Single_String(t *testing.T) {
 	// --- Given ---
-	tag := &single[int]{value: 42, stringer: strconv.Itoa}
+	tag := &Single[int]{value: 42, strValuer: strconv.Itoa}
 
 	// --- When ---
 	have := tag.String()
@@ -247,10 +262,10 @@ func Test_single_String(t *testing.T) {
 	assert.Equal(t, "42", have)
 }
 
-func Test_single_ValidateWith(t *testing.T) {
+func Test_Single_ValidateWith(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		// --- Given ---
-		tag := &single[int]{name: "name", value: 42}
+		tag := &Single[int]{name: "name", value: 42}
 
 		// --- When ---
 		err := tag.ValidateWith(verax.Max(42))
@@ -261,7 +276,7 @@ func Test_single_ValidateWith(t *testing.T) {
 
 	t.Run("error", func(t *testing.T) {
 		// --- Given ---
-		tag := &single[int]{name: "name", value: 44}
+		tag := &Single[int]{name: "name", value: 44}
 
 		// --- When ---
 		err := tag.ValidateWith(verax.Max(42))

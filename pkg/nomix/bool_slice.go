@@ -9,7 +9,7 @@ import (
 )
 
 // BoolSlice is a tag for a slice of bool values.
-type BoolSlice = slice[bool]
+type BoolSlice = Slice[bool]
 
 // boolSliceSpec defines the [KindSpec] for [BoolSlice] type.
 var boolSliceSpec = KindSpec{
@@ -25,12 +25,7 @@ func BoolSliceSpec() KindSpec { return boolSliceSpec }
 
 // NewBoolSlice returns a new instance of [BoolSlice].
 func NewBoolSlice(name string, val ...bool) *BoolSlice {
-	return &slice[bool]{
-		name:     name,
-		value:    val,
-		kind:     KindBoolSlice,
-		stringer: boolSliceToString,
-	}
+	return NewSlice(name, val, KindBoolSlice, strValueBoolSlice, nil)
 }
 
 // CreateBoolSlice casts the value to []bool. Returns the [BoolSlice] instance
@@ -53,8 +48,8 @@ func createBoolSlice(val any, _ Options) ([]bool, error) {
 	return nil, ErrInvType
 }
 
-// boolSliceToString converts a bool slice to its string representation.
-func boolSliceToString(v []bool) string {
+// strValueBoolSlice converts a bool slice to its string representation.
+func strValueBoolSlice(v []bool) string {
 	ret := "["
 	for i, val := range v {
 		if i > 0 {
