@@ -15,7 +15,7 @@ type Options struct {
 	// Initial map size.
 	//
 	// Used by [NewTagSet] and [NewMetaSet] to allocate the init map.
-	length int
+	Length int
 
 	// Initial map.
 	//
@@ -26,20 +26,20 @@ type Options struct {
 	//
 	// When set, [MetaSet.MetaGetTime] will allow time to be represented as a
 	// string.
-	timeFormat string
+	TimeFormat string
 
 	// Location to parse format.
 	//
 	// When set [time.ParseInLocation] instead of [time.Parse] in the
 	// [MetaSet.MetaGetTime] to parse strings.
-	location *time.Location
+	Location *time.Location
 
 	// When set [MetaSet.MetaGetLoc] will allow timezone to be represented as a
 	// sting.
 	//
 	// Example:
 	//   Europe/Warsaw
-	locationAsString bool
+	LocationAsString bool
 
 	// String values considered as zero time value.
 	//
@@ -52,23 +52,24 @@ type Options struct {
 	zeroTime []string
 
 	// The base for integers when parsing.
-	intBase int
+	Radix int
 }
 
-// DefaultOptions returns default options.
-func DefaultOptions() Options {
-	return Options{
-		timeFormat: time.RFC3339Nano,
-		intBase:    10,
+// NewOptions returns a new [Options] instance with default values.
+func NewOptions(opts ...Option) Options {
+	o := Options{
+		TimeFormat: time.RFC3339Nano,
+		Radix:      10,
 	}
+	for _, opt := range opts {
+		opt(&o)
+	}
+	return o
 }
-
-// defaultOptions is default options.
-var defaultOptions = DefaultOptions()
 
 // WithLen is an option to set the default length for the map.
 func WithLen(n int) Option {
-	return func(opts *Options) { opts.length = n }
+	return func(opts *Options) { opts.Length = n }
 }
 
 // WithMeta is an option to set the initial map for the [MetaSet].
@@ -89,21 +90,21 @@ func WithTags(m map[string]Tag) Option {
 
 // WithTimeFormat is the [MetaSet] option setting string time format.
 func WithTimeFormat(format string) Option {
-	return func(opts *Options) { opts.timeFormat = format }
+	return func(opts *Options) { opts.TimeFormat = format }
 }
 
 // WithTimeLoc is the [MetaSet] option setting location for parsed time strings.
 func WithTimeLoc(loc *time.Location) Option {
-	return func(opts *Options) { opts.location = loc }
+	return func(opts *Options) { opts.Location = loc }
 }
 
 // WithLocString is the [MetaSet] option allowing string timezone names.
-func WithLocString(opts *Options) { opts.locationAsString = true }
+func WithLocString(opts *Options) { opts.LocationAsString = true }
 
 // WithZeroTime is [MetaSet] option setting zero time values.
 func WithZeroTime(zero ...string) Option {
 	return func(opts *Options) { opts.zeroTime = zero }
 }
 
-// WithBaseHEX sets base to hexadecimal when parsing integers.
-func WithBaseHEX(opts *Options) { opts.intBase = 16 }
+// WithRadixHEX sets base to hexadecimal when parsing integers.
+func WithRadixHEX(opts *Options) { opts.Radix = 16 }

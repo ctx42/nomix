@@ -9,15 +9,15 @@ import (
 )
 
 // Definition represents a named tag definition. In other words, it wraps a
-// [KindSpec] and a tag name.
+// [Spec] and a tag name.
 type Definition struct {
 	name string     // Tag name.
-	spec KindSpec   // Tag specification.
+	spec Spec       // Tag specification.
 	rule verax.Rule // Optional validation rule.
 }
 
 // Define defines named [Tag].
-func Define(name string, spec KindSpec, rules ...verax.Rule) *Definition {
+func Define(name string, spec Spec, rules ...verax.Rule) *Definition {
 	def := &Definition{
 		name: name,
 		spec: spec,
@@ -32,7 +32,7 @@ func Define(name string, spec KindSpec, rules ...verax.Rule) *Definition {
 func (def *Definition) TagName() string { return def.name }
 
 // TagKind returns the tag definition kind.
-func (def *Definition) TagKind() TagKind { return def.spec.knd }
+func (def *Definition) TagKind() Kind { return def.spec.knd }
 
 // TagCreate creates a new [Tag] matching the definition. It does not validate
 // the value.
@@ -60,9 +60,8 @@ func (def *Definition) TagParse(val string, opts ...Option) (Tag, error) {
 
 // Validate validates the given value against the definition.
 //
-// NOTE: The [TagCreator] is first used to create a [Tag] instance with the
-// provided value this means that all supported by [TagCreator] types are
-// supported.
+// NOTE: The [Creator] is first used to create a [Tag] instance with the
+// provided value; hence all types supported by [Creator] are supported.
 func (def *Definition) Validate(val any) error {
 	_, err := def.TagCreate(val) // Also does validation.
 	return err

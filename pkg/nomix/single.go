@@ -12,16 +12,16 @@ import (
 
 // Compile time checks.
 var (
-	_ Tag              = &Single[int]{}
-	_ TagValueComparer = &Single[int]{}
-	_ TagComparer      = &Single[int]{}
+	_ Tag           = &Single[int]{}
+	_ ValueComparer = &Single[int]{}
+	_ Comparer      = &Single[int]{}
 )
 
 // Single is a generic type for single value [Tag].
 type Single[T comparable] struct {
 	name      string                        // Tag name.
 	value     T                             // Tag value.
-	kind      TagKind                       // Tag kind.
+	kind      Kind                          // Tag kind.
 	strValuer func(T) string                // T to string function.
 	sqlValuer func(T) (driver.Value, error) // T to SQL value function.
 }
@@ -30,7 +30,7 @@ type Single[T comparable] struct {
 func NewSingle[T comparable](
 	name string,
 	val T,
-	kind TagKind,
+	kind Kind,
 	strValuer func(T) string,
 	sqlValuer func(T) (driver.Value, error),
 ) *Single[T] {
@@ -44,9 +44,9 @@ func NewSingle[T comparable](
 	}
 }
 
-func (tag *Single[T]) TagName() string  { return tag.name }
-func (tag *Single[T]) TagKind() TagKind { return tag.kind }
-func (tag *Single[T]) TagValue() any    { return tag.value }
+func (tag *Single[T]) TagName() string { return tag.name }
+func (tag *Single[T]) TagKind() Kind   { return tag.kind }
+func (tag *Single[T]) TagValue() any   { return tag.value }
 func (tag *Single[T]) TagSet(v any) error {
 	if v, ok := v.(T); ok {
 		tag.value = v

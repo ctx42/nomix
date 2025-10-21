@@ -10,7 +10,7 @@ func Test_TagKind_String_tabular(t *testing.T) {
 	tt := []struct {
 		testN string
 
-		knd TagKind
+		knd Kind
 	}{
 		{"KindString", KindString},
 		{"KindInt64", KindInt64},

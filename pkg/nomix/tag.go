@@ -3,13 +3,13 @@
 
 package nomix
 
-// TagKind describes the type of [Tag] value.
-type TagKind uint16
+// Kind describes the type of [Tag] value.
+type Kind int16
 
 // String implements [fmt.Stringer].
 //
 // nolint: cyclop
-func (tk TagKind) String() string {
+func (tk Kind) String() string {
 	switch tk {
 	case KindString:
 		return "KindString"
@@ -50,12 +50,12 @@ func (tk TagKind) String() string {
 
 // Base [Tag] kinds.
 const (
-	KindString  TagKind = 0b00000000_00000010
-	KindInt64   TagKind = 0b00000000_00000100
-	KindFloat64 TagKind = 0b00000000_00001000
-	KindTime    TagKind = 0b00000000_00010000
-	KindJSON    TagKind = 0b00000000_00100000
-	KindUUID    TagKind = 0b00000000_01000000
+	KindString  Kind = 0b00000000_00000010
+	KindInt64   Kind = 0b00000000_00000100
+	KindFloat64 Kind = 0b00000000_00001000
+	KindTime    Kind = 0b00000000_00010000
+	KindJSON    Kind = 0b00000000_00100000
+	KindUUID    Kind = 0b00000000_01000000
 )
 
 // Derived [Tag] kinds.
@@ -77,8 +77,8 @@ const (
 	KindIntSlice     = KindInt | KindSlice
 )
 
-// KindSlice is a [TagKind] type modifier indicating it is a slice.
-const KindSlice TagKind = 0b00000000_10000000
+// KindSlice is a [Kind] type modifier indicating it is a slice.
+const KindSlice Kind = 0b00000000_10000000
 
 // Tag is an interface representing a tag.
 //
@@ -87,13 +87,13 @@ type Tag interface {
 	// TagName returns tag name.
 	TagName() string
 
-	// TagKind returns the [TagKind] holding the information about the type of
-	// the tag value. Use it interprets the value returned by the [Tag.TagValue]
-	// method.
-	TagKind() TagKind
+	// TagKind returns the [Kind] holding the information about the type of
+	// the tag value. Use it to interpret the value returned by the
+	// [Tag.TagValue] method.
+	TagKind() Kind
 
 	// TagValue returns tag value.
-	// You may use the value returned by the [Tag.TagKind] method
+	// You may use the value returned by the [Tag.Kind] method
 	// to cast it to the proper type.
 	TagValue() any
 }
@@ -115,81 +115,79 @@ type Tagger interface {
 	TagDelete(name string)
 }
 
-// TagAllGetter is an interface for retrieving all tags in the set.
-type TagAllGetter interface {
+// AllGetter is an interface for retrieving all tags in the set.
+type AllGetter interface {
 	// TagGetAll returns all tags in the set as a map. May return nil. The
 	// returned map should be treated as read-only.
 	TagGetAll() map[string]Tag
 }
 
-// TagComparer is an interface for comparing tags.
-type TagComparer interface {
+// Comparer is an interface for comparing tags.
+type Comparer interface {
 	// TagSame returns true if both tags have the same name, kind and value.
 	TagSame(other Tag) bool
 }
 
-// TagValueComparer is an interface for comparing tag values.
-type TagValueComparer interface {
+// ValueComparer is an interface for comparing tag values.
+type ValueComparer interface {
 	// TagEqual returns true if both tags are having the same kind and value.
 	TagEqual(other Tag) bool
 }
 
-// TagCreator is an interface for creating [Tag] instances.
-type TagCreator interface {
+// Creator is an interface for creating [Tag] instances.
+type Creator interface {
 	// TagCreate creates the appropriate [Tag] instance based on the value's
 	// type. It returns the [ErrNoCreator] error if the value's type is not
 	// supported. The name must be set by the implementer.
 	TagCreate(value any, opts ...Option) (Tag, error)
 }
 
-// TagNamedCreator is an interface for creating named [Tag] instances.
-type TagNamedCreator interface {
+// NamedCreator is an interface for creating named [Tag] instances.
+type NamedCreator interface {
 	// TagCreate creates the appropriate [Tag] instance based on the value's
 	// type. It returns the [ErrNoCreator] error if the value's type is not
 	// supported.
 	TagCreate(name string, value any, opts ...Option) (Tag, error)
 }
 
-// TagParser is an interface for creating [Tag] instances from their string
+// Parser is an interface for creating [Tag] instances from their string
 // representation.
-type TagParser interface {
+type Parser interface {
 	TagParse(name string, val string, opts ...Option) (Tag, error)
 }
 
-// TagNamedParser is an interface for creating named [Tag] instances from their
+// NamedParser is an interface for creating named [Tag] instances from their
 // string representation. The name must be set by the implementer.
-type TagNamedParser interface {
+type NamedParser interface {
 	TagParse(val string, opts ...Option) (Tag, error)
 }
 
-// TagCreateFunc function signature for creating [Tag] instances.
-type TagCreateFunc func(name string, val any, opts ...Option) (Tag, error)
+// CreateFunc function signature for creating [Tag] instances.
+type CreateFunc func(name string, val any, opts ...Option) (Tag, error)
 
-// TagParseFunc function signature for creating [Tag] instances from their
-// string representation.
-type TagParseFunc func(name, val string, opts ...Option) (Tag, error)
+// ParseFunc function signature for creating [Tag] instances from their string
+// representation.
+type ParseFunc func(name, val string, opts ...Option) (Tag, error)
 
-// CreateFunc creates a [TagCreateFunc] from a function that creates concrete
+// TagCreateFunc creates a [CreateFunc] from a function that creates concrete
 // tag instances.
 //
 // Examples:
 //
-//	CreateFunc(CreateBool)
-//	CreateFunc(CreateInt64)
-func CreateFunc[T Tag](fn func(name string, val any, opts ...Option) (T, error)) TagCreateFunc {
+//	TagCreateFunc(func(name string, val any, opts ...Option) (MyTag, error))
+func TagCreateFunc[T Tag](fn func(name string, val any, opts ...Option) (T, error)) CreateFunc {
 	return func(name string, val any, opts ...Option) (Tag, error) {
 		return fn(name, val, opts...)
 	}
 }
 
-// ParseFunc creates a [TagParseFunc] from a function that creates concrete
+// TagParseFunc creates a [ParseFunc] from a function that creates concrete
 // tag instances from their string representation.
 //
 // Examples:
 //
-//	ParseFunc(ParseBool)
-//	ParseFunc(ParseInt64)
-func ParseFunc[T Tag](fn func(name string, val string, opts ...Option) (T, error)) TagParseFunc {
+//	TagParseFunc(func(name string, val string, opts ...Option) (T, error))
+func TagParseFunc[T Tag](fn func(name string, val string, opts ...Option) (T, error)) ParseFunc {
 	return func(name string, val string, opts ...Option) (Tag, error) {
 		return fn(name, val, opts...)
 	}

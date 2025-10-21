@@ -11,19 +11,36 @@ import (
 	"github.com/ctx42/testing/pkg/must"
 )
 
-func Test_DefaultParsingOpts(t *testing.T) {
-	// --- When ---
-	have := DefaultOptions()
+func Test_NewOptions(t *testing.T) {
+	t.Run("default", func(t *testing.T) {
+		// --- When ---
+		have := NewOptions()
 
-	// --- Then ---
-	assert.Equal(t, 0, have.length)
-	assert.Nil(t, have.init)
-	assert.Equal(t, time.RFC3339Nano, have.timeFormat)
-	assert.Nil(t, have.location)
-	assert.False(t, have.locationAsString)
-	assert.Empty(t, have.zeroTime)
-	assert.Equal(t, 10, have.intBase)
-	assert.Fields(t, 7, have)
+		// --- Then ---
+		assert.Equal(t, 0, have.Length)
+		assert.Nil(t, have.init)
+		assert.Equal(t, time.RFC3339Nano, have.TimeFormat)
+		assert.Nil(t, have.Location)
+		assert.False(t, have.LocationAsString)
+		assert.Empty(t, have.zeroTime)
+		assert.Equal(t, 10, have.Radix)
+		assert.Fields(t, 7, have)
+	})
+
+	t.Run("with changes", func(t *testing.T) {
+		// --- When ---
+		have := NewOptions(WithTimeFormat("2006"))
+
+		// --- Then ---
+		assert.Equal(t, 0, have.Length)
+		assert.Nil(t, have.init)
+		assert.Equal(t, "2006", have.TimeFormat)
+		assert.Nil(t, have.Location)
+		assert.False(t, have.LocationAsString)
+		assert.Empty(t, have.zeroTime)
+		assert.Equal(t, 10, have.Radix)
+		assert.Fields(t, 7, have)
+	})
 }
 
 func Test_WithLen(t *testing.T) {
@@ -34,7 +51,7 @@ func Test_WithLen(t *testing.T) {
 	WithLen(10)(opts)
 
 	// --- Then ---
-	assert.Equal(t, 10, opts.length)
+	assert.Equal(t, 10, opts.Length)
 }
 
 func Test_WithMeta(t *testing.T) {
@@ -51,7 +68,7 @@ func Test_WithMeta(t *testing.T) {
 
 func Test_WithTags(t *testing.T) {
 	// --- Given ---
-	m := map[string]Tag{"A": NewInt("A", 1)}
+	m := map[string]Tag{"A": nil}
 	opts := &Options{}
 
 	// --- When ---
@@ -69,7 +86,7 @@ func Test_WithTimeFormat(t *testing.T) {
 	WithTimeFormat(time.RFC822)(opts)
 
 	// --- Then ---
-	assert.Equal(t, time.RFC822, opts.timeFormat)
+	assert.Equal(t, time.RFC822, opts.TimeFormat)
 }
 
 func Test_WithTimeLoc(t *testing.T) {
@@ -81,7 +98,7 @@ func Test_WithTimeLoc(t *testing.T) {
 	WithTimeLoc(WAW)(opts)
 
 	// --- Then ---
-	assert.Same(t, WAW, opts.location)
+	assert.Same(t, WAW, opts.Location)
 }
 
 func Test_WithLocString(t *testing.T) {
@@ -92,7 +109,7 @@ func Test_WithLocString(t *testing.T) {
 	WithLocString(opts)
 
 	// --- Then ---
-	assert.True(t, opts.locationAsString)
+	assert.True(t, opts.LocationAsString)
 }
 
 func Test_WithZeroTime(t *testing.T) {
@@ -106,13 +123,13 @@ func Test_WithZeroTime(t *testing.T) {
 	assert.Equal(t, []string{"a", "b", "c"}, opts.zeroTime)
 }
 
-func Test_WithBaseHEX(t *testing.T) {
+func Test_WithRadixHEX(t *testing.T) {
 	// --- Given ---
 	opts := &Options{}
 
 	// --- When ---
-	WithBaseHEX(opts)
+	WithRadixHEX(opts)
 
 	// --- Then ---
-	assert.Equal(t, 16, opts.intBase)
+	assert.Equal(t, 16, opts.Radix)
 }

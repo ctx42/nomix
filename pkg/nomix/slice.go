@@ -12,16 +12,16 @@ import (
 
 // Compile time checks.
 var (
-	_ Tag              = &Slice[int]{}
-	_ TagValueComparer = &Slice[int]{}
-	_ TagComparer      = &Slice[int]{}
+	_ Tag           = &Slice[int]{}
+	_ ValueComparer = &Slice[int]{}
+	_ Comparer      = &Slice[int]{}
 )
 
 // Slice is a generic type for multi value [Tag].
 type Slice[T comparable] struct {
 	name      string                          // Tag name.
 	value     []T                             // Tag value.
-	kind      TagKind                         // Tag kind.
+	kind      Kind                            // Tag kind.
 	strValuer func([]T) string                // T to string function.
 	sqlValuer func([]T) (driver.Value, error) // T to SQL value function.
 }
@@ -30,7 +30,7 @@ type Slice[T comparable] struct {
 func NewSlice[T comparable](
 	name string,
 	val []T,
-	kind TagKind,
+	kind Kind,
 	strValuer func([]T) string,
 	sqlValuer func([]T) (driver.Value, error),
 ) *Slice[T] {
@@ -44,9 +44,9 @@ func NewSlice[T comparable](
 	}
 }
 
-func (tag *Slice[T]) TagName() string  { return tag.name }
-func (tag *Slice[T]) TagKind() TagKind { return tag.kind }
-func (tag *Slice[T]) TagValue() any    { return tag.value }
+func (tag *Slice[T]) TagName() string { return tag.name }
+func (tag *Slice[T]) TagKind() Kind   { return tag.kind }
+func (tag *Slice[T]) TagValue() any   { return tag.value }
 
 func (tag *Slice[T]) TagSet(v any) error {
 	if v, ok := v.([]T); ok {

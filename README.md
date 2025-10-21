@@ -8,24 +8,23 @@
 * [nomix: Tagging and Metadata for Go](#nomix-tagging-and-metadata-for-go)
   * [Installation](#installation)
   * [Introduction](#introduction)
-    * [Kinds](#kinds)
-    * [Slices](#slices)
-  * [Instances](#instances)
-  * [Tag Set](#tag-set)
-  * [Meta Set](#meta-set)
+  * [Base and Derived Types](#base-and-derived-types)
+  * [Tag Kind](#tag-kind)
+  * [Tag Interface](#tag-interface)
+  * [Typed Tags](#typed-tags)
+  * [Tag Spec](#tag-spec)
+  * [Tag Definition](#tag-definition)
+  * [Registry](#registry)
+  * [Tag Sets](#tag-sets)
 <!-- TOC -->
 
-In the world of software engineering, we often deal with a vast array of
-assets like files, user profiles, products in an online store. These assets 
-form the backbone of application data structures, but as systems grow more 
-complex, simply storing the core data isn't enough. That's where metadata comes 
-into play. Metadata provides a way to add extra layers of information and 
-organization to these assets, making systems more adaptable. 
+In the world of software engineering, we often deal with a vast array of assets like files, profiles, products, and so on. These assets form the backbone of application data structures, but as systems grow more complex, simply storing the core data isn't enough. That's where metadata comes into play. Metadata provides a way to add extra layers of information and organization to these assets, making systems more adaptable.
 
-`nomix` – from nomos (law/order) or “nomen” (name).
+The `nomix` – from *nomos* (law/order) or *nomen* (name) library provides a simple interface to deal with multi type labeled metadata value sets in a generic way. In the context of the module we call them **tags**.
+
+Before explaining the library's API, let's introduce its approach and philosophy.
 
 ## Installation
-
 To use `nomix` in your Go project, install it with:
 
 ```bash
@@ -33,15 +32,56 @@ go get github.com/ctx42/nomix
 ```
 
 ## Introduction
+When we talk about tags, we usually think about a set of name-value pairs representing a set of data that describes and gives information about other data.
 
-The `nomix` module distinguishes two main types of information: 
+![tagged_gopher.png](doc/tagged_gopher.png)
 
-- **metadata** is a set of named values of any type (`map[string]any`).   
-- **tags** is a set of named values each with a specific type (`map[string]Tag`).
+Using `map[string]any` in Go is a simple way to model this kind of data, but it has several drawbacks:
 
-The `metadata` values are more flexible where `tags` are more restricted values
-that implement the `Tag` interface.
+- Managing `any` values is challenging.
+- Comparing `any` values is challenging.
+- Restricting `any` to specific supported types is not straightforward.
+- Mapping `any` to database types is complex.
 
+We need a more sophisticated solution that is user-friendly for programmers, supports easy definition types and validation rules, and simplifies database storage. To enable efficient searching and indexing of tags, we must limit supported types to those widely available across databases.
+
+## Base and Derived Types
+The requirement to limit types to a small, widely supported set across most database engines guided our design. We named these **Base Types** and selected the following seven during the module's design:
+
+- `byte`
+- `string`
+- `int64`
+- `float64`
+- `time`
+- `JSON`
+- `UUID`
+
+In the database layer, the **Base Types** can map to multiple types, termed **Derived Types**, in the application layer. Examples of derived types include:
+
+- `bool`
+- `int`
+- `uint16`
+-  .... and so on
+
+## Tag Kind
+
+Each of the types has assigned the **Type Kind** which is `int16` number.
+
+![tag-kind.png](doc/tag-kind.png)
+
+The lower octet is reserved by the library to hold *base types*, the seven higher bits are for use by a library user to create *derived types*. Notice that there is also a bit indicating *slice type* which allows us to create typed slices (arrays) of the base types.
+
+For example, if we wanted to define `[]int` *derived type* we could do it as follows:
+
+![tag-int.png](doc/tag-int.png)
+
+Based on the above idea, we can seamlessly map types from Go to a database.
+
+![type-mapping.png](doc/type-mapping.png)
+
+## Tag Interface
+
+OK we have the basis of the module explained. Building on it we define the main `nomix` interface:
 ```go
 // Tag is an interface representing a tag.
 //
@@ -50,10 +90,10 @@ type Tag interface {
 	// TagName returns tag name.
 	TagName() string
 
-	// TagKind returns the [TagKind] holding the information about the type of
-	// the tag value. Use it interprets the value returned by the [Tag.TagValue]
-	// method.
-	TagKind() TagKind
+	// TagKind returns the [Kind] holding the information about the type of
+	// the tag value. Use it to interpret the value returned by the
+	// [Tag.TagValue] method.
+	TagKind() Kind
 
 	// TagValue returns tag value.
 	// You may use the value returned by the [Tag.TagKind] method
@@ -62,139 +102,157 @@ type Tag interface {
 }
 ```
 
-### Kinds
+The `Tag` interface is implemented by all the **Named** and **Typed Tags**. It still has the `any` returned from the `TagValue` method, but we need it if we want to be able to handle tag sets with all the supported *base types* and `derived types` by the same interface.
 
-The `TagKind` identifies the underlying Go type and can be used to decide what 
-database type to map it to. The `nomix` module defines and implements the 
-following set of _base kinds_:
+## Typed Tags
 
-- `nomix.KindString` - in Go represented by `string` type.
-- `nomix.KindInt64`  - in Go represented by `int64` type.
-- `nomix.KindFloat64`  - in Go represented by `float64` type.
-- `nomix.KindTime`  - in Go represented by `time.Time` type.
-- `nomix.KindJSON`  - in Go represented by `json.RawMessage` type.
-
-The _base kinds_ represent known Go types and at the same time reflect the most 
-common database types. The idea is to provide the small set of base types and 
-`derive` the other types from them.
-
-The derived kinds implemented in `nomix` are: 
-
-- `nomix.KindBool` - in Go represented by `bool` type.
-- `nomix.KindInt` - in Go represented by `int` type.
-
-### Slices
-
-All the kinds (except `nomix.KindJSON`) have the `SliceKind` equivalents.
-
-- `nomix.KindByteSlice`  - in Go represented by `[]byte` type.
-- `nomix.KindStringSlice` - in Go represented by `[]string` type.
-- `nomix.KindInt64Slice` - in Go represented by `[]int64` type.
-- `nomix.KindFloat64Slice` - in Go represented by `[]float64` type.
-- `nomix.KindTimeSlice` - in Go represented by `[]time.Time` type.
-- `nomix.KindBoolSlice` - in Go represented by `[]bool` type.
-- `nomix.KindIntSlice` - in Go represented by `[]int` type.
-
-## Instances
-
-Tge `nomix` module provides a `Tag` interface implementations for all the kinds:
-
-- `nomix.String` and `nomix.StringSlice` 
-- `nomix.Int64` and `nomix.Int64Slice` 
-- `nomix.Float64` and `nomix.Float64Slice` 
-- `nomix.Time` and `nomix.TimeSlice` 
-- `nomix.Bool` and `nomix.BoolSlice` 
-- `nomix.Int` and `nomix.IntSlice` 
-- `nomix.ByteSlice` 
-
-## Tag Set
-
-The `Tag` interface provides the basis for operating on sets of differently 
-typed and named values in a generic way.
-
-Anything can become a set of tags by implementing the `Tagger` interface.
+To create typed tags the `nomix` package provides generic `Single` and `Slice` types which both implement the `Tag` interface and in the same time provide typed methods to access their typed values.
 
 ```go
-// Tagger is an interface for managing a collection of distinctly named [Tag]
-// instances (set). The implementations must not allow for nil values to be
-// stored in the set.
-type Tagger interface {
-	// Get retrieves from the set a [Tag] by its name. If the name doesn't
-	// exist in the set, it returns nil.
-	Get(name string) Tag
+// Single is a generic type for single value [Tag].
+type Single[T comparable] struct { ... }
 
-	// TagSet adds instances of [Tag] to the set. If the tag name already
-	// exists in the set, it will be overwritten. The nil instances are ignored.
-	TagSet(tag ...Tag)
+// Slice is a generic type for multi value [Tag].
+type Slice[T comparable] struct { ... }
+```
 
-	// TagDelete removes from the set the [Tag] by name. If the name does not
-	// exist, the method has no effect.
-	TagDelete(name string)
+Both of the types have constructor functions (`NewSingle` and `NewSlice`) to create the instances.
+
+Lets say we would like to define an `int` *derived type* based on `int64` *base type* and its constructor function.
+
+```go
+// Int is a tag representing a single integer value.
+type Int = nomix.Single[int]
+
+// NewInt returns a new instance of [Int].
+func NewInt(name string, val int) *Int {
+	return nomix.NewSingle(name, val, nomix.KindInt, strconv.Itoa, sqlValueInt)
 }
-``` 
 
-But `nomix` module provides a `TagSet` type that implements the `Tagger` and 
-adds some additional functionality around getting typed values from the set. 
+// sqlValueInt converts int to its int64 representation. Never returns an error.
+func sqlValueInt(val int) (driver.Value, error) { return int64(val), nil }
+```
+
+That's it. The `nomix.NewSingle` is the `nomix.Single[T comparable]` constructor function which you call defining the tag name, value, kind, a function that returns the string representation of the *derived type* and a function returning `driver.Value` for it.
+
+You can see the full implementation of `Int` and many other base and derived types in `xtag` package.
+## Tag Spec
+The `TagSpec` is a structure providing tag kind specification, it puts together the `TagKind` and `TagCreateFunc` and `TagParseFunc` functions which create tags of given *kind* and parse tags of that kind from strings respectively. The functions have signatures:
 
 ```go
-set := NewTagSet()
+// TagCreateFunc function signature for creating [Tag] instances.
+type TagCreateFunc func(name string, val any, opts ...Option) (Tag, error)
 
-set.TagSet(NewInt("A", 42), NewBool("B", true), NewString("C", "foo"))
+// TagParseFunc function signature for creating [Tag] instances from their
+// string representation.
+type TagParseFunc func(name, val string, opts ...Option) (Tag, error)
+```
+
+the *spec* for previously seen `Int` tag looks like this:
+
+```go
+spec := nomix.NewKindSpec(
+    nomix.KindInt,
+    nomix.CreateFunc(xtag.CreateInt),
+    nomix.ParseFunc(xtag.ParseInt),
+)
+
+tagA, errA := spec.TagCreate("A", 42)
+tagB, errB := spec.TagParse("B", "42")
+
+fmt.Printf("- A: %v err: %v\n", tagA.TagValue(), errA)
+fmt.Printf("- B: %v err: %v\n", tagB.TagValue(), errB)
+// Output:
+// - A: 42 err: <nil>
+// - B: 42 err: <nil>
+```
+
+The `TagSpec` main job is to simplify creation of tags for given *base* or *derived* types.
+
+## Tag Definition
+
+The `Definition` defines named tag using `KindSpec` and optionally set of [validation rules](https://github.com/ctx42/verax).
+
+```go
+def := nomix.Define("name", xtag.IntSpec(), verax.Max(42))
+
+tag, err := def.TagCreate(42)
+fmt.Printf("- success: %s err: %v\n", tag, err)
+
+tag, err = def.TagCreate(44)
+fmt.Printf("- failure: %v err: %v\n", tag, err)
+
+// Output:
+// - success: 42 err: <nil>
+// - failure: <nil> err: name: must be no greater than 42
+```
+
+With `Definition` you can create definitions for tags you are using in your system along with their validation and then use it to create instances of the tags.
+
+## Registry
+
+The `Registry` allows you to register *specs* (for *kinds*) and then associate Go types with them.
+
+```go
+reg := nomix.NewRegistry()
+
+_ = reg.Register(xtag.IntSpec())       // Register spec.
+_, _ = reg.Associate(0, nomix.KindInt) // Associate the int type with spec.
+
+spec := reg.SpecForKind(nomix.KindInt) // Get spec for KindInt.
+tag, err := spec.TagCreate("A", 42)
+format := "name: %s; kind: %s; value: %v; err: %v\n"
+fmt.Printf(format, tag.TagName(), tag.TagKind(), tag.TagValue(), err)
+
+spec = reg.SpecForType(0) // Get spec for int type.
+tag, err = spec.TagCreate("B", 44)
+fmt.Printf(format, tag.TagName(), tag.TagKind(), tag.TagValue(), err)
+
+// Convenience function to create tags for registered types.
+tag, err = reg.Create("C", 11)
+fmt.Printf(format, tag.TagName(), tag.TagKind(), tag.TagValue(), err)
+
+// Output:
+// name: A; kind: KindInt; value: 42; err: <nil>
+// name: B; kind: KindInt; value: 44; err: <nil>
+// name: C; kind: KindInt; value: 11; err: <nil>
+```
+
+The `nomix` package also provides a global registry if you wish to register all your specs and types in for example `init` function.
+
+```go
+reg := nomix.GlobalRegistry()
+```
+## Tag Sets
+The `nomix.TagSet` is a structure helping to operate on sets of typed tags.
+
+```go
+set := NewTagSet() // The map[string]Tag type.
+
+set.TagSet(
+    xtag.NewInt("A", 42),
+    xtag.NewBool("B", true),
+    xtag.NewString("C", "foo"),
+)
 
 fmt.Printf("There are %d tags in the set:\n", set.TagCount())
-fmt.Printf("- A: %v\n", set.Get("A").TagValue())
-fmt.Printf("- B: %v\n", set.Get("B").TagValue())
-fmt.Printf("- C: %v\n", set.Get("C").TagValue())
-
-fmt.Printf("\nGetting typed tags:\n")
-
-// Tag exists but is of a different type.
-tagA, err := set.TagGetInt64("A")
-fmt.Printf("  A: %v; err: %v\n", tagA, err)
-
-tagC, err := set.TagGetString("C")
-fmt.Printf("  C: %v;   err: %v\n", tagC, err)
+fmt.Printf("- A: %v\n", set.TagGet("A").TagValue())
+fmt.Printf("- B: %v\n", set.TagGet("B").TagValue())
+fmt.Printf("- C: %v\n", set.TagGet("C").TagValue())
+fmt.Printf("- D: %v\n", set.TagGet("D"))
 
 // Output:
 // There are 3 tags in the set:
 // - A: 42
 // - B: true
 // - C: foo
-//
-// Getting typed tags:
-//   A: <nil>; err: A: invalid element type
-//   C: foo;   err: <nil>
+// - D: <nil>
 ```
 
-## Meta Set
-
-Similarly to tags the `nomix` module provides equivalent interfaces and 
-structures for metadata.
+and untyped tags.
 
 ```go
-// Metadata is an interface for managing a collection of distinctly named
-// metadata values. The implementations must not allow for nil values to be
-// stored in the set.
-type Metadata interface {
-	// MetaGet retrieves from the set a metadata value by its name. If the name
-	// does not exist in the set, it returns nil.
-	MetaGet(name string) any
-
-	// MetaSet adds a named value to the set. If the value with the given name
-	// already exists in the set, it will be overwritten. Setting a nil value
-	// must be implemented as a no-op.
-	MetaSet(name string, value any)
-
-	// MetaDelete removes from the set the metadata value by name. If the name
-	// does not exist, the method has no effect.
-	MetaDelete(name string)
-}
-```
-
-Similar example as for tags with `MetaSet`.
-
-```go
-set := NewMetaSet()
+set := NewMetaSet() // The map[string]any type.
 
 set.MetaSet("A", 42)
 set.MetaSet("B", true)
@@ -204,24 +262,21 @@ fmt.Printf("There are %d entries in the set:\n", set.MetaCount())
 fmt.Printf("- A: %v\n", set.MetaGet("A"))
 fmt.Printf("- B: %v\n", set.MetaGet("B"))
 fmt.Printf("- C: %v\n", set.MetaGet("C"))
-
-fmt.Printf("\nGetting metadata values:\n")
-
-// Tag exists but is of a different type.
-metaA, err := set.MetaGetBool("A")
-fmt.Printf("  A: %v; err: %v\n", metaA, err)
-
-metaC, err := set.MetaGetString("C")
-fmt.Printf("  C: %v;   err: %v\n", metaC, err)
+fmt.Printf("- D: %v\n", set.MetaGet("D"))
 
 // Output:
 // There are 3 entries in the set:
 // - A: 42
 // - B: true
 // - C: foo
-//
-// Getting metadata values:
-//   A: false; err: A: invalid element type
-//   C: foo;   err: <nil>
+// - D: <nil>
 ```
+For convenience the `xtag` package provides *specs*, and *typed tags* for most used types:
 
+- `String` and `StringSlice`
+- `Int64` and `Int64Slice`
+- `Float64` and `Float64Slice`
+- `Time` and `TimeSlice`
+- `Bool` and `BoolSlice`
+- `Int` and `IntSlice`
+- `ByteSlice`

@@ -153,7 +153,7 @@ func Test_Single_TagEqual(t *testing.T) {
 	tt := []struct {
 		testN string
 
-		tag0 TagValueComparer
+		tag0 ValueComparer
 		tag1 Tag
 		want bool
 	}{
@@ -204,7 +204,7 @@ func Test_Single_TagSame(t *testing.T) {
 	tt := []struct {
 		testN string
 
-		tag0 TagComparer
+		tag0 Comparer
 		tag1 Tag
 		want bool
 	}{
