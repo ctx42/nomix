@@ -28,7 +28,7 @@ func Define(name string, spec Spec, rules ...verax.Rule) *Definition {
 	return def
 }
 
-// TagName returns the tag definition name.
+// TagName returns the tag name definition is for.
 func (def *Definition) TagName() string { return def.name }
 
 // TagKind returns the tag definition kind.
