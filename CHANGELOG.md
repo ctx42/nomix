@@ -1,3 +1,13 @@
+## v0.5.0 (Fri, 13 Feb 2026 13:08:14 UTC)
+- Change Registry to make it more usable.
+- Simplify Registry API by removing redundant methods.
+- Change TagKind bit association.
+- Add support for `driver.Valuer` interface in `single` and `slice` generic types.
+- Expose structures allowing for custom tag implementations.
+- style: Use an empty `Options` struct when options are not used.
+- Move tag type definitions to separate `xtag` package.
+- doc: Improve code documentation.
+
 ## v0.4.0 (Fri, 17 Oct 2025 19:56:52 UTC)
 - Changes to tag validation logic.
 
