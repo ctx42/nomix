@@ -1,0 +1,89 @@
+// SPDX-FileCopyrightText: (c) 2026 Rafal Zajac
+// SPDX-License-Identifier: MIT
+
+package nomix
+
+import (
+	"encoding/json"
+
+	"github.com/ctx42/xrr/pkg/xrr"
+)
+
+// Marker types for the package's error domain.
+type (
+	edError    struct{}
+	edInternal struct{}
+)
+
+// Compile checks.
+var (
+	_ error            = (*Error)(nil)
+	_ xrr.Coder        = (*Error)(nil)
+	_ json.Marshaler   = (*Error)(nil)
+	_ json.Unmarshaler = (*Error)(nil)
+
+	_ error            = (*InternalError)(nil)
+	_ xrr.Coder        = (*InternalError)(nil)
+	_ json.Marshaler   = (*InternalError)(nil)
+	_ json.Unmarshaler = (*InternalError)(nil)
+
+	_ error            = (*FieldErrors)(nil)
+	_ xrr.Fielder      = (*FieldErrors)(nil)
+	_ json.Marshaler   = (*FieldErrors)(nil)
+	_ json.Unmarshaler = (*FieldErrors)(nil)
+)
+
+// Error constructor functions for the package's error domain.
+var (
+	newError         = xrr.ErrorFunc[edError]()
+	newInternalError = xrr.ErrorFunc[edInternal]()
+	newFieldsError   = xrr.FieldsFunc[edError]()
+)
+
+// Error represents an error in the package's error domain.
+type Error = xrr.GenericError[edError]
+
+// NewError returns a new error in the package's error domain.
+func NewError(msg, code string, opts ...xrr.Option) error {
+	return newError(msg, code, opts...)
+}
+
+// InternalError represents an internal error (library misuse) in the package's
+// error domain.
+type InternalError = xrr.GenericError[edInternal]
+
+// NewInternalError returns a new internal error in the package's domain.
+func NewInternalError(msg, code string, opts ...xrr.Option) error {
+	return newInternalError(msg, code, opts...)
+}
+
+// FieldErrors represents a field error in the package's error domain.
+type FieldErrors = xrr.GenericFields[edError]
+
+// NewFieldError returns a new field error in the package's error domain.
+func NewFieldError(field string, err error) *FieldErrors {
+	return newFieldsError(field, err)
+}
+
+// NewFieldErrors creates a new [FieldErrors] from the given map. The map is
+// stored directly without copying.
+func NewFieldErrors(fields map[string]error) *FieldErrors {
+	return xrr.NewFields[edError](fields)
+}
+
+// IsVeraxError reports whether the error is non-nil [Error], [FieldErrors] or
+// [InternalError].
+func IsVeraxError(err error) bool {
+	return IsValidationError(err) || IsInternalError(err)
+}
+
+// IsValidationError reports whether the error is non-nil [Error] or
+// [FieldErrors].
+func IsValidationError(err error) bool {
+	return err != nil && xrr.IsDomain[edError](err)
+}
+
+// IsInternalError reports whether the error is non-nil [InternalError].
+func IsInternalError(err error) bool {
+	return err != nil && xrr.IsDomain[edInternal](err)
+}

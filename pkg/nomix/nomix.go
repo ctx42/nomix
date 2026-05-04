@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac <rzajac@gmail.com>
+// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac
 // SPDX-License-Identifier: MIT
 
 // Package nomix provides a set of types and functions for handling tags and
@@ -8,6 +8,9 @@ package nomix
 import (
 	"errors"
 )
+
+// TODO(rz): All validations must return Validation error type.
+// TODO(rz): DO ont use types from xrr package - now we have our own error types.
 
 // Metadata parsing and casting errors.
 var (
