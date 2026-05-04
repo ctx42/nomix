@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac <rzajac@gmail.com>
+// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac
 // SPDX-License-Identifier: MIT
 
 package nomix
@@ -28,7 +28,7 @@ type Options struct {
 	// string.
 	TimeFormat string
 
-	// Location to parse format.
+	// Location to parse the time format.
 	//
 	// When set [time.ParseInLocation] instead of [time.Parse] in the
 	// [MetaSet.MetaGetTime] to parse strings.
