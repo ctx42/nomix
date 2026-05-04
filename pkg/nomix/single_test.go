@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac <rzajac@gmail.com>
+// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac
 // SPDX-License-Identifier: MIT
 
 package nomix
@@ -282,6 +282,6 @@ func Test_Single_ValidateWith(t *testing.T) {
 		err := tag.ValidateWith(verax.Max(42))
 
 		// --- Then ---
-		assert.ErrorEqual(t, "name: must be no greater than 42", err)
+		assert.ErrorEqual(t, "name: must be less or equal to 42", err)
 	})
 }

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac <rzajac@gmail.com>
+// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac
 // SPDX-License-Identifier: MIT
 
 package nomix
@@ -357,6 +357,6 @@ func Test_Slice_ValidateWith(t *testing.T) {
 		err := tag.ValidateWith(rule)
 
 		// --- Then ---
-		assert.ErrorEqual(t, "name.1: must be no greater than 42", err)
+		assert.ErrorEqual(t, "name.1: must be less or equal to 42", err)
 	})
 }

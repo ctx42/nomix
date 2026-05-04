@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac <rzajac@gmail.com>
+// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac
 // SPDX-License-Identifier: MIT
 
 package nomix
@@ -7,7 +7,6 @@ import (
 	"database/sql/driver"
 
 	"github.com/ctx42/verax/pkg/verax"
-	"github.com/ctx42/xrr/pkg/xrr"
 )
 
 // Compile time checks.
@@ -111,7 +110,7 @@ func (tag *Slice[T]) String() string { return tag.strValuer(tag.value) }
 
 func (tag *Slice[T]) ValidateWith(rule verax.Rule) error {
 	if err := rule.Validate(tag.value); err != nil {
-		return xrr.FieldError(tag.name, err)
+		return NewFieldError(tag.name, err) // TODO(rz): test type
 	}
 	return nil
 }
