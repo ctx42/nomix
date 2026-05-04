@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac <rzajac@gmail.com>
+// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac
 // SPDX-License-Identifier: MIT
 
 package xtag
@@ -12,15 +12,15 @@ import (
 // StringSlice is a tag for a slice of strings.
 type StringSlice = nomix.Slice[string]
 
-// stringSliceSpec defines the [nomix.Spec] for [StringSlice] type.
-var stringSliceSpec = nomix.NewSpec(
+// stringSliceSpec defines the [nomix.KindSpec] for [StringSlice] type.
+var stringSliceSpec = nomix.NewKindSpec(
 	nomix.KindStringSlice,
 	nomix.TagCreateFunc(CreateStringSlice),
 	nomix.TagParserNotImpl,
 )
 
-// StringSliceSpec returns a [nomix.Spec] for [StringSlice] type.
-func StringSliceSpec() nomix.Spec { return stringSliceSpec }
+// StringSliceSpec returns a [nomix.KindSpec] for [StringSlice] type.
+func StringSliceSpec() nomix.KindSpec { return stringSliceSpec }
 
 // NewStringSlice returns a new instance of [StringSlice].
 func NewStringSlice(name string, val ...string) *StringSlice {

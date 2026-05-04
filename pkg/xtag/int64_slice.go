@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac <rzajac@gmail.com>
+// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac
 // SPDX-License-Identifier: MIT
 
 package xtag
@@ -13,15 +13,15 @@ import (
 // Int64Slice is a tag representing multiple int64 values.
 type Int64Slice = nomix.Slice[int64]
 
-// int64SliceSpec defines the [nomix.Spec] for [Int64Slice] type.
-var int64SliceSpec = nomix.NewSpec(
+// int64SliceSpec defines the [nomix.KindSpec] for [Int64Slice] type.
+var int64SliceSpec = nomix.NewKindSpec(
 	nomix.KindInt64Slice,
 	nomix.TagCreateFunc(CreateInt64Slice),
 	nomix.TagParserNotImpl,
 )
 
-// Int64SliceSpec returns a [nomix.Spec] for [Int64Slice] type.
-func Int64SliceSpec() nomix.Spec { return int64SliceSpec }
+// Int64SliceSpec returns a [nomix.KindSpec] for [Int64Slice] type.
+func Int64SliceSpec() nomix.KindSpec { return int64SliceSpec }
 
 // NewInt64Slice returns a new instance of [Int64Slice].
 func NewInt64Slice(name string, val ...int64) *Int64Slice {

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac <rzajac@gmail.com>
+// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac
 // SPDX-License-Identifier: MIT
 
 package xtag
@@ -13,15 +13,15 @@ import (
 // BoolSlice is a tag representing multiple boolean values.
 type BoolSlice = nomix.Slice[bool]
 
-// boolSliceSpec defines the [nomix.Spec] for [BoolSlice] type.
-var boolSliceSpec = nomix.NewSpec(
+// boolSliceSpec defines the [nomix.KindSpec] for [BoolSlice] type.
+var boolSliceSpec = nomix.NewKindSpec(
 	nomix.KindBoolSlice,
 	nomix.TagCreateFunc(CreateBoolSlice),
 	nomix.TagParserNotImpl,
 )
 
-// BoolSliceSpec returns a [nomix.Spec] for [BoolSlice] type.
-func BoolSliceSpec() nomix.Spec { return boolSliceSpec }
+// BoolSliceSpec returns a [nomix.KindSpec] for [BoolSlice] type.
+func BoolSliceSpec() nomix.KindSpec { return boolSliceSpec }
 
 // NewBoolSlice returns a new instance of [BoolSlice].
 func NewBoolSlice(name string, val ...bool) *BoolSlice {

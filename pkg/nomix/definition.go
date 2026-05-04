@@ -1,23 +1,23 @@
-// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac <rzajac@gmail.com>
+// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac
 // SPDX-License-Identifier: MIT
 
 package nomix
 
 import (
 	"github.com/ctx42/verax/pkg/verax"
-	"github.com/ctx42/xrr/pkg/xrr"
 )
 
 // Definition represents a named tag definition. In other words, it wraps a
-// [Spec] and a tag name.
+// [KindSpec] and a tag name.
 type Definition struct {
 	name string     // Tag name.
-	spec Spec       // Tag specification.
+	spec KindSpec   // Tag specification.
 	rule verax.Rule // Optional validation rule.
+	// TODO(rz): add metadata.
 }
 
 // Define defines named [Tag].
-func Define(name string, spec Spec, rules ...verax.Rule) *Definition {
+func Define(name string, spec KindSpec, rules ...verax.Rule) *Definition {
 	def := &Definition{
 		name: name,
 		spec: spec,
@@ -62,6 +62,7 @@ func (def *Definition) TagParse(val string, opts ...Option) (Tag, error) {
 //
 // NOTE: The [Creator] is first used to create a [Tag] instance with the
 // provided value; hence all types supported by [Creator] are supported.
+// TODO(rz): Must return Validation type error.
 func (def *Definition) Validate(val any) error {
 	_, err := def.TagCreate(val) // Also does validation.
 	return err
@@ -72,7 +73,7 @@ func (def *Definition) validate(val any) error {
 		return nil
 	}
 	if err := def.rule.Validate(val); err != nil {
-		return xrr.FieldError(def.name, err)
+		return NewFieldError(def.name, err) // TODO(rz): test type
 	}
 	return nil
 }

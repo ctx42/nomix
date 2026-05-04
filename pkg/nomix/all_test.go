@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac <rzajac@gmail.com>
+// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac
 // SPDX-License-Identifier: MIT
 
 package nomix
@@ -8,10 +8,10 @@ import (
 	"strconv"
 )
 
-// TstIntSpec returns [Spec] used in testing. It is a very simple spec
+// TstIntSpec returns [KindSpec] used in testing. It is a very simple spec
 // representing an int type.
-func TstIntSpec() Spec {
-	return Spec{knd: KindInt, tcr: TstIntCreate, tpr: TstIntParse}
+func TstIntSpec() KindSpec {
+	return KindSpec{knd: KindInt, tcr: TstIntCreate, tpr: TstIntParse}
 }
 
 // TstIntCreate is a test create function matching [CreateFunc] signature.

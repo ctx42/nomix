@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac <rzajac@gmail.com>
+// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac
 // SPDX-License-Identifier: MIT
 
 package nomix
@@ -154,7 +154,7 @@ func Test_Definition_TagParse(t *testing.T) {
 		have, err := def.TagParse("44")
 
 		// --- Then ---
-		assert.ErrorEqual(t, "name: must be no greater than 42", err)
+		assert.ErrorEqual(t, "name: must be less or equal to 42", err)
 		assert.Nil(t, have)
 	})
 }
@@ -206,7 +206,7 @@ func Test_Definition_Validate(t *testing.T) {
 		errMax := def.Validate(88)
 
 		// --- Then ---
-		assert.ErrorEqual(t, "name: must be no less than 42", errMin)
-		assert.ErrorEqual(t, "name: must be no greater than 44", errMax)
+		assert.ErrorEqual(t, "name: must be greater or equal to 42", errMin)
+		assert.ErrorEqual(t, "name: must be less or equal to 44", errMax)
 	})
 }

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac <rzajac@gmail.com>
+// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac
 // SPDX-License-Identifier: MIT
 
 package xtag
@@ -12,8 +12,8 @@ import (
 // String is a tag for a slice of strings.
 type String = nomix.Single[string]
 
-// stringSpec defines the [nomix.Spec] for [String] type.
-var stringSpec = nomix.NewSpec(
+// stringSpec defines the [nomix.KindSpec] for [String] type.
+var stringSpec = nomix.NewKindSpec(
 	nomix.KindString,
 	nomix.TagCreateFunc(CreateString),
 	func(name string, val string, opts ...nomix.Option) (nomix.Tag, error) {
@@ -21,8 +21,8 @@ var stringSpec = nomix.NewSpec(
 	},
 )
 
-// StringSpec returns a [nomix.Spec] for [String] type.
-func StringSpec() nomix.Spec { return stringSpec }
+// StringSpec returns a [nomix.KindSpec] for [String] type.
+func StringSpec() nomix.KindSpec { return stringSpec }
 
 // NewString returns a new instance of [String].
 func NewString(name, val string) *String {

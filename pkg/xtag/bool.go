@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac <rzajac@gmail.com>
+// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac
 // SPDX-License-Identifier: MIT
 
 package xtag
@@ -14,15 +14,15 @@ import (
 // Bool is a tag representing a single boolean value.
 type Bool = nomix.Single[bool]
 
-// boolSpec defines the [nomix.Spec] for [Bool] type.
-var boolSpec = nomix.NewSpec(
+// boolSpec defines the [nomix.KindSpec] for [Bool] type.
+var boolSpec = nomix.NewKindSpec(
 	nomix.KindBool,
 	nomix.TagCreateFunc(CreateBool),
 	nomix.TagParseFunc(ParseBool),
 )
 
-// BoolSpec returns a [nomix.Spec] for [Bool] type.
-func BoolSpec() nomix.Spec { return boolSpec }
+// BoolSpec returns a [nomix.KindSpec] for [Bool] type.
+func BoolSpec() nomix.KindSpec { return boolSpec }
 
 // NewBool returns a new instance of [Bool].
 func NewBool(name string, val bool) *Bool {

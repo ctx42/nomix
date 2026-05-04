@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac <rzajac@gmail.com>
+// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac
 // SPDX-License-Identifier: MIT
 
 package nomix
@@ -79,8 +79,8 @@ func Test_Registry_Associate(t *testing.T) {
 	t.Run("associate with a different kind", func(t *testing.T) {
 		// --- Given ---
 		reg := NewRegistry()
-		must.Nil(reg.Register(Spec{knd: KindInt}))
-		must.Nil(reg.Register(Spec{knd: KindInt64}))
+		must.Nil(reg.Register(KindSpec{knd: KindInt}))
+		must.Nil(reg.Register(KindSpec{knd: KindInt64}))
 		must.Value(reg.Associate(42, KindInt))
 
 		// --- When ---

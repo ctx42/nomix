@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac <rzajac@gmail.com>
+// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac
 // SPDX-License-Identifier: MIT
 
 package nomix
@@ -610,4 +610,46 @@ func Test_TagParserNotImpl(t *testing.T) {
 	assert.ErrorIs(t, ErrNotImpl, err)
 	assert.ErrorContain(t, "name: tag parser ", err)
 	assert.Nil(t, have)
+}
+
+func Test_getSpecArg(t *testing.T) {
+	t.Run("error - key does not exist", func(t *testing.T) {
+		// --- Given ---
+		args := map[string]any{"name": uint(42)}
+
+		// --- When ---
+		have, err := getSpecArg[uint](args, "other", "role_name")
+
+		// --- Then ---
+		assert.SameType(t, &InternalError{}, err)
+		wMsg := "role_name: spec missing required argument: other"
+		assert.ErrorEqual(t, wMsg, err)
+		assert.Equal(t, uint(0), have)
+	})
+
+	t.Run("success", func(t *testing.T) {
+		// --- Given ---
+		args := map[string]any{"name": uint(42)}
+
+		// --- When ---
+		have, err := getSpecArg[uint](args, "name", "role_name")
+
+		// --- Then ---
+		assert.NoError(t, err)
+		assert.Equal(t, uint(42), have)
+	})
+
+	t.Run("error - argument is of a wrong type", func(t *testing.T) {
+		// --- Given ---
+		args := map[string]any{"name": uint(42)}
+
+		// --- When ---
+		have, err := getSpecArg[int](args, "name", "role_name")
+
+		// --- Then ---
+		assert.SameType(t, &InternalError{}, err)
+		wMsg := `role_name: spec argument "name" must be int, got uint`
+		assert.ErrorEqual(t, wMsg, err)
+		assert.Equal(t, 0, have)
+	})
 }

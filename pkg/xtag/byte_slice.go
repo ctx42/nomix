@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac <rzajac@gmail.com>
+// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac
 // SPDX-License-Identifier: MIT
 
 package xtag
@@ -13,15 +13,15 @@ import (
 // ByteSlice is a tag for a slice of bytes.
 type ByteSlice = nomix.Slice[byte]
 
-// byteSliceSpec defines the [nomix.Spec] for [ByteSlice] type.
-var byteSliceSpec = nomix.NewSpec(
+// byteSliceSpec defines the [nomix.KindSpec] for [ByteSlice] type.
+var byteSliceSpec = nomix.NewKindSpec(
 	nomix.KindByteSlice,
 	nomix.TagCreateFunc(CreateByteSlice),
 	nomix.TagParserNotImpl,
 )
 
-// ByteSliceSpec returns a [nomix.Spec] for [ByteSlice] type.
-func ByteSliceSpec() nomix.Spec { return byteSliceSpec }
+// ByteSliceSpec returns a [nomix.KindSpec] for [ByteSlice] type.
+func ByteSliceSpec() nomix.KindSpec { return byteSliceSpec }
 
 // NewByteSlice returns a new instance of [ByteSlice].
 func NewByteSlice(name string, val ...byte) *ByteSlice {

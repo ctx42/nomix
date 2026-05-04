@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac <rzajac@gmail.com>
+// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac
 // SPDX-License-Identifier: MIT
 
 package xtag
@@ -13,15 +13,15 @@ import (
 // TimeSlice is a tag for a slice of [time.Time] values.
 type TimeSlice = nomix.Slice[time.Time]
 
-// timeSliceSpec defines the [nomix.Spec] for [TimeSlice] type.
-var timeSliceSpec = nomix.NewSpec(
+// timeSliceSpec defines the [nomix.KindSpec] for [TimeSlice] type.
+var timeSliceSpec = nomix.NewKindSpec(
 	nomix.KindTimeSlice,
 	nomix.TagCreateFunc(CreateTimeSlice),
 	nomix.TagParserNotImpl,
 )
 
-// TimeSliceSpec returns a [nomix.Spec] for [TimeSlice] type.
-func TimeSliceSpec() nomix.Spec { return timeSliceSpec }
+// TimeSliceSpec returns a [nomix.KindSpec] for [TimeSlice] type.
+func TimeSliceSpec() nomix.KindSpec { return timeSliceSpec }
 
 // NewTimeSlice returns a new instance of [TimeSlice].
 func NewTimeSlice(name string, val ...time.Time) *TimeSlice {

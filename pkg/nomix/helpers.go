@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac <rzajac@gmail.com>
+// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac
 // SPDX-License-Identifier: MIT
 
 package nomix
@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"slices"
 	"time"
+
+	"github.com/ctx42/verax/pkg/spec"
 )
 
 // GetTag retrieves the [Tag] of type T from the set. Returns the [Tag] if
@@ -272,4 +274,26 @@ func ParseTime(val string, opts Options) (time.Time, error) {
 // implemented.
 func TagParserNotImpl(name, _ string, _ ...Option) (Tag, error) {
 	return nil, fmt.Errorf("%s: tag parser %w", name, ErrNotImpl)
+}
+
+// getSpecArg retrieves an argument of type T from the args map.
+//
+// Returns [InternalError] if the argument does not exist or if the value is
+// not of type T.
+func getSpecArg[T any](args map[string]any, key, rule string) (T, error) {
+	var ok bool
+	var anyVal any
+	var retVal T
+
+	if anyVal, ok = args[key]; !ok {
+		msg := fmt.Sprintf("%s: spec missing required argument: %s", rule, key)
+		return retVal, NewInternalError(msg, spec.ECInvSpec) // TODO(rz): test type
+	}
+
+	if retVal, ok = anyVal.(T); !ok {
+		format := "%s: spec argument %q must be %T, got %T"
+		msg := fmt.Sprintf(format, rule, key, retVal, anyVal)
+		return retVal, NewInternalError(msg, spec.ECInvSpec) // TODO(rz): test type
+	}
+	return retVal, nil
 }

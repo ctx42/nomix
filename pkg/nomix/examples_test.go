@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac <rzajac@gmail.com>
+// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac
 // SPDX-License-Identifier: MIT
 
 package nomix_test
@@ -39,8 +39,8 @@ func ExampleCreateFunc() {
 	// name: A; kind: KindInt; value: 42; err: <nil>
 }
 
-func ExampleNewSpec() {
-	spec := nomix.NewSpec(
+func ExampleNewKindSpec() {
+	spec := nomix.NewKindSpec(
 		nomix.KindInt,
 		nomix.TagCreateFunc(xtag.CreateInt),
 		nomix.TagParseFunc(xtag.ParseInt),
@@ -67,7 +67,7 @@ func ExampleDefine() {
 
 	// Output:
 	// - success: 42 err: <nil>
-	// - failure: <nil> err: name: must be no greater than 42
+	// - failure: <nil> err: name: must be less or equal to 42
 }
 
 func ExampleRegistry() {

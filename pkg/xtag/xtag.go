@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac <rzajac@gmail.com>
+// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac
 // SPDX-License-Identifier: MIT
 
 // Package xtag provides tags for primitive types.
@@ -11,7 +11,7 @@ import (
 	"github.com/ctx42/nomix/pkg/nomix"
 )
 
-// RegisterAll registers all [nomix.Spec] the package provides in the
+// RegisterAll registers all [nomix.KindSpec] the package provides in the
 // given [nomix.Registry] and associates types with them.
 func RegisterAll(reg *nomix.Registry) {
 	mustRegisterKind(reg, int64Spec)
@@ -56,7 +56,7 @@ func RegisterAll(reg *nomix.Registry) {
 }
 
 // mustAssociateType calls [nomix.Registry.Register], and panics on error.
-func mustRegisterKind(reg *nomix.Registry, spec nomix.Spec) {
+func mustRegisterKind(reg *nomix.Registry, spec nomix.KindSpec) {
 	if err := reg.Register(spec); err != nil {
 		panic(err)
 	}

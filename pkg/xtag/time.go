@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac <rzajac@gmail.com>
+// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac
 // SPDX-License-Identifier: MIT
 
 package xtag
@@ -14,15 +14,15 @@ import (
 // Time is a tag representing a single [time.Time] value.
 type Time = nomix.Single[time.Time]
 
-// timeSpec defines the [nomix.Spec] for [Time] type.
-var timeSpec = nomix.NewSpec(
+// timeSpec defines the [nomix.KindSpec] for [Time] type.
+var timeSpec = nomix.NewKindSpec(
 	nomix.KindTime,
 	nomix.TagCreateFunc(CreateTime),
 	nomix.TagParseFunc(ParseTime),
 )
 
-// TimeSpec returns a [nomix.Spec] for [Time] type.
-func TimeSpec() nomix.Spec { return timeSpec }
+// TimeSpec returns a [nomix.KindSpec] for [Time] type.
+func TimeSpec() nomix.KindSpec { return timeSpec }
 
 // NewTime returns a new instance of [Time].
 func NewTime(name string, val time.Time) *Time {

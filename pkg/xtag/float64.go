@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac <rzajac@gmail.com>
+// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac
 // SPDX-License-Identifier: MIT
 
 package xtag
@@ -13,15 +13,15 @@ import (
 // Float64 is a tag representing a single float64 value.
 type Float64 = nomix.Single[float64]
 
-// float64Spec defines the [nomix.Spec] for [Float64] type.
-var float64Spec = nomix.NewSpec(
+// float64Spec defines the [nomix.KindSpec] for [Float64] type.
+var float64Spec = nomix.NewKindSpec(
 	nomix.KindFloat64,
 	nomix.TagCreateFunc(CreateFloat64),
 	nomix.TagParseFunc(ParseFloat64),
 )
 
-// Float64Spec returns a [nomix.Spec] for [Float64] type.
-func Float64Spec() nomix.Spec { return float64Spec }
+// Float64Spec returns a [nomix.KindSpec] for [Float64] type.
+func Float64Spec() nomix.KindSpec { return float64Spec }
 
 // NewFloat64 returns a new instance of [Float64].
 func NewFloat64(name string, val float64) *Float64 {

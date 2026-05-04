@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac <rzajac@gmail.com>
+// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac
 // SPDX-License-Identifier: MIT
 
 package xtag
@@ -14,15 +14,15 @@ import (
 // Int is a tag representing a single integer value.
 type Int = nomix.Single[int]
 
-// intSpec defines the [nomix.Spec] for [Int] type.
-var intSpec = nomix.NewSpec(
+// intSpec defines the [nomix.KindSpec] for [Int] type.
+var intSpec = nomix.NewKindSpec(
 	nomix.KindInt,
 	nomix.TagCreateFunc(CreateInt),
 	nomix.TagParseFunc(ParseInt),
 )
 
-// IntSpec returns a [nomix.Spec] for [Int] type.
-func IntSpec() nomix.Spec { return intSpec }
+// IntSpec returns a [nomix.KindSpec] for [Int] type.
+func IntSpec() nomix.KindSpec { return intSpec }
 
 // NewInt returns a new instance of [Int].
 func NewInt(name string, val int) *Int {

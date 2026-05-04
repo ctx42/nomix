@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac <rzajac@gmail.com>
+// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac
 // SPDX-License-Identifier: MIT
 
 package xtag
@@ -13,15 +13,15 @@ import (
 // IntSlice is a tag for a slice of int values.
 type IntSlice = nomix.Slice[int]
 
-// intSliceSpec defines the [nomix.Spec] for [IntSlice] type.
-var intSliceSpec = nomix.NewSpec(
+// intSliceSpec defines the [nomix.KindSpec] for [IntSlice] type.
+var intSliceSpec = nomix.NewKindSpec(
 	nomix.KindIntSlice,
 	nomix.TagCreateFunc(CreateIntSlice),
 	nomix.TagParserNotImpl,
 )
 
-// IntSliceSpec returns a [nomix.Spec] for [IntSlice] type.
-func IntSliceSpec() nomix.Spec { return intSliceSpec }
+// IntSliceSpec returns a [nomix.KindSpec] for [IntSlice] type.
+func IntSliceSpec() nomix.KindSpec { return intSliceSpec }
 
 // NewIntSlice returns a new instance of [IntSlice].
 func NewIntSlice(name string, val ...int) *IntSlice {

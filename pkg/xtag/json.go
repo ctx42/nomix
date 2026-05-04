@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac <rzajac@gmail.com>
+// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac
 // SPDX-License-Identifier: MIT
 
 package xtag
@@ -13,15 +13,15 @@ import (
 // JSON is a tag for a [json.RawMessage] value.
 type JSON = nomix.Slice[byte]
 
-// jsonSpec defines the [nomix.Spec] for [JSON] type.
-var jsonSpec = nomix.NewSpec(
+// jsonSpec defines the [nomix.KindSpec] for [JSON] type.
+var jsonSpec = nomix.NewKindSpec(
 	nomix.KindJSON,
 	nomix.TagCreateFunc(CreateJSON),
 	nomix.TagParseFunc(ParseJSON),
 )
 
-// JSONSpec returns a [nomix.Spec] for [JSON] type.
-func JSONSpec() nomix.Spec { return jsonSpec }
+// JSONSpec returns a [nomix.KindSpec] for [JSON] type.
+func JSONSpec() nomix.KindSpec { return jsonSpec }
 
 // NewJSON returns a new instance of [JSON].
 func NewJSON(name string, v json.RawMessage) *JSON {

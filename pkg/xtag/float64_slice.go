@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac <rzajac@gmail.com>
+// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac
 // SPDX-License-Identifier: MIT
 
 package xtag
@@ -13,15 +13,15 @@ import (
 // Float64Slice is a tag representing multiple boolean values.
 type Float64Slice = nomix.Slice[float64]
 
-// float64SliceSpec defines the [nomix.Spec] for [Float64Slice] type.
-var float64SliceSpec = nomix.NewSpec(
+// float64SliceSpec defines the [nomix.KindSpec] for [Float64Slice] type.
+var float64SliceSpec = nomix.NewKindSpec(
 	nomix.KindFloat64Slice,
 	nomix.TagCreateFunc(CreateFloat64Slice),
 	nomix.TagParserNotImpl,
 )
 
-// Float64SliceSpec returns a [nomix.Spec] for [Float64Slice] type.
-func Float64SliceSpec() nomix.Spec { return float64SliceSpec }
+// Float64SliceSpec returns a [nomix.KindSpec] for [Float64Slice] type.
+func Float64SliceSpec() nomix.KindSpec { return float64SliceSpec }
 
 // NewFloat64Slice returns a new instance of [Float64Slice].
 func NewFloat64Slice(name string, val ...float64) *Float64Slice {
