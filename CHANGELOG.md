@@ -1,3 +1,10 @@
+## v0.6.0 (Mon, 04 May 2026 20:43:23 UTC)
+- chore: upgrade Go to 1.126 and all module dependencies.
+- chore: Remove the email address from copyright lines.
+- feat(nomix): add package-local error domain types.
+- refactor(nomix): use package-local error type in Single and Slice.
+- refactor(nomix)!: rename Spec to KindSpec, add spec serialization.
+
 ## v0.5.0 (Fri, 13 Feb 2026 13:08:14 UTC)
 - Change Registry to make it more usable.
 - Simplify Registry API by removing redundant methods.
