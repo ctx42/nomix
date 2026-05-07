@@ -357,6 +357,7 @@ func Test_Slice_ValidateWith(t *testing.T) {
 		err := tag.ValidateWith(rule)
 
 		// --- Then ---
+		assert.SameType(t, &verax.FieldErrors{}, err)
 		assert.ErrorEqual(t, "name.1: must be less or equal to 42", err)
 	})
 }

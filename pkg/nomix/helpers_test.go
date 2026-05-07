@@ -170,6 +170,28 @@ func Test_CreateInt64_existing_tabular(t *testing.T) {
 	}
 }
 
+func Test_CreateInt64(t *testing.T) {
+	t.Run("error - unsupported type", func(t *testing.T) {
+		// --- When ---
+		have, err := CreateInt64("not-an-int")
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrInvType, err)
+		assert.Equal(t, int64(0), have)
+	})
+}
+
+func Test_CreateInt64Slice(t *testing.T) {
+	t.Run("error - unsupported type", func(t *testing.T) {
+		// --- When ---
+		have, err := CreateInt64Slice("not-a-slice")
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrInvType, err)
+		assert.Nil(t, have)
+	})
+}
+
 func Test_CreateInt64Slice_tabular(t *testing.T) {
 	tt := []struct {
 		testN string
@@ -205,6 +227,7 @@ func Test_CreateFloat64_tabular(t *testing.T) {
 		want float64
 	}{
 		{"int", 1, 1},
+		{"byte", byte(1), 1},
 		{"int8", int8(1), 1},
 		{"int16", int16(1), 1},
 		{"int32", int32(1), 1},
@@ -250,6 +273,15 @@ func Test_CreateFloat64(t *testing.T) {
 
 		// --- Then ---
 		assert.ErrorContain(t, "int value out of range", err)
+		assert.Equal(t, 0.0, have)
+	})
+
+	t.Run("error - unsupported type", func(t *testing.T) {
+		// --- When ---
+		have, err := CreateFloat64("not-a-number")
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrInvType, err)
 		assert.Equal(t, 0.0, have)
 	})
 }
@@ -308,6 +340,15 @@ func Test_CreateFloat64Slice(t *testing.T) {
 
 		// --- Then ---
 		assert.ErrorContain(t, "int value out of range", err)
+		assert.Nil(t, have)
+	})
+
+	t.Run("error - unsupported type", func(t *testing.T) {
+		// --- When ---
+		have, err := CreateFloat64Slice("not-a-slice")
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrInvType, err)
 		assert.Nil(t, have)
 	})
 }

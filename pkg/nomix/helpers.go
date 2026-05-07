@@ -287,13 +287,13 @@ func getSpecArg[T any](args map[string]any, key, rule string) (T, error) {
 
 	if anyVal, ok = args[key]; !ok {
 		msg := fmt.Sprintf("%s: spec missing required argument: %s", rule, key)
-		return retVal, NewInternalError(msg, spec.ECInvSpec) // TODO(rz): test type
+		return retVal, NewInternalError(msg, spec.ECInvSpec)
 	}
 
 	if retVal, ok = anyVal.(T); !ok {
 		format := "%s: spec argument %q must be %T, got %T"
 		msg := fmt.Sprintf(format, rule, key, retVal, anyVal)
-		return retVal, NewInternalError(msg, spec.ECInvSpec) // TODO(rz): test type
+		return retVal, NewInternalError(msg, spec.ECInvSpec)
 	}
 	return retVal, nil
 }

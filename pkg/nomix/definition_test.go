@@ -154,6 +154,7 @@ func Test_Definition_TagParse(t *testing.T) {
 		have, err := def.TagParse("44")
 
 		// --- Then ---
+		assert.SameType(t, &verax.FieldErrors{}, err)
 		assert.ErrorEqual(t, "name: must be less or equal to 42", err)
 		assert.Nil(t, have)
 	})

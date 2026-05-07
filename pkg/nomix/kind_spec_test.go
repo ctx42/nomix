@@ -102,15 +102,6 @@ func Test_KindSpec_Spec(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, KindSpecName, have.Name)
 	assert.Equal(t, int16(KindInt), have.Args[spec.ArgValue])
-
-	reg := spec.NewRegistry[KindSpec]()
-	enc, _ := reg.EncodeSpec(have)
-	fmt.Println(string(enc)) // TODO():
-
-	to := &spec.Spec{}
-	fmt.Println(reg.DecodeSpec(enc, to))       // TODO():
-	fmt.Println(to)                            // TODO():
-	fmt.Printf("%T\n", to.Args[spec.ArgValue]) // TODO():
 }
 
 func Test_KindSpecFromSpec(t *testing.T) {

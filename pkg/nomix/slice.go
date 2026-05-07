@@ -110,7 +110,7 @@ func (tag *Slice[T]) String() string { return tag.strValuer(tag.value) }
 
 func (tag *Slice[T]) ValidateWith(rule verax.Rule) error {
 	if err := rule.Validate(tag.value); err != nil {
-		return NewFieldError(tag.name, err) // TODO(rz): test type
+		return verax.NewFieldError(tag.name, err)
 	}
 	return nil
 }

@@ -9,9 +9,6 @@ import (
 	"errors"
 )
 
-// TODO(rz): All validations must return Validation error type.
-// TODO(rz): DO ont use types from xrr package - now we have our own error types.
-
 // Metadata parsing and casting errors.
 var (
 	// ErrInvType represents an invalid element type.

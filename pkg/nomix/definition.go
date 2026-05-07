@@ -13,7 +13,6 @@ type Definition struct {
 	name string     // Tag name.
 	spec KindSpec   // Tag specification.
 	rule verax.Rule // Optional validation rule.
-	// TODO(rz): add metadata.
 }
 
 // Define defines named [Tag].
@@ -62,7 +61,6 @@ func (def *Definition) TagParse(val string, opts ...Option) (Tag, error) {
 //
 // NOTE: The [Creator] is first used to create a [Tag] instance with the
 // provided value; hence all types supported by [Creator] are supported.
-// TODO(rz): Must return Validation type error.
 func (def *Definition) Validate(val any) error {
 	_, err := def.TagCreate(val) // Also does validation.
 	return err
@@ -73,7 +71,7 @@ func (def *Definition) validate(val any) error {
 		return nil
 	}
 	if err := def.rule.Validate(val); err != nil {
-		return NewFieldError(def.name, err) // TODO(rz): test type
+		return verax.NewFieldError(def.name, err)
 	}
 	return nil
 }
