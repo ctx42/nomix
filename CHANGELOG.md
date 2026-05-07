@@ -1,3 +1,6 @@
+## v0.7.0 (Thu, 07 May 2026 12:51:03 UTC)
+- refactor(nomix): improve coverage, use verax validation errors.
+
 ## v0.6.0 (Mon, 04 May 2026 20:43:23 UTC)
 - chore: upgrade Go to 1.126 and all module dependencies.
 - chore: Remove the email address from copyright lines.
