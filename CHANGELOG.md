@@ -1,3 +1,6 @@
+## v0.8.0 (Fri, 08 May 2026 15:18:13 UTC)
+- feat(nomix): add TagRule, test single-rule Define branch.
+
 ## v0.7.0 (Thu, 07 May 2026 12:51:03 UTC)
 - refactor(nomix): improve coverage, use verax validation errors.
 
