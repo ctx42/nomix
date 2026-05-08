@@ -24,6 +24,20 @@ func Test_Define(t *testing.T) {
 		assert.Nil(t, have.rule)
 	})
 
+	t.Run("one rule", func(t *testing.T) {
+		// --- Given ---
+		spec := TstIntSpec()
+		r0 := &TstRule{}
+
+		// --- When ---
+		have := Define("name", spec, r0)
+
+		// --- Then ---
+		assert.Equal(t, "name", have.name)
+		assert.Equal(t, spec, have.spec)
+		assert.Same(t, r0, have.rule)
+	})
+
 	t.Run("with rules", func(t *testing.T) {
 		// --- Given ---
 		spec := TstIntSpec()
@@ -60,6 +74,31 @@ func Test_Definition_TagKind(t *testing.T) {
 
 	// --- Then ---
 	assert.Equal(t, KindInt, have)
+}
+
+func Test_Definition_TagRule(t *testing.T) {
+	t.Run("nil when no rule", func(t *testing.T) {
+		// --- Given ---
+		def := &Definition{name: "name", spec: TstIntSpec()}
+
+		// --- When ---
+		have := def.TagRule()
+
+		// --- Then ---
+		assert.Nil(t, have)
+	})
+
+	t.Run("returns rule", func(t *testing.T) {
+		// --- Given ---
+		rule := &TstRule{}
+		def := &Definition{name: "name", spec: TstIntSpec(), rule: rule}
+
+		// --- When ---
+		have := def.TagRule()
+
+		// --- Then ---
+		assert.Same(t, rule, have)
+	})
 }
 
 func Test_Definition_TagCreate(t *testing.T) {

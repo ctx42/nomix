@@ -21,7 +21,12 @@ func Define(name string, spec KindSpec, rules ...verax.Rule) *Definition {
 		name: name,
 		spec: spec,
 	}
-	if len(rules) > 0 {
+	switch len(rules) {
+	case 0:
+		// Nothing to do.
+	case 1:
+		def.rule = rules[0]
+	default:
 		def.rule = verax.Set(rules)
 	}
 	return def
@@ -32,6 +37,10 @@ func (def *Definition) TagName() string { return def.name }
 
 // TagKind returns the tag definition kind.
 func (def *Definition) TagKind() Kind { return def.spec.knd }
+
+// TagRule returns the validation rule associated with the definition, or nil if
+// none was provided.
+func (def *Definition) TagRule() verax.Rule { return def.rule }
 
 // TagCreate creates a new [Tag] matching the definition. It does not validate
 // the value.
