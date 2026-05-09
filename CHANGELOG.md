@@ -1,3 +1,7 @@
+## v0.8.1 (Sat, 09 May 2026 19:52:16 UTC)
+- feat(nomix)!: add Errorf constructors, adopt new xrr error API.
+- refactor(nomix): adopt NewInternalErrorf at call sites.
+
 ## v0.8.0 (Fri, 08 May 2026 15:18:13 UTC)
 - feat(nomix): add TagRule, test single-rule Define branch.
 
