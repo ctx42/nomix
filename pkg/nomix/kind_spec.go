@@ -4,9 +4,8 @@
 package nomix
 
 import (
-	"fmt"
-
 	"github.com/ctx42/verax/pkg/spec"
+	"github.com/ctx42/xrr/pkg/xrr"
 )
 
 // KindSpecName identifies [KindSpec] in a [spec.Spec].
@@ -56,8 +55,12 @@ func (ks KindSpec) Spec() (*spec.Spec, error) {
 // function is called.
 func KindSpecFromSpec(reg *Registry, spc *spec.Spec) (KindSpec, error) {
 	if spc.Name != KindSpecName {
-		msg := fmt.Sprintf("%s: invalid spec name: %q", KindSpecName, spc.Name)
-		return KindSpec{}, NewInternalError(msg, spec.ECInvSpec)
+		return KindSpec{}, NewInternalErrorf(
+			"%s: invalid spec name: %q",
+			KindSpecName,
+			spc.Name,
+			xrr.WithCode(spec.ECInvSpec),
+		)
 	}
 	iKnd, err := getSpecArg[int16](spc.Args, spec.ArgValue, KindSpecName)
 	if err != nil {
@@ -66,8 +69,12 @@ func KindSpecFromSpec(reg *Registry, spc *spec.Spec) (KindSpec, error) {
 
 	ks := reg.SpecForKind(Kind(iKnd))
 	if ks.IsZero() {
-		msg := fmt.Sprintf("%s: invalid spec kind: %d", KindSpecName, iKnd)
-		return KindSpec{}, NewInternalError(msg, spec.ECInvSpec)
+		return KindSpec{}, NewInternalErrorf(
+			"%s: invalid spec kind: %d",
+			KindSpecName,
+			iKnd,
+			xrr.WithCode(spec.ECInvSpec),
+		)
 	}
 	return ks, nil
 }

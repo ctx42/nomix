@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/ctx42/verax/pkg/spec"
+	"github.com/ctx42/xrr/pkg/xrr"
 )
 
 // GetTag retrieves the [Tag] of type T from the set. Returns the [Tag] if
@@ -286,14 +287,23 @@ func getSpecArg[T any](args map[string]any, key, rule string) (T, error) {
 	var retVal T
 
 	if anyVal, ok = args[key]; !ok {
-		msg := fmt.Sprintf("%s: spec missing required argument: %s", rule, key)
-		return retVal, NewInternalError(msg, spec.ECInvSpec)
+		return retVal, NewInternalErrorf(
+			"%s: spec missing required argument: %s",
+			rule,
+			key,
+			xrr.WithCode(spec.ECInvSpec),
+		)
 	}
 
 	if retVal, ok = anyVal.(T); !ok {
-		format := "%s: spec argument %q must be %T, got %T"
-		msg := fmt.Sprintf(format, rule, key, retVal, anyVal)
-		return retVal, NewInternalError(msg, spec.ECInvSpec)
+		return retVal, NewInternalErrorf(
+			"%s: spec argument %q must be %T, got %T",
+			rule,
+			key,
+			retVal,
+			anyVal,
+			xrr.WithCode(spec.ECInvSpec),
+		)
 	}
 	return retVal, nil
 }
