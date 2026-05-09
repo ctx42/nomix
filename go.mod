@@ -3,9 +3,9 @@ module github.com/ctx42/nomix
 go 1.26
 
 require (
-	github.com/ctx42/testing v0.47.0
-	github.com/ctx42/verax v0.5.0
-	github.com/ctx42/xrr v0.14.1
+	github.com/ctx42/testing v0.48.0
+	github.com/ctx42/verax v0.7.1
+	github.com/ctx42/xrr v0.15.0
 )
 
 require (
