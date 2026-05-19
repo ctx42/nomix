@@ -1,3 +1,6 @@
+## v0.9.0 (Tue, 19 May 2026 20:33:33 UTC)
+- refactor(nomix): rename IsVeraxError to IsNomixError.
+
 ## v0.8.2 (Tue, 19 May 2026 20:30:07 UTC)
 - chore: bump verax to v0.9.0, convert to v0.9.1.
 
