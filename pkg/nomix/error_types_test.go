@@ -325,13 +325,13 @@ func Test_NewFieldErrors(t *testing.T) {
 	})
 }
 
-func Test_IsVeraxError(t *testing.T) {
+func Test_IsNomixError(t *testing.T) {
 	t.Run("true for Error", func(t *testing.T) {
 		// --- Given ---
 		err := NewError("msg", "ECTst")
 
 		// --- When ---
-		have := IsVeraxError(err)
+		have := IsNomixError(err)
 
 		// --- Then ---
 		assert.True(t, have)
@@ -342,7 +342,7 @@ func Test_IsVeraxError(t *testing.T) {
 		err := NewInternalError("msg", "ECTst")
 
 		// --- When ---
-		have := IsVeraxError(err)
+		have := IsNomixError(err)
 
 		// --- Then ---
 		assert.True(t, have)
@@ -353,7 +353,7 @@ func Test_IsVeraxError(t *testing.T) {
 		err := NewFieldError("field0", NewError("msg", "ECTst"))
 
 		// --- When ---
-		have := IsVeraxError(err)
+		have := IsNomixError(err)
 
 		// --- Then ---
 		assert.True(t, have)
@@ -364,7 +364,7 @@ func Test_IsVeraxError(t *testing.T) {
 		err := errors.New("test message")
 
 		// --- When ---
-		have := IsVeraxError(err)
+		have := IsNomixError(err)
 
 		// --- Then ---
 		assert.False(t, have)
@@ -372,7 +372,7 @@ func Test_IsVeraxError(t *testing.T) {
 
 	t.Run("false for nil", func(t *testing.T) {
 		// --- When ---
-		have := IsVeraxError(nil)
+		have := IsNomixError(nil)
 
 		// --- Then ---
 		assert.False(t, have)

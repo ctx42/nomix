@@ -149,9 +149,9 @@ func NewFieldErrors(fields map[string]error) *FieldErrors {
 	return xrr.NewFields[edError](fields)
 }
 
-// IsVeraxError reports whether the error is non-nil [Error], [FieldErrors] or
+// IsNomixError reports whether the error is non-nil [Error], [FieldErrors] or
 // [InternalError].
-func IsVeraxError(err error) bool {
+func IsNomixError(err error) bool {
 	return IsValidationError(err) || IsInternalError(err)
 }
 
