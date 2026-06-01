@@ -1,3 +1,6 @@
+## v0.10.0 (Mon, 01 Jun 2026 21:28:06 UTC)
+- chore: update dependencies, refactor .editorconfig, and add AGENTS.md file.
+
 ## v0.9.0 (Tue, 19 May 2026 20:33:33 UTC)
 - refactor(nomix): rename IsVeraxError to IsNomixError.
 
