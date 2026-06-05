@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: (c) 2025 Rafal Zajac
+// SPDX-FileCopyrightText: (c) 2026 Rafal Zajac.
 // SPDX-License-Identifier: MIT
 
 // Package nomix provides a set of types and functions for handling tags and
