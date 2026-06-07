@@ -1,3 +1,7 @@
+## v0.11.0 (Sun, 07 Jun 2026 16:18:47 UTC)
+- chore: update copyright notice year.
+- fix: error domain, godoc corrections, README example sync.
+
 ## v0.10.0 (Mon, 01 Jun 2026 21:28:06 UTC)
 - chore: update dependencies, refactor .editorconfig, and add AGENTS.md file.
 
