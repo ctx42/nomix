@@ -256,11 +256,11 @@ func Test_CreateFloat64(t *testing.T) {
 		have, err := CreateFloat64(val)
 
 		// --- Then ---
-		assert.ErrorContain(t, "int64 value out of range", err)
+		assert.ErrorIs(t, ErrInvValue, err)
 		assert.Equal(t, 0.0, have)
 	})
 
-	t.Run("int64 out of range", func(t *testing.T) {
+	t.Run("int out of range", func(t *testing.T) {
 		// --- Given ---
 		var val int
 		if unsafe.Sizeof(val) < 8 {
@@ -272,7 +272,7 @@ func Test_CreateFloat64(t *testing.T) {
 		have, err := CreateFloat64(val)
 
 		// --- Then ---
-		assert.ErrorContain(t, "int value out of range", err)
+		assert.ErrorIs(t, ErrInvValue, err)
 		assert.Equal(t, 0.0, have)
 	})
 
@@ -323,11 +323,11 @@ func Test_CreateFloat64Slice(t *testing.T) {
 		have, err := CreateFloat64Slice([]int64{val})
 
 		// --- Then ---
-		assert.ErrorContain(t, "int64 value out of range", err)
+		assert.ErrorIs(t, ErrInvValue, err)
 		assert.Nil(t, have)
 	})
 
-	t.Run("int64 out of range", func(t *testing.T) {
+	t.Run("int out of range", func(t *testing.T) {
 		// --- Given ---
 		var val int
 		if unsafe.Sizeof(val) < 8 {
@@ -339,7 +339,7 @@ func Test_CreateFloat64Slice(t *testing.T) {
 		have, err := CreateFloat64Slice([]int{val})
 
 		// --- Then ---
-		assert.ErrorContain(t, "int value out of range", err)
+		assert.ErrorIs(t, ErrInvValue, err)
 		assert.Nil(t, have)
 	})
 

@@ -41,6 +41,8 @@ func (ks KindSpec) TagParse(name, val string, opts ...Option) (Tag, error) {
 // TagKind returns the [Kind] the spec is for.
 func (ks KindSpec) TagKind() Kind { return ks.knd }
 
+// IsZero reports whether the spec is a zero value (no kind, creator, or
+// parser assigned).
 func (ks KindSpec) IsZero() bool {
 	return ks.knd == 0 && ks.tcr == nil && ks.tpr == nil
 }

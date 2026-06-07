@@ -42,8 +42,8 @@ func (def *Definition) TagKind() Kind { return def.spec.knd }
 // none was provided.
 func (def *Definition) TagRule() verax.Rule { return def.rule }
 
-// TagCreate creates a new [Tag] matching the definition. It does not validate
-// the value.
+// TagCreate creates a new [Tag] matching the definition. It validates the
+// value when a rule is set.
 func (def *Definition) TagCreate(val any, opts ...Option) (Tag, error) {
 	tag, err := def.spec.TagCreate(def.name, val, opts...)
 	if err != nil {
@@ -55,6 +55,8 @@ func (def *Definition) TagCreate(val any, opts ...Option) (Tag, error) {
 	return tag, nil
 }
 
+// TagParse creates a new [Tag] from its string representation. It validates
+// the parsed value when a rule is set.
 func (def *Definition) TagParse(val string, opts ...Option) (Tag, error) {
 	tag, err := def.spec.TagParse(def.name, val, opts...)
 	if err != nil {

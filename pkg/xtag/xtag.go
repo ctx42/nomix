@@ -55,7 +55,7 @@ func RegisterAll(reg *nomix.Registry) {
 	mustAssociateType(reg, []time.Time{}, nomix.KindTimeSlice)
 }
 
-// mustAssociateType calls [nomix.Registry.Register], and panics on error.
+// mustRegisterKind calls [nomix.Registry.Register], and panics on error.
 func mustRegisterKind(reg *nomix.Registry, spec nomix.KindSpec) {
 	if err := reg.Register(spec); err != nil {
 		panic(err)

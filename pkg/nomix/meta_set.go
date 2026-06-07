@@ -8,8 +8,8 @@ var _ Metadata = MetaSet{} // Compile time check.
 // MetaSet represents a set of metadata key-values.
 type MetaSet struct{ m map[string]any }
 
-// NewMetaSet returns a new [MetaSet] instance. By default, the new map is
-// initialized with the length equal to 10.
+// NewMetaSet returns a new [MetaSet] instance. By default, no initial capacity
+// is reserved.
 func NewMetaSet(opts ...Option) MetaSet {
 	def := NewOptions(opts...)
 	set := MetaSet{}

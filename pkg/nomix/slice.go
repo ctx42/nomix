@@ -47,6 +47,8 @@ func (tag *Slice[T]) TagName() string { return tag.name }
 func (tag *Slice[T]) TagKind() Kind   { return tag.kind }
 func (tag *Slice[T]) TagValue() any   { return tag.value }
 
+// TagSet sets the tag value from an untyped value. Returns [ErrInvType] if v
+// cannot be asserted to []T.
 func (tag *Slice[T]) TagSet(v any) error {
 	if v, ok := v.([]T); ok {
 		tag.value = v
@@ -55,7 +57,10 @@ func (tag *Slice[T]) TagSet(v any) error {
 	return ErrInvType
 }
 
-func (tag *Slice[T]) Get() []T  { return tag.value }
+// Get returns the typed tag value slice.
+func (tag *Slice[T]) Get() []T { return tag.value }
+
+// Set replaces the tag value with v.
 func (tag *Slice[T]) Set(v []T) { tag.value = v }
 
 func (tag *Slice[T]) Value() (driver.Value, error) {
@@ -108,6 +113,8 @@ func (tag *Slice[T]) TagSame(other Tag) bool {
 
 func (tag *Slice[T]) String() string { return tag.strValuer(tag.value) }
 
+// ValidateWith validates the tag value against rule, returning a field error
+// keyed by the tag name on failure.
 func (tag *Slice[T]) ValidateWith(rule verax.Rule) error {
 	if err := rule.Validate(tag.value); err != nil {
 		return verax.NewFieldError(tag.name, err)

@@ -34,8 +34,7 @@ type Options struct {
 	// [MetaSet.MetaGetTime] to parse strings.
 	Location *time.Location
 
-	// When set [MetaSet.MetaGetLoc] will allow timezone to be represented as a
-	// sting.
+	// When set, allows a timezone to be represented as a string.
 	//
 	// Example:
 	//   Europe/Warsaw

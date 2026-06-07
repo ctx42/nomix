@@ -46,6 +46,9 @@ func NewSingle[T comparable](
 func (tag *Single[T]) TagName() string { return tag.name }
 func (tag *Single[T]) TagKind() Kind   { return tag.kind }
 func (tag *Single[T]) TagValue() any   { return tag.value }
+
+// TagSet sets the tag value from an untyped value. Returns [ErrInvType] if v
+// cannot be asserted to T.
 func (tag *Single[T]) TagSet(v any) error {
 	if v, ok := v.(T); ok {
 		tag.value = v
@@ -54,7 +57,10 @@ func (tag *Single[T]) TagSet(v any) error {
 	return ErrInvType
 }
 
-func (tag *Single[T]) Get() T  { return tag.value }
+// Get returns the typed tag value.
+func (tag *Single[T]) Get() T { return tag.value }
+
+// Set replaces the tag value with v.
 func (tag *Single[T]) Set(v T) { tag.value = v }
 
 // Value implements [driver.Valuer] interface. When the type has no sqlValuer
@@ -88,6 +94,8 @@ func (tag *Single[T]) TagSame(other Tag) bool {
 
 func (tag *Single[T]) String() string { return tag.strValuer(tag.value) }
 
+// ValidateWith validates the tag value against rule, returning a field error
+// keyed by the tag name on failure.
 func (tag *Single[T]) ValidateWith(rule verax.Rule) error {
 	if err := rule.Validate(tag.value); err != nil {
 		return NewFieldError(tag.name, err)

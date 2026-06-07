@@ -3,8 +3,8 @@ module github.com/ctx42/nomix
 go 1.26
 
 require (
-	github.com/ctx42/testing v0.49.0
-	github.com/ctx42/verax v0.12.0
+	github.com/ctx42/testing v0.50.0
+	github.com/ctx42/verax v0.13.0
 	github.com/ctx42/xrr v0.17.0
 )
 

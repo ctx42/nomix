@@ -4,7 +4,6 @@
 package nomix
 
 import (
-	"errors"
 	"fmt"
 	"slices"
 	"time"
@@ -27,7 +26,7 @@ func GetTag[T any](set TagSet, name string) (T, error) {
 }
 
 // GetTagValue retrieves the value of the [Tag] of type T from the set. Returns
-// the value if found, or the zero value for T ane error.
+// the value if found, or the zero value for T and error.
 func GetTagValue[T any](set TagSet, name string) (T, error) {
 	var zero T
 	if tag := set.TagGet(name); tag != nil {
@@ -114,9 +113,8 @@ func CreateInt64Slice(val any) ([]int64, error) {
 // CreateFloat64 casts the value to float64. Returns the float64 and nil error
 // if the value is a byte, int, int8, int16, int32, int64, float32, or float64.
 // Returns 0.0 and [ErrInvType] if the value's type is not a supported numeric
-// type.
-//
-// NOTE: For values outside ±2^53 range, the function will return an error.
+// type. Returns 0.0 and [ErrInvValue] if an int or int64 value falls outside
+// the ±2^53 range where float64 cannot represent integers exactly.
 func CreateFloat64(val any) (float64, error) {
 	const maxSafeFloat64 = 1 << 53
 
@@ -125,8 +123,7 @@ func CreateFloat64(val any) (float64, error) {
 		return v, nil
 	case int:
 		if v > maxSafeFloat64-1 || v < -(maxSafeFloat64-1) {
-			msg := "int value out of range for precise float64 conversion"
-			return 0, errors.New(msg)
+			return 0, ErrInvValue
 		}
 		return float64(v), nil
 	case byte:
@@ -139,8 +136,7 @@ func CreateFloat64(val any) (float64, error) {
 		return float64(v), nil
 	case int64:
 		if v > maxSafeFloat64-1 || v < -(maxSafeFloat64-1) {
-			msg := "int64 value out of range for precise float64 conversion"
-			return 0, errors.New(msg)
+			return 0, ErrInvValue
 		}
 		return float64(v), nil
 	case float32:

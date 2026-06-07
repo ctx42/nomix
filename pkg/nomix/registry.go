@@ -4,7 +4,6 @@
 package nomix
 
 import (
-	"fmt"
 	"reflect"
 	"sync"
 )
@@ -14,7 +13,10 @@ var specs *Registry
 
 func init() { specs = NewRegistry() }
 
-// GlobalRegistry returns the global [Registry] instance.
+// GlobalRegistry returns the global, shared [Registry] instance initialised by
+// the package. All callers share this instance; [Registry.Register] and
+// [Registry.Associate] are safe for concurrent use but modify global state.
+// Use [NewRegistry] when isolation is required.
 func GlobalRegistry() *Registry { return specs }
 
 // Registry represents a collection of [Spec]s.
@@ -42,7 +44,7 @@ func (reg *Registry) Register(spec KindSpec) error {
 
 	if _, ok := reg.kinds[spec.knd]; ok {
 		format := "spec for %[1]s(%[1]d) already registered"
-		return fmt.Errorf(format, spec.knd)
+		return NewInternalErrorf(format, spec.knd)
 	}
 	reg.kinds[spec.knd] = spec
 	return nil
@@ -57,7 +59,7 @@ func (reg *Registry) Associate(typ any, knd Kind) (Kind, error) {
 
 	spec, ok := reg.kinds[knd]
 	if !ok {
-		return 0, fmt.Errorf("no spec for %[1]s(%[1]d)", knd)
+		return 0, NewInternalErrorf("no spec for %[1]s(%[1]d)", knd)
 	}
 	rt := reflect.TypeOf(typ)
 	was := reg.specs[rt]
@@ -91,5 +93,5 @@ func (reg *Registry) Create(name string, val any, opts ...Option) (Tag, error) {
 	if spec := reg.specs[valTyp]; !spec.IsZero() {
 		return spec.tcr(name, val, opts...)
 	}
-	return nil, fmt.Errorf("%w for %s of type %T", ErrNoCreator, name, val)
+	return nil, NewErrorf("%w for %s of type %T", ErrNoCreator, name, val)
 }
