@@ -288,6 +288,26 @@ your specs and types in for example `init` function.
 reg := nomix.GlobalRegistry()
 ```
 
+The `xtag` package registers all its specs and type associations in one call.
+Kinds already registered keep their spec, so `RegisterAll` is safe to call more
+than once on the same registry:
+
+<!-- gmmce:pkg/xtag/ExampleRegisterAll -->
+```go
+reg := nomix.NewRegistry()
+xtag.RegisterAll(reg) // Safe to call more than once.
+
+tagA, errA := reg.Create("A", 42)
+tagB, errB := reg.Create("B", time.Date(2000, 1, 2, 3, 4, 5, 0, time.UTC))
+
+format := "%s: kind: %s; value: %v; err: %v\n"
+fmt.Printf(format, tagA.TagName(), tagA.TagKind(), tagA, errA)
+fmt.Printf(format, tagB.TagName(), tagB.TagKind(), tagB, errB)
+// Output:
+// A: kind: KindInt; value: 42; err: <nil>
+// B: kind: KindTime; value: 2000-01-02T03:04:05Z; err: <nil>
+```
+
 ## Tag Sets
 
 The `nomix.TagSet` is a structure helping to operate on sets of typed tags.
