@@ -1,3 +1,48 @@
+## v0.12.0 (Fri, 09 Oct 2026 19:24:12 UTC)
+- chore: update AGENTS.md file.
+- test: align tests with the project test style.
+- chore: update dependencies and refine NewFieldError behavior.
+- refactor(nomix): initialise the global registry without init.
+- fix(nomix): release the registry lock before creating a tag.
+- fix(nomix): return errors instead of panicking on missing functions.
+- refactor(nomix): build Slice.TagSame on Slice.TagEqual.
+- fix(nomix): compare tag kinds in TagEqual and TagSame.
+- fix(nomix): compare time tag values as instants.
+- fix(nomix)!: return verax field errors from Single.ValidateWith.
+- fix(nomix): name the tag in TagSet type errors.
+- fix(xtag): skip already registered kinds in RegisterAll.
+- feat(xtag): accept JSON text as a string in CreateJSON.
+- refactor(xtag): drop unused Options parameters from create helpers.
+- fix(xtag): format slice tags in linear time and quote strings.
+- feat(nomix)!: accept Tagger and Metadata in the typed getters.
+- refactor(nomix): assert interface implementations at compile time.
+- test(nomix): cover TagCreateFunc and TagParseFunc.
+- docs(nomix): correct option docs and deprecate WithLocString.
+- docs(nomix): state who supplies the tag name in creator interfaces.
+- docs: correct stale and inaccurate godoc.
+- style: wrap long lines, fix names, and remove dead code.
+- docs(readme): name the real kind spec types.
+- docs(readme): fix broken bold markup for derived types.
+- docs(readme): re-key example markers for gomake doc:mce.
+- docs(readme): show the import paths and minimum Go version.
+- docs(readme): introduce the library before installing it.
+- docs(readme): list the JSON tag among the xtag types.
+- docs: show xtag.RegisterAll in an example and the README.
+- docs(readme): describe kinds and derived types accurately.
+- docs(readme): add a tagline and link the tests badge.
+- docs(readme): fix grammar and typos.
+- fix(nomix): treat a typed nil tag as unequal in comparisons.
+- fix(xtag): keep existing type associations in RegisterAll.
+- docs: note that slice tag SQL values need array support.
+- docs(agents): bring the architecture notes up to date.
+- docs(readme): note that RegisterAll keeps existing associations.
+- docs(readme): note the derived kind values the library uses.
+- docs(readme): explain how tags are stored in a database.
+- docs(readme): name GlobalRegistry in prose instead of a code block.
+- docs: show typed tag retrieval with GetTagValue.
+- docs(readme): fix grammar and an ambiguous reference.
+- docs(readme): point to the license.
+
 ## v0.11.0 (Sun, 07 Jun 2026 16:18:47 UTC)
 - chore: update copyright notice year.
 - fix: error domain, godoc corrections, README example sync.
