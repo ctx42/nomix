@@ -13,8 +13,8 @@ import (
 
 // RegisterAll registers all [nomix.KindSpec] the package provides in the
 // given [nomix.Registry] and associates types with them. Kinds already
-// registered in the registry keep their spec, so calling it more than once,
-// or after registering custom specs, is safe.
+// registered keep their spec and types already associated keep their kind, so
+// calling it more than once, or after registering custom specs, is safe.
 func RegisterAll(reg *nomix.Registry) {
 	mustRegisterKind(reg, int64Spec)
 	mustRegisterKind(reg, intSpec)
@@ -68,8 +68,12 @@ func mustRegisterKind(reg *nomix.Registry, spec nomix.KindSpec) {
 	}
 }
 
-// mustAssociateType calls [nomix.Registry.Associate], and panics on error.
+// mustAssociateType calls [nomix.Registry.Associate] and panics on error,
+// unless the type is already associated with a kind.
 func mustAssociateType(reg *nomix.Registry, typ any, knd nomix.Kind) {
+	if !reg.SpecForType(typ).IsZero() {
+		return
+	}
 	if _, err := reg.Associate(typ, knd); err != nil {
 		panic(err)
 	}

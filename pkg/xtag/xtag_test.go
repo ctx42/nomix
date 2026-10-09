@@ -46,6 +46,26 @@ func Test_RegisterAll(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, "custom", have.TagValue())
 	})
+
+	t.Run("type already associated", func(t *testing.T) {
+		// --- Given ---
+		reg := nomix.NewRegistry()
+		fn := func(name string, v any, _ ...nomix.Option) (nomix.Tag, error) {
+			tag := nomix.NewSingle(name, v.(string), nomix.KindUUID, nil, nil)
+			return tag, nil
+		}
+		spec := nomix.NewKindSpec(nomix.KindUUID, fn, nomix.TagParserNotImpl)
+		must.Nil(reg.Register(spec))
+		must.Value(reg.Associate("", nomix.KindUUID))
+
+		// --- When ---
+		RegisterAll(reg)
+
+		// --- Then ---
+		have, err := reg.Create("name", "abc")
+		assert.NoError(t, err)
+		assert.Equal(t, nomix.KindUUID, have.TagKind())
+	})
 }
 
 func Test_RegisterAll_tabular(t *testing.T) {
