@@ -134,7 +134,8 @@ type ValueComparer interface {
 	TagEqual(other Tag) bool
 }
 
-// Creator is an interface for creating [Tag] instances.
+// Creator is an interface for creating [Tag] instances whose name is supplied
+// by the implementer, such as [Definition].
 type Creator interface {
 	// TagCreate creates the appropriate [Tag] instance based on the value's
 	// type. It returns the [ErrNoCreator] error if the value's type is not
@@ -142,7 +143,8 @@ type Creator interface {
 	TagCreate(value any, opts ...Option) (Tag, error)
 }
 
-// NamedCreator is an interface for creating named [Tag] instances.
+// NamedCreator is an interface for creating [Tag] instances with the name
+// passed by the caller, such as [KindSpec].
 type NamedCreator interface {
 	// TagCreate creates the appropriate [Tag] instance based on the value's
 	// type. It returns the [ErrNoCreator] error if the value's type is not
@@ -151,14 +153,19 @@ type NamedCreator interface {
 }
 
 // Parser is an interface for creating [Tag] instances from their string
-// representation.
+// representation with the name passed by the caller, such as [KindSpec].
 type Parser interface {
+	// TagParse creates a [Tag] with the given name from its string
+	// representation.
 	TagParse(name string, val string, opts ...Option) (Tag, error)
 }
 
-// NamedParser is an interface for creating named [Tag] instances from their
-// string representation. The name must be set by the implementer.
+// NamedParser is an interface for creating [Tag] instances from their string
+// representation whose name is supplied by the implementer, such as
+// [Definition].
 type NamedParser interface {
+	// TagParse creates a [Tag] from its string representation. The name must
+	// be set by the implementer.
 	TagParse(val string, opts ...Option) (Tag, error)
 }
 
