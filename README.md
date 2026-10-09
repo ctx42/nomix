@@ -6,8 +6,8 @@
 
 <!-- TOC -->
 * [nomix: Tagging and Metadata for Go](#nomix-tagging-and-metadata-for-go)
-  * [Installation](#installation)
   * [Introduction](#introduction)
+  * [Installation](#installation)
   * [Base and Derived Types](#base-and-derived-types)
   * [Tag Kind](#tag-kind)
   * [Tag Interface](#tag-interface)
@@ -32,24 +32,6 @@ generic way. In the context of the module we call them **tags**.
 Before explaining the library's API, let's introduce its approach and
 philosophy.
 
-## Installation
-
-Requires Go 1.26 or later. To use `nomix` in your Go project, install it with:
-
-```bash
-go get github.com/ctx42/nomix
-```
-
-The core abstractions live in `pkg/nomix` and the ready-to-use tag types in
-`pkg/xtag`:
-
-```go
-import (
-	"github.com/ctx42/nomix/pkg/nomix"
-	"github.com/ctx42/nomix/pkg/xtag"
-)
-```
-
 ## Introduction
 
 When we talk about tags, we usually think about a set of name-value pairs
@@ -70,6 +52,24 @@ We need a more sophisticated solution that is user-friendly for programmers,
 supports easy definition types and validation rules, and simplifies database
 storage. To enable efficient searching and indexing of tags, we must limit
 supported types to those widely available across databases.
+
+## Installation
+
+Requires Go 1.26 or later. To use `nomix` in your Go project, install it with:
+
+```bash
+go get github.com/ctx42/nomix
+```
+
+The core abstractions live in `pkg/nomix` and the ready-to-use tag types in
+`pkg/xtag`:
+
+```go
+import (
+	"github.com/ctx42/nomix/pkg/nomix"
+	"github.com/ctx42/nomix/pkg/xtag"
+)
+```
 
 ## Base and Derived Types
 
