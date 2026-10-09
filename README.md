@@ -290,12 +290,9 @@ fmt.Printf(format, tag.TagName(), tag.TagKind(), tag.TagValue(), err)
 // name: C; kind: KindInt; value: 11; err: <nil>
 ```
 
-The `nomix` package also provides a global registry if you wish to register all
-your specs and types, for example, in an `init` function.
-
-```go
-reg := nomix.GlobalRegistry()
-```
+The `nomix` package also provides a global registry, available via
+`nomix.GlobalRegistry()`, if you wish to register all your specs and types, for
+example, in an `init` function.
 
 The `xtag` package registers all its specs and type associations in one call.
 Kinds already registered keep their spec and types already associated keep
