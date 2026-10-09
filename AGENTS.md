@@ -22,8 +22,8 @@ go generate ./pkg/nomix/...
 
 ## Architecture
 
-`nomix` is a two-package Go module for handling typed, named metadata (called *
-*tags**) in a generic way, with database-friendly type constraints.
+`nomix` is a two-package Go module for handling typed, named metadata (called
+**tags**) in a generic way, with database-friendly type constraints.
 
 ### Package `pkg/nomix` — core abstractions
 
@@ -47,28 +47,31 @@ any kind to produce its slice variant.
 - Both implement `driver.Valuer`, `fmt.Stringer`, `Comparer`, and
   `ValueComparer`.
 
-**Spec / Definition / Registry** (`spec.go`, `definition.go`, `registry.go`):
+**KindSpec / Definition / Registry** (`kind_spec.go`, `definition.go`,
+`registry.go`):
 
-- `Spec` pairs a `Kind` with a `CreateFunc` and a `ParseFunc`; it is the factory
-  for a tag kind.
-- `Definition` wraps a `Spec` with a fixed name and optional `verax.Rule`
+- `KindSpec` pairs a `Kind` with a `CreateFunc` and a `ParseFunc`; it is the
+  factory for a tag kind.
+- `Definition` wraps a `KindSpec` with a fixed name and optional `verax.Rule`
   validators.
-- `Registry` maps `Kind → Spec` and `reflect.Type → Spec`. A package-level
-  global registry is available via `GlobalRegistry()`.
+- `Registry` maps `Kind → KindSpec` and `reflect.Type → KindSpec`. A
+  package-level global registry is available via `GlobalRegistry()`.
 
 **Sets** (`tag_set.go`, `meta_set.go`):
 
-- `TagSet` — `map[string]Tag`-backed, rich typed access; use `GetTag[T]` /
-  `GetTagValue[T]` generics for typed retrieval.
-- `MetaSet` — `map[string]any`-backed, with typed getter methods (`MetaGetInt`,
-  `MetaGetString`, `MetaGetTime`, etc.) and `Options`-controlled parsing.
+- `TagSet` — `map[string]Tag`-backed; use the `GetTag[T]` / `GetTagValue[T]`
+  generics (any `Tagger`) for typed retrieval.
+- `MetaSet` — `map[string]any`-backed; use the `GetMetaValue[T]` generic (any
+  `Metadata`) for typed retrieval.
 
-**Options** (`options.go`): `Option` functions configure `MetaSet` and tag
-parsing. Key options: `WithTimeFormat`, `WithTimeLoc`, `WithZeroTime`,
-`WithRadixHEX`, `WithLen`, `WithMeta`, `WithTags`.
+**Options** (`options.go`): `Option` functions configure set construction
+(`WithLen`, `WithMeta`, `WithTags`) and tag creation and parsing
+(`WithTimeFormat`, `WithTimeLoc`, `WithZeroTime`, `WithRadixHEX`).
+`WithLocString` is deprecated and has no effect.
 
 **Test helpers** (`all_test.go`): `TstIntSpec`, `TstIntCreate`, `TstIntParse`,
-and `TstRule` are exported test helpers used across internal tests.
+`TstRule`, and `TstTag`, plus the `tstTagger` and `tstMetadata` interface
+implementations, are shared across internal tests.
 
 **Code generation** (`00_generate.go`, `00_generate_main.go`): runs `mocker`
 from `github.com/ctx42/testing` to generate `tag_mock_test.go` (mock for the
@@ -83,12 +86,13 @@ types and exposes a `Spec` for each. Each type file (e.g. `int.go`, `bool.go`,
 - A type alias (e.g. `type Int = nomix.Single[int]`)
 - A constructor (e.g. `NewInt(name, val)`)
 - `CreateXxx` / `ParseXxx` matching `nomix.CreateFunc` / `nomix.ParseFunc`
-- `XxxSpec()` returning the `nomix.Spec` for that kind
+- `XxxSpec()` returning the `nomix.KindSpec` for that kind
 
-`RegisterAll(reg)` registers all specs and type associations at once. Supported
-types: `String`, `Int`, `Int64`, `Float64`, `Bool`, `Time`, `JSON`, and slice
-variants (`StringSlice`, `IntSlice`, `Int64Slice`, `Float64Slice`, `BoolSlice`,
-`TimeSlice`, `ByteSlice`).
+`RegisterAll(reg)` registers all specs and type associations at once, keeping
+kinds already registered and types already associated, so it is safe to call
+more than once. Supported types: `String`, `Int`, `Int64`, `Float64`, `Bool`,
+`Time`, `JSON`, and slice variants (`StringSlice`, `IntSlice`, `Int64Slice`,
+`Float64Slice`, `BoolSlice`, `TimeSlice`, `ByteSlice`).
 
 ### Dependency highlights
 
@@ -102,8 +106,11 @@ variants (`StringSlice`, `IntSlice`, `Int64Slice`, `Float64Slice`, `BoolSlice`,
 
 - `Kind` bits: lower byte = base type, bit 7 = slice modifier, upper byte =
   derived-type discriminator.
-- `Single` and `Slice` are never constructed without a `strValuer`; `sqlValuer`
-  may be nil (falls back to returning the value directly).
-- `TagSet` and `MetaSet` silently ignore nil values on set operations.
-- `Registry.Register` is idempotent-safe per kind (returns error on duplicate);
-  `Associate` overwrites silently.
+- `Single` and `Slice` accept a nil `strValuer` (`String` falls back to
+  `fmt.Sprint`) and a nil `sqlValuer` (`Value` returns the value directly).
+- `TagSet` and `MetaSet` silently ignore nil values on set operations; their
+  zero values are read-only.
+- `Registry.Register` returns an error for a kind already registered;
+  `Associate` overwrites silently; the zero `Registry` is ready to use.
+- A `KindSpec` without a creator or parser returns `ErrNoCreator` /
+  `ErrNotImpl` instead of panicking.
