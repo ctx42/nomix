@@ -182,7 +182,10 @@ type ParseFunc func(name, val string, opts ...Option) (Tag, error)
 // Examples:
 //
 //	TagCreateFunc(func(name string, val any, opts ...Option) (MyTag, error))
-func TagCreateFunc[T Tag](fn func(name string, val any, opts ...Option) (T, error)) CreateFunc {
+func TagCreateFunc[T Tag](
+	fn func(name string, val any, opts ...Option) (T, error),
+) CreateFunc {
+
 	return func(name string, val any, opts ...Option) (Tag, error) {
 		return fn(name, val, opts...)
 	}
@@ -194,7 +197,10 @@ func TagCreateFunc[T Tag](fn func(name string, val any, opts ...Option) (T, erro
 // Examples:
 //
 //	TagParseFunc(func(name string, val string, opts ...Option) (T, error))
-func TagParseFunc[T Tag](fn func(name string, val string, opts ...Option) (T, error)) ParseFunc {
+func TagParseFunc[T Tag](
+	fn func(name string, val string, opts ...Option) (T, error),
+) ParseFunc {
+
 	return func(name string, val string, opts ...Option) (Tag, error) {
 		return fn(name, val, opts...)
 	}

@@ -25,13 +25,24 @@ func StringSliceSpec() nomix.KindSpec { return stringSliceSpec }
 
 // NewStringSlice returns a new instance of [StringSlice].
 func NewStringSlice(name string, val ...string) *StringSlice {
-	return nomix.NewSlice(name, val, nomix.KindStringSlice, strValueStringSlice, nil)
+	return nomix.NewSlice(
+		name,
+		val,
+		nomix.KindStringSlice,
+		strValueStringSlice,
+		nil,
+	)
 }
 
 // CreateStringSlice casts the value to []string. Returns the [StringSlice]
 // instance with the given name and nil error on success. Returns nil and
 // [nomix.ErrInvType] if the value is not the []string type.
-func CreateStringSlice(name string, val any, _ ...nomix.Option) (*StringSlice, error) {
+func CreateStringSlice(
+	name string,
+	val any,
+	_ ...nomix.Option,
+) (*StringSlice, error) {
+
 	v, err := createStringSlice(val)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", name, err)

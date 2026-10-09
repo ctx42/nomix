@@ -69,15 +69,8 @@ func mustRegisterKind(reg *nomix.Registry, spec nomix.KindSpec) {
 }
 
 // mustAssociateType calls [nomix.Registry.Associate], and panics on error.
-func mustAssociateType(
-	reg *nomix.Registry,
-	typ any,
-	knd nomix.Kind,
-) nomix.Kind {
-
-	was, err := reg.Associate(typ, knd)
-	if err != nil {
+func mustAssociateType(reg *nomix.Registry, typ any, knd nomix.Kind) {
+	if _, err := reg.Associate(typ, knd); err != nil {
 		panic(err)
 	}
-	return was
 }

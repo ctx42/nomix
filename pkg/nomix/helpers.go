@@ -45,8 +45,8 @@ func GetTagValue[T any](set Tagger, name string) (T, error) {
 // if found, or the zero value for T and error.
 func GetMetaValue[T any](set Metadata, name string) (T, error) {
 	var zero T
-	if tag := set.MetaGet(name); tag != nil {
-		if v, ok := tag.(T); ok {
+	if val := set.MetaGet(name); val != nil {
+		if v, ok := val.(T); ok {
 			return v, nil
 		}
 		return zero, fmt.Errorf("%s: %w", name, ErrInvType)
@@ -75,15 +75,15 @@ func CreateInt64(val any) (int64, error) {
 	return 0, ErrInvType
 }
 
-// convertableToInt64 lists types that can be upgraded to int64 without loss of
+// convertibleToInt64 lists types that can be upgraded to int64 without loss of
 // precision.
-type convertableToInt64 interface {
+type convertibleToInt64 interface {
 	byte | int | int8 | int16 | int32 | int64
 }
 
 // toInt64Slice upgrades a slice of values that can be upgraded to []int64
 // without loss of precision.
-func toInt64Slice[T convertableToInt64](v []T) []int64 {
+func toInt64Slice[T convertibleToInt64](v []T) []int64 {
 	upgraded := make([]int64, len(v))
 	for i, val := range v {
 		upgraded[i] = int64(val)
@@ -148,9 +148,9 @@ func CreateFloat64(val any) (float64, error) {
 	return 0, ErrInvType
 }
 
-// convertableToFloat64 lists types that can be upgraded to float64 without
+// convertibleToFloat64 lists types that can be upgraded to float64 without
 // loss of precision.
-type convertableToFloat64 interface {
+type convertibleToFloat64 interface {
 	int | int8 | int16 | int32 | int64 | float32 | float64
 }
 
@@ -158,7 +158,7 @@ type convertableToFloat64 interface {
 // without loss of precision.
 //
 // NOTE: For values outside ±2^53 range, the function will return an error.
-func toFloat64Slice[T convertableToFloat64](val []T) ([]float64, error) {
+func toFloat64Slice[T convertibleToFloat64](val []T) ([]float64, error) {
 	upgraded := make([]float64, len(val))
 	for i, v := range val {
 		var err error

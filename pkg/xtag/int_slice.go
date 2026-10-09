@@ -31,7 +31,12 @@ func NewIntSlice(name string, val ...int) *IntSlice {
 // CreateIntSlice casts the value to []int. Returns the [IntSlice] instance
 // with the given name and nil error on success. Returns nil and
 // [nomix.ErrInvType] if the value is not []int type.
-func CreateIntSlice(name string, val any, _ ...nomix.Option) (*IntSlice, error) {
+func CreateIntSlice(
+	name string,
+	val any,
+	_ ...nomix.Option,
+) (*IntSlice, error) {
+
 	v, err := createIntSlice(val)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", name, err)

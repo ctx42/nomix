@@ -22,8 +22,5 @@ func main() {
 
 func GenTagMock(opts ...mocker.Option) error {
 	opts = append(opts, mocker.WithTgtFilename("tag_mock_test.go"))
-	if err := mocker.Generate("Tag", opts...); err != nil {
-		return err
-	}
-	return nil
+	return mocker.Generate("Tag", opts...)
 }
