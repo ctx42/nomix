@@ -3,6 +3,13 @@
 
 package nomix
 
+// Compile time checks.
+var (
+	_ Tagger        = TagSet{}
+	_ AllGetter     = TagSet{}
+	_ MetaAllGetter = TagSet{}
+)
+
 // TagSet represents a set of tags. The zero value is read-only; use
 // [NewTagSet] to create a set that can be modified.
 type TagSet struct {

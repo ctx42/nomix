@@ -3,7 +3,11 @@
 
 package nomix
 
-var _ Metadata = MetaSet{} // Compile time check.
+// Compile time checks.
+var (
+	_ Metadata      = MetaSet{}
+	_ MetaAllGetter = MetaSet{}
+)
 
 // MetaSet represents a set of metadata key-values. The zero value is
 // read-only; use [NewMetaSet] to create a set that can be modified.

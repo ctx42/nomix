@@ -10,6 +10,13 @@ import (
 	"github.com/ctx42/xrr/pkg/xrr"
 )
 
+// Compile time checks.
+var (
+	_ NamedCreator  = KindSpec{}
+	_ Parser        = KindSpec{}
+	_ spec.Specable = KindSpec{}
+)
+
 // KindSpecName identifies [KindSpec] in a [spec.Spec].
 const KindSpecName = "kind-spec"
 

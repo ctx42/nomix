@@ -7,6 +7,12 @@ import (
 	"github.com/ctx42/verax/pkg/verax"
 )
 
+// Compile time checks.
+var (
+	_ Creator     = (*Definition)(nil)
+	_ NamedParser = (*Definition)(nil)
+)
+
 // Definition represents a named tag definition. In other words, it wraps a
 // [KindSpec] and a tag name.
 type Definition struct {
