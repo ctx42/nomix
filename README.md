@@ -90,12 +90,11 @@ In the database layer, the **Base Types** can map to multiple types, termed
 
 - `bool`
 - `int`
-- `uint16`
-- ... and so on
+- ... and any type you define, such as a `uint16`
 
 ## Tag Kind
 
-Each of the types has assigned the **Type Kind** which is `int16` number.
+Each type is assigned a `Kind`, an `int16` number.
 
 ![tag-kind.png](doc/tag-kind.png)
 
