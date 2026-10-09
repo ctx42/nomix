@@ -9,9 +9,44 @@ import (
 	"time"
 
 	"github.com/ctx42/testing/pkg/assert"
+	"github.com/ctx42/testing/pkg/must"
 
 	"github.com/ctx42/nomix/pkg/nomix"
 )
+
+func Test_RegisterAll(t *testing.T) {
+	t.Run("second call", func(t *testing.T) {
+		// --- Given ---
+		reg := nomix.NewRegistry()
+		RegisterAll(reg)
+
+		// --- When ---
+		RegisterAll(reg)
+
+		// --- Then ---
+		have, err := reg.Create("name", 42)
+		assert.NoError(t, err)
+		assert.Equal(t, nomix.KindInt, have.TagKind())
+	})
+
+	t.Run("kind already registered", func(t *testing.T) {
+		// --- Given ---
+		reg := nomix.NewRegistry()
+		fn := func(name string, _ any, _ ...nomix.Option) (nomix.Tag, error) {
+			return NewString(name, "custom"), nil
+		}
+		spec := nomix.NewKindSpec(nomix.KindTime, fn, nomix.TagParserNotImpl)
+		must.Nil(reg.Register(spec))
+
+		// --- When ---
+		RegisterAll(reg)
+
+		// --- Then ---
+		have, err := reg.Create("name", time.Now())
+		assert.NoError(t, err)
+		assert.Equal(t, "custom", have.TagValue())
+	})
+}
 
 func Test_RegisterAll_tabular(t *testing.T) {
 	tt := []struct {
