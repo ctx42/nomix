@@ -34,9 +34,9 @@ func NewInt64Slice(name string, val ...int64) *Int64Slice {
 }
 
 // CreateInt64Slice casts the value to []int64. Returns the [Int64Slice]
-// instance with the given name and nil error if the value is a []int, []int8,
-// []int16, []int32, or []int64. Returns nil and [nomix.ErrInvType] if the
-// value's type is not a supported numeric slice type.
+// instance with the given name and nil error if the value is a []int, []byte,
+// []int8, []int16, []int32, or []int64. Returns nil and [nomix.ErrInvType] if
+// the value's type is not a supported numeric slice type.
 func CreateInt64Slice(
 	name string,
 	val any,

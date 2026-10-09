@@ -93,7 +93,7 @@ type Tag interface {
 	TagKind() Kind
 
 	// TagValue returns tag value.
-	// You may use the value returned by the [Tag.Kind] method
+	// You may use the value returned by the [Tag.TagKind] method
 	// to cast it to the proper type.
 	TagValue() any
 }

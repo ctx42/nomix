@@ -40,7 +40,9 @@ func CreateInt64(name string, val any, _ ...nomix.Option) (*Int64, error) {
 	return NewInt64(name, v), nil
 }
 
-// ParseInt64 parses string representation of the 64-bit integer tag.
+// ParseInt64 parses string representation of the 64-bit integer tag. Returns
+// nil and [nomix.ErrInvFormat] if the value cannot be parsed; the parser's
+// error is not included.
 func ParseInt64(name, v string, opts ...nomix.Option) (*Int64, error) {
 	def := nomix.NewOptions(opts...)
 	val, err := strconv.ParseInt(v, def.Radix, 64)

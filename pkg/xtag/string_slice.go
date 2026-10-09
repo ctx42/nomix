@@ -30,7 +30,7 @@ func NewStringSlice(name string, val ...string) *StringSlice {
 
 // CreateStringSlice casts the value to []string. Returns the [StringSlice]
 // instance with the given name and nil error on success. Returns nil and
-// [ErrInvType] if the value is not the []string type.
+// [nomix.ErrInvType] if the value is not the []string type.
 func CreateStringSlice(name string, val any, _ ...nomix.Option) (*StringSlice, error) {
 	v, err := createStringSlice(val)
 	if err != nil {
@@ -40,8 +40,8 @@ func CreateStringSlice(name string, val any, _ ...nomix.Option) (*StringSlice, e
 }
 
 // createStringSlice casts the value to []string. Returns the []string and nil
-// error on success. Returns nil and [ErrInvType] if the value is not the
-// []string type.
+// error on success. Returns nil and [nomix.ErrInvType] if the value is not
+// the []string type.
 func createStringSlice(val any) ([]string, error) {
 	if v, ok := val.([]string); ok {
 		return v, nil

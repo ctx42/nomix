@@ -36,7 +36,7 @@ func NewBoolSlice(name string, val ...bool) *BoolSlice {
 
 // CreateBoolSlice casts the value to []bool. Returns the [BoolSlice] instance
 // with the given name and nil error on success. Returns nil and
-// [nomix.ErrInvType] if the value is the []bool type.
+// [nomix.ErrInvType] if the value is not the []bool type.
 func CreateBoolSlice(
 	name string,
 	val any,

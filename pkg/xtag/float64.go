@@ -33,7 +33,8 @@ func NewFloat64(name string, val float64) *Float64 {
 // int32, int64, float32, or float64. Returns nil and [nomix.ErrInvType] if the
 // value's type is not a supported numeric type.
 //
-// NOTE: For int64 values outside ±2^53 range, the result is undefined.
+// Returns nil and [nomix.ErrInvValue] for int and int64 values outside the
+// ±2^53 range, which float64 cannot represent exactly.
 func CreateFloat64(name string, val any, _ ...nomix.Option) (*Float64, error) {
 	v, err := nomix.CreateFloat64(val)
 	if err != nil {
@@ -43,6 +44,8 @@ func CreateFloat64(name string, val any, _ ...nomix.Option) (*Float64, error) {
 }
 
 // ParseFloat64 parses string representation of the 64-bit floating point tag.
+// Returns nil and [nomix.ErrInvFormat] if the value cannot be parsed; the
+// parser's error is not included.
 func ParseFloat64(name, v string, _ ...nomix.Option) (*Float64, error) {
 	val, err := strconv.ParseFloat(v, 64)
 	if err != nil {

@@ -5,7 +5,7 @@ package nomix
 
 // MetaAllGetter is an interface wrapping MetaGetAll method.
 type MetaAllGetter interface {
-	// MetaGetAll returns all tags in the set as a map. May return nil. The
+	// MetaGetAll returns all metadata in the set as a map. May return nil. The
 	// returned map should be treated as read-only.
 	MetaGetAll() map[string]any
 }
@@ -18,7 +18,7 @@ type MetaAllSetter interface {
 	MetaSetAll(map[string]any)
 }
 
-// MetaFromGetter is an interface wrapping MetaFromGetter method.
+// MetaFromGetter is an interface wrapping MetaSetFrom method.
 type MetaFromGetter interface {
 	// MetaSetFrom sets metadata on the implementor from the [MetaAllGetter].
 	MetaSetFrom(src MetaAllGetter)

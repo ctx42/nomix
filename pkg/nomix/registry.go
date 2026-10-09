@@ -8,7 +8,7 @@ import (
 	"sync"
 )
 
-// specs is the global registry of [Spec]s.
+// specs is the global registry of [KindSpec]s.
 var specs = NewRegistry()
 
 // GlobalRegistry returns the global, shared [Registry] instance initialised by
@@ -17,7 +17,8 @@ var specs = NewRegistry()
 // Use [NewRegistry] when isolation is required.
 func GlobalRegistry() *Registry { return specs }
 
-// Registry represents a collection of [Spec]s. The zero value is ready to use.
+// Registry represents a collection of [KindSpec]s. The zero value is ready
+// to use.
 type Registry struct {
 	kinds map[Kind]KindSpec
 	specs map[reflect.Type]KindSpec
@@ -72,7 +73,7 @@ func (reg *Registry) Associate(typ any, knd Kind) (Kind, error) {
 }
 
 // SpecForType retrieves the [KindSpec] for the given type. Requires prior type
-// association with a [KindSpec]. Use [Spec.IsZero] to check if a spec is
+// association with a [KindSpec]. Use [KindSpec.IsZero] to check if a spec is
 // available for the type.
 func (reg *Registry) SpecForType(typ any) KindSpec {
 	reg.mx.RLock()

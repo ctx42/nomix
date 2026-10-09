@@ -81,7 +81,7 @@ type convertableToInt64 interface {
 	byte | int | int8 | int16 | int32 | int64
 }
 
-// createInt64Slice upgrades a slice of values that can be upgraded to []int64
+// toInt64Slice upgrades a slice of values that can be upgraded to []int64
 // without loss of precision.
 func toInt64Slice[T convertableToInt64](v []T) []int64 {
 	upgraded := make([]int64, len(v))
@@ -92,9 +92,9 @@ func toInt64Slice[T convertableToInt64](v []T) []int64 {
 }
 
 // CreateInt64Slice casts the value to []int64. Returns the []int64 and nil
-// error if the value is a []int, []int8, []int16, []int32, or []int64. Returns
-// nil and [ErrInvType] if the value's type is not a supported numeric slice
-// type.
+// error if the value is a []int, []byte, []int8, []int16, []int32, or []int64.
+// Returns nil and [ErrInvType] if the value's type is not a supported numeric
+// slice type.
 func CreateInt64Slice(val any) ([]int64, error) {
 	switch v := val.(type) {
 	case []int64:
@@ -215,10 +215,10 @@ func CreateTime(val any, opts Options) (time.Time, error) {
 
 // CreateTimeSlice casts the value to []time.Time, or when the value is a
 // []string, it parses its elements in the given location but only when the
-// format is provided. With the "zvt" argument you may provide a list of
-// strings representing zero value time. Returns the []time.Time and nil error
-// on success. Returns nil and error if the value's type is not a supported
-// type or the value is not a valid time representation.
+// format is provided. Strings set with [WithZeroTime] become the zero time.
+// Returns the []time.Time and nil error on success. Returns nil and error if
+// the value's type is not a supported type or the value is not a valid time
+// representation.
 func CreateTimeSlice(val any, opts Options) ([]time.Time, error) {
 	switch v := val.(type) {
 	case []time.Time:
@@ -246,7 +246,8 @@ func CreateTimeSlice(val any, opts Options) ([]time.Time, error) {
 // ParseTime parses a string representation of [time.Time]. Returns the time
 // and nil error if the value is a valid time representation. Returns zero
 // value time and [ErrInvFormat] if the value is not a valid time
-// representation.
+// representation; the parser's error is not included. Returns zero value time
+// and [ErrInvType] when opts.TimeFormat is empty.
 func ParseTime(val string, opts Options) (time.Time, error) {
 	if opts.TimeFormat == "" {
 		return time.Time{}, ErrInvType

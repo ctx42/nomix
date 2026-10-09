@@ -30,7 +30,7 @@ func NewInt(name string, val int) *Int {
 }
 
 // CreateInt casts the value to int. Returns the [Int] instance with the given
-// type and nil error on success. Returns nil and [nomix.ErrInvType] if the
+// name and nil error on success. Returns nil and [nomix.ErrInvType] if the
 // value is not the int type.
 func CreateInt(name string, val any, _ ...nomix.Option) (*Int, error) {
 	if v, ok := val.(int); ok {
@@ -39,7 +39,9 @@ func CreateInt(name string, val any, _ ...nomix.Option) (*Int, error) {
 	return nil, fmt.Errorf("%s: %w", name, nomix.ErrInvType)
 }
 
-// ParseInt parses string representation of the integer tag.
+// ParseInt parses string representation of the integer tag. Returns nil and
+// [nomix.ErrInvFormat] if the value cannot be parsed; the parser's error is
+// not included.
 func ParseInt(name, val string, opts ...nomix.Option) (*Int, error) {
 	def := nomix.NewOptions(opts...)
 	v, err := strconv.ParseInt(val, def.Radix, 0)

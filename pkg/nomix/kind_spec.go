@@ -70,8 +70,7 @@ func (ks KindSpec) Spec() (*spec.Spec, error) {
 }
 
 // KindSpecFromSpec creates a [KindSpec] from a [spec.Spec]. The [Kind] encoded
-// in the spec must be registered in the global [Registry] at the time this
-// function is called.
+// in the spec must be registered in reg at the time this function is called.
 func KindSpecFromSpec(reg *Registry, spc *spec.Spec) (KindSpec, error) {
 	if spc.Name != KindSpecName {
 		return KindSpec{}, NewInternalErrorf(

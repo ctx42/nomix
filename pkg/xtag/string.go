@@ -9,7 +9,7 @@ import (
 	"github.com/ctx42/nomix/pkg/nomix"
 )
 
-// String is a tag for a slice of strings.
+// String is a tag representing a single string value.
 type String = nomix.Single[string]
 
 // stringSpec defines the [nomix.KindSpec] for [String] type.

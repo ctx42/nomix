@@ -45,7 +45,9 @@ func CreateBool(name string, val any, _ ...nomix.Option) (*Bool, error) {
 	return nil, fmt.Errorf("%s: %w", name, nomix.ErrInvType)
 }
 
-// ParseBool parses string representation of the boolean tag.
+// ParseBool parses string representation of the boolean tag. Returns nil and
+// [nomix.ErrInvFormat] if the value cannot be parsed; the parser's error is
+// not included.
 func ParseBool(name, val string, _ ...nomix.Option) (*Bool, error) {
 	vv, err := strconv.ParseBool(val)
 	if err != nil {

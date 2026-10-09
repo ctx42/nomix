@@ -9,7 +9,7 @@ import (
 	"github.com/ctx42/nomix/pkg/nomix"
 )
 
-// Float64Slice is a tag representing multiple boolean values.
+// Float64Slice is a tag representing multiple float64 values.
 type Float64Slice = nomix.Slice[float64]
 
 // float64SliceSpec defines the [nomix.KindSpec] for [Float64Slice] type.

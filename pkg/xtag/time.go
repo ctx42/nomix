@@ -48,12 +48,12 @@ func CreateTime(name string, val any, opts ...nomix.Option) (*Time, error) {
 	return NewTime(name, v), nil
 }
 
-// ParseTime parses a string representation of [time.Time]. Returns the time
-// and nil error if the value is a valid time representation. Returns zero
-// value time and [nomix.ErrInvFormat] if the value is not a valid time
-// representation.
+// ParseTime parses a string representation of [time.Time]. Returns the [Time]
+// instance with the given name and nil error if the value is a valid time
+// representation. Returns nil and an error wrapping [nomix.ParseTime]'s
+// error otherwise.
 //
-// To support string zero time values, use the [WithZeroTime] option.
+// To support string zero time values, use the [nomix.WithZeroTime] option.
 func ParseTime(name, val string, opts ...nomix.Option) (*Time, error) {
 	def := nomix.NewOptions(opts...)
 	v, err := nomix.ParseTime(val, def)
