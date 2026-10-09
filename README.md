@@ -34,10 +34,20 @@ philosophy.
 
 ## Installation
 
-To use `nomix` in your Go project, install it with:
+Requires Go 1.26 or later. To use `nomix` in your Go project, install it with:
 
 ```bash
 go get github.com/ctx42/nomix
+```
+
+The core abstractions live in `pkg/nomix` and the ready-to-use tag types in
+`pkg/xtag`:
+
+```go
+import (
+	"github.com/ctx42/nomix/pkg/nomix"
+	"github.com/ctx42/nomix/pkg/xtag"
+)
 ```
 
 ## Introduction
