@@ -11,6 +11,9 @@ import (
 )
 
 // BoolSlice is a tag representing multiple boolean values.
+//
+// Its SQL value is the []bool itself, so storing it requires a database
+// driver that accepts array arguments.
 type BoolSlice = nomix.Slice[bool]
 
 // boolSliceSpec defines the [nomix.KindSpec] for [BoolSlice] type.

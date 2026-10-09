@@ -11,6 +11,9 @@ import (
 )
 
 // StringSlice is a tag for a slice of strings.
+//
+// Its SQL value is the []string itself, so storing it requires a database
+// driver that accepts array arguments.
 type StringSlice = nomix.Slice[string]
 
 // stringSliceSpec defines the [nomix.KindSpec] for [StringSlice] type.

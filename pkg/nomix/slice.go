@@ -65,6 +65,9 @@ func (tag *Slice[T]) Get() []T { return tag.value }
 // Set replaces the tag value with v.
 func (tag *Slice[T]) Set(v []T) { tag.value = v }
 
+// Value implements [driver.Valuer] interface. When the type has no sqlValuer
+// defined, it returns the []T slice directly and never returns an error; only
+// database drivers accepting array arguments can store such a value.
 func (tag *Slice[T]) Value() (driver.Value, error) {
 	if tag.sqlValuer == nil {
 		return tag.value, nil

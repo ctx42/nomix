@@ -10,6 +10,9 @@ import (
 )
 
 // Float64Slice is a tag representing multiple float64 values.
+//
+// Its SQL value is the []float64 itself, so storing it requires a database
+// driver that accepts array arguments.
 type Float64Slice = nomix.Slice[float64]
 
 // float64SliceSpec defines the [nomix.KindSpec] for [Float64Slice] type.

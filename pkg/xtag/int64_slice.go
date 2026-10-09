@@ -10,6 +10,9 @@ import (
 )
 
 // Int64Slice is a tag representing multiple int64 values.
+//
+// Its SQL value is the []int64 itself, so storing it requires a database
+// driver that accepts array arguments.
 type Int64Slice = nomix.Slice[int64]
 
 // int64SliceSpec defines the [nomix.KindSpec] for [Int64Slice] type.

@@ -12,6 +12,9 @@ import (
 )
 
 // TimeSlice is a tag for a slice of [time.Time] values.
+//
+// Its SQL value is the []time.Time itself, so storing it requires a database
+// driver that accepts array arguments.
 type TimeSlice = nomix.Slice[time.Time]
 
 // timeSliceSpec defines the [nomix.KindSpec] for [TimeSlice] type.

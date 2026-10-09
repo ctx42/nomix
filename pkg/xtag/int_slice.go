@@ -11,6 +11,9 @@ import (
 )
 
 // IntSlice is a tag for a slice of int values.
+//
+// Its SQL value is the []int itself, so storing it requires a database
+// driver that accepts array arguments.
 type IntSlice = nomix.Slice[int]
 
 // intSliceSpec defines the [nomix.KindSpec] for [IntSlice] type.
