@@ -27,8 +27,8 @@ the core data isn't enough. That's where metadata comes into play. Metadata
 provides a way to add extra layers of information and organization to these
 assets, making systems more adaptable.
 
-The `nomix` – from *nomos* (law/order) or *nomen* (name) library provides a
-simple interface to deal with multi type labeled metadata value sets in a
+The `nomix` library (from *nomos*, law/order, or *nomen*, name) provides a
+simple interface to deal with multi-type, labeled metadata value sets in a
 generic way. In the context of the module we call them **tags**.
 
 Before explaining the library's API, let's introduce its approach and
@@ -51,7 +51,7 @@ has several drawbacks:
 - Mapping `any` to database types is complex.
 
 We need a more sophisticated solution that is user-friendly for programmers,
-supports easy definition types and validation rules, and simplifies database
+supports easy definition of types and validation rules, and simplifies database
 storage. To enable efficient searching and indexing of tags, we must limit
 supported types to those widely available across databases.
 
@@ -140,10 +140,10 @@ type Tag interface {
 }
 ```
 
-The `Tag` interface is implemented by all the **Named** and **Typed Tags**. It
-still has the `any` returned from the `TagValue` method, but we need it if we
-want to be able to handle tag sets with all the supported *base types* and
-`derived types` by the same interface.
+The `Tag` interface is implemented by all tag types. It still has the `any`
+returned from the `TagValue` method, but we need it if we want to be able to
+handle tag sets with all the supported *base types* and *derived types* by the
+same interface.
 
 ## Typed Tags
 
@@ -184,7 +184,7 @@ returns the string representation of the *derived type* and a function returning
 `driver.Value` for it.
 
 You can see the full implementation of `Int` and many other base and derived
-types in `xtag` package.
+types in the `xtag` package.
 
 Both types implement `driver.Valuer`, so tags can be passed directly as
 `database/sql` query arguments. The SQL value comes from the function given to
@@ -364,7 +364,8 @@ fmt.Printf("- B missing: %v\n", errors.Is(err, nomix.ErrMissing))
 // - B missing: true
 ```
 
-The `nomix.MetaSet` does the same for untyped metadata.
+The `nomix.MetaSet` does for untyped metadata what `nomix.TagSet` does for
+tags.
 
 <!-- gmmce:pkg/nomix/ExampleMetaSet -->
 ```go
