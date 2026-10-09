@@ -51,12 +51,5 @@ func CreateBoolSlice(
 
 // strValueBoolSlice converts a bool slice to its string representation.
 func strValueBoolSlice(v []bool) string {
-	ret := "["
-	for i, val := range v {
-		if i > 0 {
-			ret += ", "
-		}
-		ret += strconv.FormatBool(val)
-	}
-	return ret + "]"
+	return formatSlice(v, strconv.FormatBool)
 }

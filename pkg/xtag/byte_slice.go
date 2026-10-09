@@ -51,12 +51,5 @@ func CreateByteSlice(
 
 // strValueByteSlice converts a byte slice to its string representation.
 func strValueByteSlice(v []byte) string {
-	ret := "["
-	for i, val := range v {
-		if i > 0 {
-			ret += ", "
-		}
-		ret += strconv.Itoa(int(val))
-	}
-	return ret + "]"
+	return formatSlice(v, func(b byte) string { return strconv.Itoa(int(b)) })
 }

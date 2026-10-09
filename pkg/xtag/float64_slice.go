@@ -5,7 +5,6 @@ package xtag
 
 import (
 	"fmt"
-	"strconv"
 
 	"github.com/ctx42/nomix/pkg/nomix"
 )
@@ -55,12 +54,5 @@ func CreateFloat64Slice(
 
 // strValueFloat64Slice converts a float64 slice to its string representation.
 func strValueFloat64Slice(v []float64) string {
-	ret := "["
-	for i, val := range v {
-		if i > 0 {
-			ret += ", "
-		}
-		ret += strconv.FormatFloat(val, 'g', -1, 64)
-	}
-	return ret + "]"
+	return formatSlice(v, float64ToString)
 }

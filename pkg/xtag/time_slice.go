@@ -5,6 +5,7 @@ package xtag
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/ctx42/nomix/pkg/nomix"
@@ -55,12 +56,8 @@ func CreateTimeSlice(
 
 // strValueTimeSlice converts a [time.Time] slice to its string representation.
 func strValueTimeSlice(v []time.Time) string {
-	ret := "["
-	for i, val := range v {
-		if i > 0 {
-			ret += ", "
-		}
-		ret += `"` + val.Format(time.RFC3339Nano) + `"`
-	}
-	return ret + "]"
+	return formatSlice(v, quoteTime)
 }
+
+// quoteTime formats the time as a quoted [time.RFC3339Nano] string.
+func quoteTime(v time.Time) string { return strconv.Quote(strValueTime(v)) }

@@ -79,3 +79,11 @@ func Test_CreateTimeSlice(t *testing.T) {
 		assert.Nil(t, tag)
 	})
 }
+
+func Test_quoteTime(t *testing.T) {
+	// --- When ---
+	have := quoteTime(time.Date(2000, 1, 2, 3, 4, 5, 0, time.UTC))
+
+	// --- Then ---
+	assert.Equal(t, `"2000-01-02T03:04:05Z"`, have)
+}

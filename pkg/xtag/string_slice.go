@@ -5,6 +5,7 @@ package xtag
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/ctx42/nomix/pkg/nomix"
 )
@@ -50,12 +51,5 @@ func createStringSlice(val any) ([]string, error) {
 
 // strValueStringSlice converts a string slice to its string representation.
 func strValueStringSlice(v []string) string {
-	ret := "["
-	for i, val := range v {
-		if i > 0 {
-			ret += ", "
-		}
-		ret += `"` + val + `"`
-	}
-	return ret + "]"
+	return formatSlice(v, strconv.Quote)
 }

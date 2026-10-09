@@ -93,3 +93,28 @@ func Test_createStringSlice(t *testing.T) {
 		assert.Nil(t, have)
 	})
 }
+
+func Test_strValueStringSlice_tabular(t *testing.T) {
+	tt := []struct {
+		testN string
+
+		val  []string
+		want string
+	}{
+		{"nil", nil, `[]`},
+		{"one", []string{"abc"}, `["abc"]`},
+		{"two", []string{"abc", "xyz"}, `["abc", "xyz"]`},
+		{"with quotes", []string{`a", "b`}, `["a\", \"b"]`},
+		{"with newline", []string{"x\ny"}, `["x\ny"]`},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.testN, func(t *testing.T) {
+			// --- When ---
+			have := strValueStringSlice(tc.val)
+
+			// --- Then ---
+			assert.Equal(t, tc.want, have)
+		})
+	}
+}

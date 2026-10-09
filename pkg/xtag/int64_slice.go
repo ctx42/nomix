@@ -5,7 +5,6 @@ package xtag
 
 import (
 	"fmt"
-	"strconv"
 
 	"github.com/ctx42/nomix/pkg/nomix"
 )
@@ -53,12 +52,5 @@ func CreateInt64Slice(
 
 // strValueInt64Slice converts an int64 slice to its string representation.
 func strValueInt64Slice(v []int64) string {
-	ret := "["
-	for i, val := range v {
-		if i > 0 {
-			ret += ", "
-		}
-		ret += strconv.FormatInt(val, 10)
-	}
-	return ret + "]"
+	return formatSlice(v, strValueInt64)
 }

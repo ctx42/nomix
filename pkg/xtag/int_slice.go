@@ -50,12 +50,5 @@ func createIntSlice(val any) ([]int, error) {
 
 // strValueIntSlice converts an int slice to its string representation.
 func strValueIntSlice(v []int) string {
-	ret := "["
-	for i, val := range v {
-		if i > 0 {
-			ret += ", "
-		}
-		ret += strconv.Itoa(val)
-	}
-	return ret + "]"
+	return formatSlice(v, strconv.Itoa)
 }
