@@ -75,7 +75,7 @@ func (tag *Single[T]) Value() (driver.Value, error) {
 
 func (tag *Single[T]) TagEqual(other Tag) bool {
 	o, ok := other.(*Single[T])
-	return ok && tag.kind == o.kind && tag.value == o.value
+	return ok && tag.kind == o.kind && valueEqual(tag.value, o.value)
 }
 
 func (tag *Single[T]) TagSame(other Tag) bool {

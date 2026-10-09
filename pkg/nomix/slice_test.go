@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/ctx42/testing/pkg/assert"
 	"github.com/ctx42/verax/pkg/verax"
@@ -158,6 +159,10 @@ func Test_Slice_Value(t *testing.T) {
 }
 
 func Test_Slice_TagEqual_tabular(t *testing.T) {
+	now := time.Now()
+	tim := time.Date(2000, 1, 2, 3, 4, 5, 0, time.UTC)
+	zone := time.FixedZone("X", 3600)
+
 	tt := []struct {
 		testN string
 
@@ -205,6 +210,24 @@ func Test_Slice_TagEqual_tabular(t *testing.T) {
 			"diff kind",
 			&Slice[byte]{kind: KindJSON, value: []byte("1")},
 			&Slice[byte]{kind: KindByteSlice, value: []byte("1")},
+			false,
+		},
+		{
+			"time without monotonic clock",
+			&Slice[time.Time]{value: []time.Time{now}},
+			&Slice[time.Time]{value: []time.Time{now.Round(0)}},
+			true,
+		},
+		{
+			"same time in diff zone",
+			&Slice[time.Time]{value: []time.Time{tim}},
+			&Slice[time.Time]{value: []time.Time{tim.In(zone)}},
+			true,
+		},
+		{
+			"diff time",
+			&Slice[time.Time]{value: []time.Time{tim}},
+			&Slice[time.Time]{value: []time.Time{tim.Add(time.Second)}},
 			false,
 		},
 		{

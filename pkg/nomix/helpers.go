@@ -306,3 +306,14 @@ func getSpecArg[T any](args map[string]any, key, rule string) (T, error) {
 	}
 	return retVal, nil
 }
+
+// valueEqual reports whether a and b are equal. Values of type [time.Time]
+// are equal when they represent the same instant; other values are compared
+// with the == operator.
+func valueEqual[T comparable](a, b T) bool {
+	if ta, ok := any(a).(time.Time); ok {
+		tb, ok := any(b).(time.Time)
+		return ok && ta.Equal(tb)
+	}
+	return a == b
+}

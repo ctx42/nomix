@@ -695,3 +695,34 @@ func Test_getSpecArg(t *testing.T) {
 		assert.Equal(t, 0, have)
 	})
 }
+
+func Test_valueEqual_tabular(t *testing.T) {
+	now := time.Now()
+	tim := time.Date(2000, 1, 2, 3, 4, 5, 0, time.UTC)
+	zone := time.FixedZone("X", 3600)
+
+	tt := []struct {
+		testN string
+
+		a    any
+		b    any
+		want bool
+	}{
+		{"equal ints", 42, 42, true},
+		{"diff ints", 42, 44, false},
+		{"time without monotonic clock", now, now.Round(0), true},
+		{"same time in diff zone", tim, tim.In(zone), true},
+		{"diff time", tim, tim.Add(time.Second), false},
+		{"time and int", tim, 42, false},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.testN, func(t *testing.T) {
+			// --- When ---
+			have := valueEqual(tc.a, tc.b)
+
+			// --- Then ---
+			assert.Equal(t, tc.want, have)
+		})
+	}
+}

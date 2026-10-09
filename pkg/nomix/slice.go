@@ -74,7 +74,10 @@ func (tag *Slice[T]) Value() (driver.Value, error) {
 
 func (tag *Slice[T]) TagEqual(other Tag) bool {
 	o, ok := other.(*Slice[T])
-	return ok && tag.kind == o.kind && slices.Equal(tag.value, o.value)
+	if !ok || tag.kind != o.kind {
+		return false
+	}
+	return slices.EqualFunc(tag.value, o.value, valueEqual[T])
 }
 
 func (tag *Slice[T]) TagSame(other Tag) bool {

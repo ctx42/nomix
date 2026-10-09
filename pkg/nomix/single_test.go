@@ -8,6 +8,7 @@ import (
 	"errors"
 	"strconv"
 	"testing"
+	"time"
 
 	"github.com/ctx42/testing/pkg/assert"
 	"github.com/ctx42/verax/pkg/verax"
@@ -154,6 +155,10 @@ func Test_Single_Value(t *testing.T) {
 }
 
 func Test_Single_TagEqual_tabular(t *testing.T) {
+	now := time.Now()
+	tim := time.Date(2000, 1, 2, 3, 4, 5, 0, time.UTC)
+	zone := time.FixedZone("X", 3600)
+
 	tt := []struct {
 		testN string
 
@@ -189,6 +194,24 @@ func Test_Single_TagEqual_tabular(t *testing.T) {
 			"diff kind",
 			&Single[int]{kind: KindInt, value: 42},
 			&Single[int]{kind: KindInt64, value: 42},
+			false,
+		},
+		{
+			"time without monotonic clock",
+			&Single[time.Time]{value: now},
+			&Single[time.Time]{value: now.Round(0)},
+			true,
+		},
+		{
+			"same time in diff zone",
+			&Single[time.Time]{value: tim},
+			&Single[time.Time]{value: tim.In(zone)},
+			true,
+		},
+		{
+			"diff time",
+			&Single[time.Time]{value: tim},
+			&Single[time.Time]{value: tim.Add(time.Second)},
 			false,
 		},
 		{
