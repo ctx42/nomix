@@ -290,8 +290,9 @@ reg := nomix.GlobalRegistry()
 ```
 
 The `xtag` package registers all its specs and type associations in one call.
-Kinds already registered keep their spec, so `RegisterAll` is safe to call more
-than once on the same registry:
+Kinds already registered keep their spec and types already associated keep
+their kind, so `RegisterAll` is safe to call more than once on the same
+registry:
 
 <!-- gmmce:pkg/xtag/ExampleRegisterAll -->
 ```go
