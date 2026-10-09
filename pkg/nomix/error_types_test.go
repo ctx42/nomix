@@ -267,6 +267,14 @@ func Test_NewFieldError(t *testing.T) {
 		xrrtest.AssertHasField(t, "field0", err)
 	})
 
+	t.Run("nil error", func(t *testing.T) {
+		// --- When ---
+		err := NewFieldError("field0", nil)
+
+		// --- Then ---
+		assert.NoError(t, err)
+	})
+
 	t.Run("marshals to JSON", func(t *testing.T) {
 		// --- Given ---
 		e := NewFieldError("field0", NewError("inner msg", "ECInner"))

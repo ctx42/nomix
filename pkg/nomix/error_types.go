@@ -138,8 +138,9 @@ func NewInternalErrorf(format string, args ...any) error {
 // FieldErrors represents a field error in the package's error domain.
 type FieldErrors = xrr.GenericFields[edError]
 
-// NewFieldError returns a new field error in the package's error domain.
-func NewFieldError(field string, err error) *FieldErrors {
+// NewFieldError returns a new [FieldErrors] in the package's error domain
+// holding the single field, or nil when err is nil.
+func NewFieldError(field string, err error) error {
 	return newFieldsError(field, err)
 }
 
