@@ -1,11 +1,13 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/ctx42/nomix)](https://goreportcard.com/report/github.com/ctx42/nomix)
 [![GoDoc](https://img.shields.io/badge/api-Godoc-blue.svg)](https://pkg.go.dev/github.com/ctx42/nomix)
-![Tests](https://github.com/ctx42/nomix/actions/workflows/go.yml/badge.svg?branch=master)
+[![Tests](https://github.com/ctx42/nomix/actions/workflows/go.yml/badge.svg?branch=master)](https://github.com/ctx42/nomix/actions/workflows/go.yml)
 
-# nomix: Tagging and Metadata for Go
+# nomix
+
+Typed, named metadata (tags) for Go, restricted to database-friendly types.
 
 <!-- TOC -->
-* [nomix: Tagging and Metadata for Go](#nomix-tagging-and-metadata-for-go)
+* [nomix](#nomix)
   * [Introduction](#introduction)
   * [Installation](#installation)
   * [Base and Derived Types](#base-and-derived-types)
