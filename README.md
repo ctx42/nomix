@@ -18,6 +18,7 @@ Typed, named metadata (tags) for Go, restricted to database-friendly types.
   * [Tag Definition](#tag-definition)
   * [Registry](#registry)
   * [Tag Sets](#tag-sets)
+  * [License](#license)
 <!-- TOC -->
 
 In the world of software engineering, we often deal with a vast array of assets
@@ -400,3 +401,7 @@ used types:
 - `Int` and `IntSlice`
 - `ByteSlice`
 - `JSON`
+
+## License
+
+MIT, see [LICENSE.md](LICENSE.md).
