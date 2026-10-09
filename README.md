@@ -176,19 +176,22 @@ types in `xtag` package.
 
 ## Tag Spec
 
-The `TagSpec` is a structure providing tag kind specification, it puts together
-the `TagKind` and `TagCreateFunc` and `TagParseFunc` functions which create tags
-of given *kind* and parse tags of that kind from strings respectively. The
+The `KindSpec` is a structure providing tag kind specification, it puts
+together the `Kind` and the `CreateFunc` and `ParseFunc` functions which create
+tags of given *kind* and parse tags of that kind from strings respectively. The
 functions have signatures:
 
 ```go
-// TagCreateFunc function signature for creating [Tag] instances.
-type TagCreateFunc func (name string, val any, opts ...Option) (Tag, error)
+// CreateFunc function signature for creating [Tag] instances.
+type CreateFunc func(name string, val any, opts ...Option) (Tag, error)
 
-// TagParseFunc function signature for creating [Tag] instances from their
-// string representation.
-type TagParseFunc func (name, val string, opts ...Option) (Tag, error)
+// ParseFunc function signature for creating [Tag] instances from their string
+// representation.
+type ParseFunc func(name, val string, opts ...Option) (Tag, error)
 ```
+
+The `TagCreateFunc` and `TagParseFunc` adapters turn functions returning
+concrete tag types into a `CreateFunc` and a `ParseFunc`.
 
 the *spec* for previously seen `Int` tag looks like this:
 
@@ -210,7 +213,7 @@ fmt.Printf("- B: %v err: %v\n", tagB.TagValue(), errB)
 // - B: 42 err: <nil>
 ```
 
-The `TagSpec` main job is to simplify creation of tags for given *base* or
+The `KindSpec` main job is to simplify creation of tags for given *base* or
 *derived* types.
 
 ## Tag Definition
