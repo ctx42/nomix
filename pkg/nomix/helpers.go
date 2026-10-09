@@ -17,7 +17,7 @@ import (
 //
 // The tag is matched by its Go type only. When several tag kinds share one
 // Go type (for example JSON and byte slice tags), check [Tag.TagKind] too.
-func GetTag[T any](set TagSet, name string) (T, error) {
+func GetTag[T any](set Tagger, name string) (T, error) {
 	var zero T
 	if tag := set.TagGet(name); tag != nil {
 		if v, ok := tag.(T); ok {
@@ -30,7 +30,7 @@ func GetTag[T any](set TagSet, name string) (T, error) {
 
 // GetTagValue retrieves the value of the [Tag] of type T from the set. Returns
 // the value if found, or the zero value for T and error.
-func GetTagValue[T any](set TagSet, name string) (T, error) {
+func GetTagValue[T any](set Tagger, name string) (T, error) {
 	var zero T
 	if tag := set.TagGet(name); tag != nil {
 		if v, ok := tag.TagValue().(T); ok {
@@ -43,7 +43,7 @@ func GetTagValue[T any](set TagSet, name string) (T, error) {
 
 // GetMetaValue retrieves the value of type T from the set. Returns the value
 // if found, or the zero value for T and error.
-func GetMetaValue[T any](set MetaSet, name string) (T, error) {
+func GetMetaValue[T any](set Metadata, name string) (T, error) {
 	var zero T
 	if tag := set.MetaGet(name); tag != nil {
 		if v, ok := tag.(T); ok {

@@ -28,6 +28,19 @@ func Test_GetTag(t *testing.T) {
 		assert.Same(t, tagA, have)
 	})
 
+	t.Run("custom Tagger", func(t *testing.T) {
+		// --- Given ---
+		tagA := TstTag(t, "A", KindInt, 1)
+		set := tstTagger{"A": tagA}
+
+		// --- When ---
+		have, err := GetTag[*TagMock](set, "A")
+
+		// --- Then ---
+		assert.NoError(t, err)
+		assert.Same(t, tagA, have)
+	})
+
 	t.Run("error - wrong tag type", func(t *testing.T) {
 		// --- Given ---
 		set := NewTagSet()
@@ -72,6 +85,18 @@ func Test_GetTagValue(t *testing.T) {
 		assert.Equal(t, 1, have)
 	})
 
+	t.Run("custom Tagger", func(t *testing.T) {
+		// --- Given ---
+		set := tstTagger{"A": TstTag(t, "A", KindInt, 1)}
+
+		// --- When ---
+		have, err := GetTagValue[int](set, "A")
+
+		// --- Then ---
+		assert.NoError(t, err)
+		assert.Equal(t, 1, have)
+	})
+
 	t.Run("error - wrong tag type", func(t *testing.T) {
 		// --- Given ---
 		set := NewTagSet()
@@ -106,6 +131,18 @@ func Test_GetMetaValue(t *testing.T) {
 		// --- Given ---
 		set := NewMetaSet()
 		set.MetaSet("A", 1)
+
+		// --- When ---
+		have, err := GetMetaValue[int](set, "A")
+
+		// --- Then ---
+		assert.NoError(t, err)
+		assert.Equal(t, 1, have)
+	})
+
+	t.Run("custom Metadata", func(t *testing.T) {
+		// --- Given ---
+		set := tstMetadata{"A": 1}
 
 		// --- When ---
 		have, err := GetMetaValue[int](set, "A")

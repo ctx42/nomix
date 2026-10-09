@@ -57,3 +57,25 @@ func TstTag[T comparable](t tester.T, name string, knd Kind, value T) *TagMock {
 	tag.OnTagValue().Return(value).Optional()
 	return tag
 }
+
+// tstTagger is a [Tagger] implementation other than [TagSet].
+type tstTagger map[string]Tag
+
+func (tgr tstTagger) TagGet(name string) Tag { return tgr[name] }
+
+func (tgr tstTagger) TagSet(tags ...Tag) {
+	for _, tag := range tags {
+		tgr[tag.TagName()] = tag
+	}
+}
+
+func (tgr tstTagger) TagDelete(name string) { delete(tgr, name) }
+
+// tstMetadata is a [Metadata] implementation other than [MetaSet].
+type tstMetadata map[string]any
+
+func (mtd tstMetadata) MetaGet(name string) any { return mtd[name] }
+
+func (mtd tstMetadata) MetaSet(name string, value any) { mtd[name] = value }
+
+func (mtd tstMetadata) MetaDelete(name string) { delete(mtd, name) }
