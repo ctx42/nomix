@@ -6,6 +6,7 @@ package nomix
 import (
 	"database/sql/driver"
 	"fmt"
+	"slices"
 
 	"github.com/ctx42/verax/pkg/verax"
 )
@@ -72,44 +73,12 @@ func (tag *Slice[T]) Value() (driver.Value, error) {
 }
 
 func (tag *Slice[T]) TagEqual(other Tag) bool {
-	if other == nil {
-		return false
-	}
 	o, ok := other.(*Slice[T])
-	if !ok {
-		return false
-	}
-	if len(tag.value) != len(o.value) {
-		return false
-	}
-	for i, v := range tag.value {
-		if v != o.value[i] {
-			return false
-		}
-	}
-	return true
+	return ok && slices.Equal(tag.value, o.value)
 }
 
 func (tag *Slice[T]) TagSame(other Tag) bool {
-	if other == nil {
-		return false
-	}
-	o, ok := other.(*Slice[T])
-	if !ok {
-		return false
-	}
-	if tag.name != o.name {
-		return false
-	}
-	if len(tag.value) != len(o.value) {
-		return false
-	}
-	for i, v := range tag.value {
-		if v != o.value[i] {
-			return false
-		}
-	}
-	return true
+	return tag.TagEqual(other) && tag.name == other.TagName()
 }
 
 // String returns the tag value as a string. When the type has no strValuer
