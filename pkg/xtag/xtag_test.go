@@ -52,7 +52,12 @@ func Test_RegisterAll_tabular(t *testing.T) {
 		{"float64 slice", []float64{42}, nomix.KindFloat64Slice, []float64{42}},
 		{"float32 slice", []float32{42}, nomix.KindFloat64Slice, []float64{42}},
 		{"bool slice", []bool{true}, nomix.KindBoolSlice, []bool{true}},
-		{"string slice", []string{"abc"}, nomix.KindStringSlice, []string{"abc"}},
+		{
+			"string slice",
+			[]string{"abc"},
+			nomix.KindStringSlice,
+			[]string{"abc"},
+		},
 		{
 			"time slice",
 			[]time.Time{time.Date(2000, 1, 2, 3, 4, 5, 0, time.UTC)},
@@ -61,16 +66,20 @@ func Test_RegisterAll_tabular(t *testing.T) {
 		},
 	}
 
-	reg := nomix.NewRegistry()
-	RegisterAll(reg)
-
 	for _, tc := range tt {
 		t.Run(tc.testN, func(t *testing.T) {
-			tag, err := reg.Create(tc.testN, tc.argValue)
+			// --- Given ---
+			reg := nomix.NewRegistry()
+			RegisterAll(reg)
+
+			// --- When ---
+			have, err := reg.Create(tc.testN, tc.argValue)
+
+			// --- Then ---
 			assert.NoError(t, err)
-			assert.Equal(t, tc.testN, tag.TagName())
-			assert.Equal(t, tc.kind, tag.TagKind())
-			assert.Equal(t, tc.wantValue, tag.TagValue())
+			assert.Equal(t, tc.testN, have.TagName())
+			assert.Equal(t, tc.kind, have.TagKind())
+			assert.Equal(t, tc.wantValue, have.TagValue())
 		})
 	}
 }

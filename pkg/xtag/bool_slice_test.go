@@ -30,14 +30,14 @@ func Test_BoolSliceSpec(t *testing.T) {
 
 func Test_NewBoolSlice(t *testing.T) {
 	// --- When ---
-	tag := NewBoolSlice("name", true, false)
+	have := NewBoolSlice("name", true, false)
 
 	// --- Then ---
-	assert.SameType(t, &BoolSlice{}, tag)
-	assert.Equal(t, "name", tag.TagName())
-	assert.Equal(t, []bool{true, false}, tag.TagValue())
-	assert.Equal(t, nomix.KindBoolSlice, tag.TagKind())
-	assert.Equal(t, "[true, false]", tag.String())
+	assert.SameType(t, &BoolSlice{}, have)
+	assert.Equal(t, "name", have.TagName())
+	assert.Equal(t, []bool{true, false}, have.TagValue())
+	assert.Equal(t, nomix.KindBoolSlice, have.TagKind())
+	assert.Equal(t, "[true, false]", have.String())
 }
 
 func Test_CreateBoolSlice(t *testing.T) {

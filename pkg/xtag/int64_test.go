@@ -33,16 +33,16 @@ func Test_Int64Spec(t *testing.T) {
 
 func Test_NewInt64(t *testing.T) {
 	// --- When ---
-	tag := NewInt64("name", 42)
+	have := NewInt64("name", 42)
 
 	// --- Then ---
-	assert.SameType(t, &Int64{}, tag)
-	assert.Equal(t, "name", tag.TagName())
-	assert.Equal(t, int64(42), tag.TagValue())
-	assert.Equal(t, nomix.KindInt64, tag.TagKind())
-	assert.Equal(t, "42", tag.String())
+	assert.SameType(t, &Int64{}, have)
+	assert.Equal(t, "name", have.TagName())
+	assert.Equal(t, int64(42), have.TagValue())
+	assert.Equal(t, nomix.KindInt64, have.TagKind())
+	assert.Equal(t, "42", have.String())
 
-	val, err := tag.Value()
+	val, err := have.Value()
 	assert.NoError(t, err)
 	assert.Equal(t, int64(42), val)
 }
@@ -50,25 +50,25 @@ func Test_NewInt64(t *testing.T) {
 func Test_CreateInt64(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		// --- When ---
-		tag, err := CreateInt64("name", 42)
+		have, err := CreateInt64("name", 42)
 
 		// --- Then ---
 		assert.NoError(t, err)
-		assert.SameType(t, &Int64{}, tag)
-		assert.Equal(t, "name", tag.TagName())
-		assert.Equal(t, int64(42), tag.TagValue())
-		assert.Equal(t, nomix.KindInt64, tag.TagKind())
-		assert.Equal(t, "42", tag.String())
+		assert.SameType(t, &Int64{}, have)
+		assert.Equal(t, "name", have.TagName())
+		assert.Equal(t, int64(42), have.TagValue())
+		assert.Equal(t, nomix.KindInt64, have.TagKind())
+		assert.Equal(t, "42", have.String())
 	})
 
 	t.Run("error - invalid type", func(t *testing.T) {
 		// --- When ---
-		tag, err := CreateInt64("name", "abc")
+		have, err := CreateInt64("name", "abc")
 
 		// --- Then ---
 		assert.ErrorIs(t, nomix.ErrInvType, err)
 		assert.ErrorContain(t, "name: ", err)
-		assert.Nil(t, tag)
+		assert.Nil(t, have)
 	})
 
 	t.Run("error - nil value", func(t *testing.T) {
@@ -81,13 +81,35 @@ func Test_CreateInt64(t *testing.T) {
 	})
 }
 
+func Test_ParseInt64(t *testing.T) {
+	t.Run("error - not supported string value", func(t *testing.T) {
+		// --- When ---
+		have, err := ParseInt64("name", "bad")
+
+		// --- Then ---
+		assert.ErrorEqual(t, "name: invalid element format", err)
+		assert.ErrorIs(t, nomix.ErrInvFormat, err)
+		assert.Nil(t, have)
+	})
+
+	t.Run("error - hex without option", func(t *testing.T) {
+		// --- When ---
+		have, err := ParseInt64("name", "AA")
+
+		// --- Then ---
+		assert.ErrorEqual(t, "name: invalid element format", err)
+		assert.ErrorIs(t, nomix.ErrInvFormat, err)
+		assert.Nil(t, have)
+	})
+}
+
 func Test_ParseInt64_success_tabular(t *testing.T) {
 	tt := []struct {
 		testN string
 
 		str  string
 		opts []nomix.Option
-		exp  int64
+		want int64
 	}{
 		{"negative", "-1", nil, -1},
 		{"zero", "0", nil, 0},
@@ -97,39 +119,17 @@ func Test_ParseInt64_success_tabular(t *testing.T) {
 	}
 
 	for _, tc := range tt {
-		t.Run(tc.str, func(t *testing.T) {
+		t.Run(tc.testN, func(t *testing.T) {
 			t.Parallel()
 
 			// --- When ---
-			tag, err := ParseInt64("name", tc.str, tc.opts...)
+			have, err := ParseInt64("name", tc.str, tc.opts...)
 
 			// --- Then ---
 			assert.NoError(t, err)
-			assert.Equal(t, tc.exp, tag.TagValue())
+			assert.Equal(t, tc.want, have.TagValue())
 		})
 	}
-}
-
-func Test_ParseInt64_error(t *testing.T) {
-	t.Run("error - not supported string value", func(t *testing.T) {
-		// --- When ---
-		tag, err := ParseInt64("name", "bad")
-
-		// --- Then ---
-		assert.ErrorEqual(t, "name: invalid element format", err)
-		assert.ErrorIs(t, nomix.ErrInvFormat, err)
-		assert.Nil(t, tag)
-	})
-
-	t.Run("error - hex without option", func(t *testing.T) {
-		// --- When ---
-		tag, err := ParseInt64("name", "AA")
-
-		// --- Then ---
-		assert.ErrorEqual(t, "name: invalid element format", err)
-		assert.ErrorIs(t, nomix.ErrInvFormat, err)
-		assert.Nil(t, tag)
-	})
 }
 
 func Test_strValueInt64(t *testing.T) {

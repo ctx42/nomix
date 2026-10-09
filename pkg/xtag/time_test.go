@@ -94,40 +94,6 @@ func Test_CreateTime(t *testing.T) {
 	})
 }
 
-func Test_ParseTime_success_tabular(t *testing.T) {
-	tt := []struct {
-		testN string
-
-		str  string
-		opts []nomix.Option
-		exp  time.Time
-	}{
-		{
-			"RFC3339",
-			"2022-03-04T05:06:07Z",
-			nil,
-			time.Date(2022, 3, 4, 5, 6, 7, 0, time.UTC),
-		},
-		{
-			"format option passed to parser",
-			"2022-03-04",
-			[]nomix.Option{nomix.WithTimeFormat("2006-01-02")},
-			time.Date(2022, 3, 4, 0, 0, 0, 0, time.UTC),
-		},
-	}
-
-	for _, tc := range tt {
-		t.Run(tc.str, func(t *testing.T) {
-			// --- When ---
-			have, err := ParseTime("name", tc.str, tc.opts...)
-
-			// --- Then ---
-			assert.NoError(t, err)
-			assert.Equal(t, tc.exp, have.TagValue())
-		})
-	}
-}
-
 func Test_ParseTime(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		// --- Given ---
@@ -179,6 +145,40 @@ func Test_ParseTime(t *testing.T) {
 		assert.ErrorIs(t, nomix.ErrInvType, err)
 		assert.Nil(t, have)
 	})
+}
+
+func Test_ParseTime_success_tabular(t *testing.T) {
+	tt := []struct {
+		testN string
+
+		str  string
+		opts []nomix.Option
+		want time.Time
+	}{
+		{
+			"RFC3339",
+			"2022-03-04T05:06:07Z",
+			nil,
+			time.Date(2022, 3, 4, 5, 6, 7, 0, time.UTC),
+		},
+		{
+			"format option passed to parser",
+			"2022-03-04",
+			[]nomix.Option{nomix.WithTimeFormat("2006-01-02")},
+			time.Date(2022, 3, 4, 0, 0, 0, 0, time.UTC),
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.testN, func(t *testing.T) {
+			// --- When ---
+			have, err := ParseTime("name", tc.str, tc.opts...)
+
+			// --- Then ---
+			assert.NoError(t, err)
+			assert.Equal(t, tc.want, have.TagValue())
+		})
+	}
 }
 
 func Test_sqlValueTime(t *testing.T) {

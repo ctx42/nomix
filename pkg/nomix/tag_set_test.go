@@ -59,9 +59,9 @@ func Test_TagSet_TagGet(t *testing.T) {
 func Test_TagSet_TagSet(t *testing.T) {
 	t.Run("set", func(t *testing.T) {
 		// --- Given ---
+		set := NewTagSet()
 		tagA := TstTag(t, "A", KindInt, 1)
 		tagB := TstTag(t, "B", KindInt, 2)
-		set := NewTagSet()
 
 		// --- When ---
 		set.TagSet(tagA, tagB)
@@ -166,7 +166,7 @@ func Test_TagSet_TagGetAll(t *testing.T) {
 		set := NewTagSet()
 		set.TagSet(tagA, tagB)
 
-		// --- Then ---
+		// --- When ---
 		have := set.TagGetAll()
 
 		// --- Then ---
@@ -178,12 +178,17 @@ func Test_TagSet_TagGetAll(t *testing.T) {
 		// --- Given ---
 		set := NewTagSet()
 
+		// --- When ---
+		have := set.TagGetAll()
+
 		// --- Then ---
-		assert.Nil(t, set.MetaGetAll())
+		assert.NotNil(t, have)
+		assert.Len(t, 0, have)
 	})
 }
 
 func Test_TagSet_TagDeleteAll(t *testing.T) {
+	// --- Given ---
 	set := NewTagSet()
 	set.TagSet(TstTag(t, "A", KindInt, 1), TstTag(t, "B", KindInt, 2))
 
@@ -200,7 +205,7 @@ func Test_TagSet_MetaGetAll(t *testing.T) {
 		set := NewTagSet()
 		set.TagSet(TstTag(t, "A", KindInt, 1), TstTag(t, "B", KindInt, 2))
 
-		// --- Then ---
+		// --- When ---
 		have := set.MetaGetAll()
 
 		// --- Then ---
@@ -211,7 +216,10 @@ func Test_TagSet_MetaGetAll(t *testing.T) {
 		// --- Given ---
 		set := NewTagSet()
 
+		// --- When ---
+		have := set.MetaGetAll()
+
 		// --- Then ---
-		assert.Nil(t, set.MetaGetAll())
+		assert.Nil(t, have)
 	})
 }

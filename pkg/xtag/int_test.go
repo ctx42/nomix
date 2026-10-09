@@ -81,33 +81,6 @@ func Test_CreateInt(t *testing.T) {
 	})
 }
 
-func Test_ParseInt_success_tabular(t *testing.T) {
-	tt := []struct {
-		testN string
-
-		str  string
-		opts []nomix.Option
-		exp  int
-	}{
-		{"negative", "-1", nil, -1},
-		{"zero", "0", nil, 0},
-		{"positive", "1", nil, 1},
-		{"hex", "AA", []nomix.Option{nomix.WithRadixHEX}, 170},
-		{"negative hex", "-AA", []nomix.Option{nomix.WithRadixHEX}, -170},
-	}
-
-	for _, tc := range tt {
-		t.Run(tc.str, func(t *testing.T) {
-			// --- When ---
-			have, err := ParseInt("name", tc.str, tc.opts...)
-
-			// --- Then ---
-			assert.NoError(t, err)
-			assert.Equal(t, tc.exp, have.TagValue())
-		})
-	}
-}
-
 func Test_ParseInt(t *testing.T) {
 	t.Run("error - not supported string value", func(t *testing.T) {
 		// --- When ---
@@ -128,6 +101,33 @@ func Test_ParseInt(t *testing.T) {
 		assert.ErrorIs(t, nomix.ErrInvFormat, err)
 		assert.Nil(t, have)
 	})
+}
+
+func Test_ParseInt_success_tabular(t *testing.T) {
+	tt := []struct {
+		testN string
+
+		str  string
+		opts []nomix.Option
+		want int
+	}{
+		{"negative", "-1", nil, -1},
+		{"zero", "0", nil, 0},
+		{"positive", "1", nil, 1},
+		{"hex", "AA", []nomix.Option{nomix.WithRadixHEX}, 170},
+		{"negative hex", "-AA", []nomix.Option{nomix.WithRadixHEX}, -170},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.testN, func(t *testing.T) {
+			// --- When ---
+			have, err := ParseInt("name", tc.str, tc.opts...)
+
+			// --- Then ---
+			assert.NoError(t, err)
+			assert.Equal(t, tc.want, have.TagValue())
+		})
+	}
 }
 
 func Test_sqlValueInt(t *testing.T) {

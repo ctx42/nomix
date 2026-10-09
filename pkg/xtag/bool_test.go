@@ -99,10 +99,22 @@ func Test_CreateBool(t *testing.T) {
 	})
 }
 
+func Test_ParseBool(t *testing.T) {
+	t.Run("error - not supported string value", func(t *testing.T) {
+		// --- When ---
+		have, err := ParseBool("name", "bad")
+
+		// --- Then ---
+		assert.ErrorEqual(t, "name: invalid element format", err)
+		assert.ErrorIs(t, nomix.ErrInvFormat, err)
+		assert.Nil(t, have)
+	})
+}
+
 func Test_ParseBool_success_tabular(t *testing.T) {
 	tt := []struct {
-		str string
-		exp bool
+		str  string
+		want bool
 	}{
 		{"1", true},
 		{"t", true},
@@ -125,21 +137,9 @@ func Test_ParseBool_success_tabular(t *testing.T) {
 
 			// --- Then ---
 			assert.NoError(t, err)
-			assert.Equal(t, tc.exp, have.TagValue())
+			assert.Equal(t, tc.want, have.TagValue())
 		})
 	}
-}
-
-func Test_ParseBool(t *testing.T) {
-	t.Run("error - not supported string value", func(t *testing.T) {
-		// --- When ---
-		have, err := ParseBool("name", "bad")
-
-		// --- Then ---
-		assert.ErrorEqual(t, "name: invalid element format", err)
-		assert.ErrorIs(t, nomix.ErrInvFormat, err)
-		assert.Nil(t, have)
-	})
 }
 
 func Test_sqlValueBool_tabular(t *testing.T) {

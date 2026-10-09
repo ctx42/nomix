@@ -20,7 +20,7 @@ func Test_GetTag(t *testing.T) {
 		set := NewTagSet()
 		set.TagSet(tagA)
 
-		// --- Then ---
+		// --- When ---
 		have, err := GetTag[*TagMock](set, "A")
 
 		// --- Then ---
@@ -33,7 +33,7 @@ func Test_GetTag(t *testing.T) {
 		set := NewTagSet()
 		set.TagSet(TstTag(t, "A", KindInt, 1))
 
-		// --- Then ---
+		// --- When ---
 		have, err := GetTag[int](set, "A")
 
 		// --- Then ---
@@ -47,7 +47,7 @@ func Test_GetTag(t *testing.T) {
 		set := NewTagSet()
 		set.TagSet()
 
-		// --- Then ---
+		// --- When ---
 		have, err := GetTag[*TagMock](set, "A")
 
 		// --- Then ---
@@ -64,7 +64,7 @@ func Test_GetTagValue(t *testing.T) {
 		set := NewTagSet()
 		set.TagSet(tagA)
 
-		// --- Then ---
+		// --- When ---
 		have, err := GetTagValue[int](set, "A")
 
 		// --- Then ---
@@ -77,7 +77,7 @@ func Test_GetTagValue(t *testing.T) {
 		set := NewTagSet()
 		set.TagSet(TstTag(t, "A", KindInt, 1))
 
-		// --- Then ---
+		// --- When ---
 		have, err := GetTagValue[float64](set, "A")
 
 		// --- Then ---
@@ -91,7 +91,7 @@ func Test_GetTagValue(t *testing.T) {
 		set := NewTagSet()
 		set.TagSet()
 
-		// --- Then ---
+		// --- When ---
 		have, err := GetTagValue[int](set, "A")
 
 		// --- Then ---
@@ -107,7 +107,7 @@ func Test_GetMetaValue(t *testing.T) {
 		set := NewMetaSet()
 		set.MetaSet("A", 1)
 
-		// --- Then ---
+		// --- When ---
 		have, err := GetMetaValue[int](set, "A")
 
 		// --- Then ---
@@ -120,7 +120,7 @@ func Test_GetMetaValue(t *testing.T) {
 		set := NewMetaSet()
 		set.MetaSet("A", 1)
 
-		// --- Then ---
+		// --- When ---
 		have, err := GetMetaValue[float64](set, "A")
 
 		// --- Then ---
@@ -133,7 +133,7 @@ func Test_GetMetaValue(t *testing.T) {
 		// --- Given ---
 		set := NewMetaSet()
 
-		// --- Then ---
+		// --- When ---
 		have, err := GetMetaValue[int](set, "A")
 
 		// --- Then ---
@@ -143,11 +143,22 @@ func Test_GetMetaValue(t *testing.T) {
 	})
 }
 
-func Test_CreateInt64_existing_tabular(t *testing.T) {
+func Test_CreateInt64(t *testing.T) {
+	t.Run("error - unsupported type", func(t *testing.T) {
+		// --- When ---
+		have, err := CreateInt64("not-an-int")
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrInvType, err)
+		assert.Equal(t, int64(0), have)
+	})
+}
+
+func Test_CreateInt64_tabular(t *testing.T) {
 	tt := []struct {
 		testN string
 
-		have any
+		val  any
 		want int64
 	}{
 		{"int", 1, 1},
@@ -161,24 +172,13 @@ func Test_CreateInt64_existing_tabular(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.testN, func(t *testing.T) {
 			// --- When ---
-			have, err := CreateInt64(tc.have)
+			have, err := CreateInt64(tc.val)
 
 			// --- Then ---
 			assert.NoError(t, err)
 			assert.Equal(t, tc.want, have)
 		})
 	}
-}
-
-func Test_CreateInt64(t *testing.T) {
-	t.Run("error - unsupported type", func(t *testing.T) {
-		// --- When ---
-		have, err := CreateInt64("not-an-int")
-
-		// --- Then ---
-		assert.ErrorIs(t, ErrInvType, err)
-		assert.Equal(t, int64(0), have)
-	})
 }
 
 func Test_CreateInt64Slice(t *testing.T) {
@@ -196,7 +196,7 @@ func Test_CreateInt64Slice_tabular(t *testing.T) {
 	tt := []struct {
 		testN string
 
-		have any
+		val  any
 		want []int64
 	}{
 		{"int", []int{42, 44}, []int64{42, 44}},
@@ -210,7 +210,7 @@ func Test_CreateInt64Slice_tabular(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.testN, func(t *testing.T) {
 			// --- When ---
-			have, err := CreateInt64Slice(tc.have)
+			have, err := CreateInt64Slice(tc.val)
 
 			// --- Then ---
 			assert.NoError(t, err)
@@ -219,36 +219,8 @@ func Test_CreateInt64Slice_tabular(t *testing.T) {
 	}
 }
 
-func Test_CreateFloat64_tabular(t *testing.T) {
-	tt := []struct {
-		testN string
-
-		have any
-		want float64
-	}{
-		{"int", 1, 1},
-		{"byte", byte(1), 1},
-		{"int8", int8(1), 1},
-		{"int16", int16(1), 1},
-		{"int32", int32(1), 1},
-		{"int64", int64(1), 1},
-		{"float32", float32(1), 1},
-		{"float64", float64(1), 1},
-	}
-
-	for _, tc := range tt {
-		t.Run(tc.testN, func(t *testing.T) {
-			// --- When ---
-			have, err := CreateFloat64(tc.have)
-
-			// --- Then ---
-			assert.NoError(t, err)
-			assert.Equal(t, tc.want, have)
-		})
-	}
-}
 func Test_CreateFloat64(t *testing.T) {
-	t.Run("int64 out of range", func(t *testing.T) {
+	t.Run("error - int64 out of range", func(t *testing.T) {
 		// --- Given ---
 		var val int64 = 1<<53 + 1
 
@@ -260,7 +232,7 @@ func Test_CreateFloat64(t *testing.T) {
 		assert.Equal(t, 0.0, have)
 	})
 
-	t.Run("int out of range", func(t *testing.T) {
+	t.Run("error - int out of range", func(t *testing.T) {
 		// --- Given ---
 		var val int
 		if unsafe.Sizeof(val) < 8 {
@@ -286,26 +258,27 @@ func Test_CreateFloat64(t *testing.T) {
 	})
 }
 
-func Test_CreateFloat64Slice_success_tabular(t *testing.T) {
+func Test_CreateFloat64_tabular(t *testing.T) {
 	tt := []struct {
 		testN string
 
-		have any
-		want []float64
+		val  any
+		want float64
 	}{
-		{"[]int", []int{42, 44}, []float64{42, 44}},
-		{"[]int8", []int8{42, 44}, []float64{42, 44}},
-		{"[]int16", []int16{42, 44}, []float64{42, 44}},
-		{"[]int32", []int32{42, 44}, []float64{42, 44}},
-		{"[]int64", []int64{42, 44}, []float64{42, 44}},
-		{"[]float32", []float32{42, 44}, []float64{42, 44}},
-		{"[]float64", []float64{42, 44}, []float64{42, 44}},
+		{"int", 1, 1},
+		{"byte", byte(1), 1},
+		{"int8", int8(1), 1},
+		{"int16", int16(1), 1},
+		{"int32", int32(1), 1},
+		{"int64", int64(1), 1},
+		{"float32", float32(1), 1},
+		{"float64", float64(1), 1},
 	}
 
 	for _, tc := range tt {
 		t.Run(tc.testN, func(t *testing.T) {
 			// --- When ---
-			have, err := CreateFloat64Slice(tc.have)
+			have, err := CreateFloat64(tc.val)
 
 			// --- Then ---
 			assert.NoError(t, err)
@@ -315,7 +288,7 @@ func Test_CreateFloat64Slice_success_tabular(t *testing.T) {
 }
 
 func Test_CreateFloat64Slice(t *testing.T) {
-	t.Run("int64 out of range", func(t *testing.T) {
+	t.Run("error - int64 out of range", func(t *testing.T) {
 		// --- Given ---
 		var val int64 = 1<<53 + 1
 
@@ -327,7 +300,7 @@ func Test_CreateFloat64Slice(t *testing.T) {
 		assert.Nil(t, have)
 	})
 
-	t.Run("int out of range", func(t *testing.T) {
+	t.Run("error - int out of range", func(t *testing.T) {
 		// --- Given ---
 		var val int
 		if unsafe.Sizeof(val) < 8 {
@@ -353,6 +326,34 @@ func Test_CreateFloat64Slice(t *testing.T) {
 	})
 }
 
+func Test_CreateFloat64Slice_success_tabular(t *testing.T) {
+	tt := []struct {
+		testN string
+
+		val  any
+		want []float64
+	}{
+		{"[]int", []int{42, 44}, []float64{42, 44}},
+		{"[]int8", []int8{42, 44}, []float64{42, 44}},
+		{"[]int16", []int16{42, 44}, []float64{42, 44}},
+		{"[]int32", []int32{42, 44}, []float64{42, 44}},
+		{"[]int64", []int64{42, 44}, []float64{42, 44}},
+		{"[]float32", []float32{42, 44}, []float64{42, 44}},
+		{"[]float64", []float64{42, 44}, []float64{42, 44}},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.testN, func(t *testing.T) {
+			// --- When ---
+			have, err := CreateFloat64Slice(tc.val)
+
+			// --- Then ---
+			assert.NoError(t, err)
+			assert.Equal(t, tc.want, have)
+		})
+	}
+}
+
 func Test_CreateTime(t *testing.T) {
 	t.Run("error - invalid type", func(t *testing.T) {
 		// --- Given ---
@@ -362,7 +363,7 @@ func Test_CreateTime(t *testing.T) {
 		have, err := CreateTime(42, opts)
 
 		// --- Then ---
-		assert.ErrorIs(t, err, ErrInvType)
+		assert.ErrorIs(t, ErrInvType, err)
 		assert.Empty(t, have)
 	})
 
@@ -374,7 +375,7 @@ func Test_CreateTime(t *testing.T) {
 		have, err := CreateTime("abc", opts)
 
 		// --- Then ---
-		assert.ErrorIs(t, err, ErrInvFormat)
+		assert.ErrorIs(t, ErrInvFormat, err)
 		assert.Empty(t, have)
 	})
 
@@ -395,7 +396,7 @@ func Test_CreateTime_success_tabular(t *testing.T) {
 	tt := []struct {
 		testN string
 
-		have any
+		val  any
 		opts []Option
 		want time.Time
 	}{
@@ -428,7 +429,7 @@ func Test_CreateTime_success_tabular(t *testing.T) {
 			}
 
 			// --- When ---
-			have, err := CreateTime(tc.have, opts)
+			have, err := CreateTime(tc.val, opts)
 
 			// --- Then ---
 			assert.NoError(t, err)
@@ -489,7 +490,7 @@ func Test_CreateTimeSlice_success_tabular(t *testing.T) {
 		format string
 		loc    *time.Location
 		zvt    []string
-		have   any
+		val    any
 		want   []time.Time
 	}{
 		{
@@ -537,7 +538,7 @@ func Test_CreateTimeSlice_success_tabular(t *testing.T) {
 			WithZeroTime(tc.zvt...)(&opts)
 
 			// --- When ---
-			have, err := CreateTimeSlice(tc.have, opts)
+			have, err := CreateTimeSlice(tc.val, opts)
 
 			// --- Then ---
 			assert.NoError(t, err)

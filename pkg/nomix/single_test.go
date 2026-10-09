@@ -29,6 +29,7 @@ func Test_NewSingle(t *testing.T) {
 }
 
 func Test_Single_TagName(t *testing.T) {
+	// --- Given ---
 	tag := &Single[int]{name: "name"}
 
 	// --- When ---
@@ -39,6 +40,7 @@ func Test_Single_TagName(t *testing.T) {
 }
 
 func Test_Single_TagKind(t *testing.T) {
+	// --- Given ---
 	tag := &Single[int]{kind: KindInt}
 
 	// --- When ---
@@ -49,6 +51,7 @@ func Test_Single_TagKind(t *testing.T) {
 }
 
 func Test_Single_TagValue(t *testing.T) {
+	// --- Given ---
 	tag := &Single[int]{value: 42}
 
 	// --- When ---
@@ -85,6 +88,7 @@ func Test_Single_TagSet(t *testing.T) {
 }
 
 func Test_Single_Get(t *testing.T) {
+	// --- Given ---
 	tag := &Single[int]{value: 42}
 
 	// --- When ---
@@ -149,7 +153,7 @@ func Test_Single_Value(t *testing.T) {
 	})
 }
 
-func Test_Single_TagEqual(t *testing.T) {
+func Test_Single_TagEqual_tabular(t *testing.T) {
 	tt := []struct {
 		testN string
 
@@ -200,7 +204,7 @@ func Test_Single_TagEqual(t *testing.T) {
 	}
 }
 
-func Test_Single_TagSame(t *testing.T) {
+func Test_Single_TagSame_tabular(t *testing.T) {
 	tt := []struct {
 		testN string
 

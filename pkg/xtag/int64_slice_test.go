@@ -30,38 +30,38 @@ func Test_Int64SliceSpec(t *testing.T) {
 
 func Test_NewInt64Slice(t *testing.T) {
 	// --- When ---
-	tag := NewInt64Slice("name", 42, 44)
+	have := NewInt64Slice("name", 42, 44)
 
 	// --- Then ---
-	assert.SameType(t, &Int64Slice{}, tag)
-	assert.Equal(t, "name", tag.TagName())
-	assert.Equal(t, []int64{42, 44}, tag.TagValue())
-	assert.Equal(t, nomix.KindInt64Slice, tag.TagKind())
-	assert.Equal(t, "[42, 44]", tag.String())
+	assert.SameType(t, &Int64Slice{}, have)
+	assert.Equal(t, "name", have.TagName())
+	assert.Equal(t, []int64{42, 44}, have.TagValue())
+	assert.Equal(t, nomix.KindInt64Slice, have.TagKind())
+	assert.Equal(t, "[42, 44]", have.String())
 }
 
 func Test_CreateInt64Slice(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		// --- When ---
-		tag, err := CreateInt64Slice("name", []int64{42, 44})
+		have, err := CreateInt64Slice("name", []int64{42, 44})
 
 		// --- Then ---
 		assert.NoError(t, err)
-		assert.SameType(t, &Int64Slice{}, tag)
-		assert.Equal(t, "name", tag.TagName())
-		assert.Equal(t, []int64{42, 44}, tag.TagValue())
-		assert.Equal(t, nomix.KindInt64Slice, tag.TagKind())
-		assert.Equal(t, "[42, 44]", tag.String())
+		assert.SameType(t, &Int64Slice{}, have)
+		assert.Equal(t, "name", have.TagName())
+		assert.Equal(t, []int64{42, 44}, have.TagValue())
+		assert.Equal(t, nomix.KindInt64Slice, have.TagKind())
+		assert.Equal(t, "[42, 44]", have.String())
 	})
 
 	t.Run("error - invalid type", func(t *testing.T) {
 		// --- When ---
-		tag, err := CreateInt64Slice("name", "abc")
+		have, err := CreateInt64Slice("name", "abc")
 
 		// --- Then ---
 		assert.ErrorIs(t, nomix.ErrInvType, err)
 		assert.ErrorContain(t, "name: ", err)
-		assert.Nil(t, tag)
+		assert.Nil(t, have)
 	})
 
 	t.Run("error - nil value", func(t *testing.T) {
@@ -78,7 +78,7 @@ func Test_CreateInt64Slice_success_tabular(t *testing.T) {
 	tt := []struct {
 		testN string
 
-		have any
+		val  any
 		want []int64
 	}{
 		{"[]int", []int{42, 44}, []int64{42, 44}},
@@ -91,7 +91,7 @@ func Test_CreateInt64Slice_success_tabular(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.testN, func(t *testing.T) {
 			// --- When ---
-			have, err := CreateInt64Slice("name", tc.have)
+			have, err := CreateInt64Slice("name", tc.val)
 
 			// --- Then ---
 			assert.NoError(t, err)

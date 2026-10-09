@@ -34,38 +34,38 @@ func Test_JSONSpec(t *testing.T) {
 
 func Test_NewJSON(t *testing.T) {
 	// --- When ---
-	tag := NewJSON("name", []byte(`{}`))
+	have := NewJSON("name", []byte(`{}`))
 
 	// --- Then ---
-	assert.SameType(t, &JSON{}, tag)
-	assert.Equal(t, "name", tag.TagName())
-	assert.Equal(t, []byte(`{}`), tag.TagValue())
-	assert.Equal(t, nomix.KindJSON, tag.TagKind())
-	assert.Equal(t, `{}`, tag.String())
+	assert.SameType(t, &JSON{}, have)
+	assert.Equal(t, "name", have.TagName())
+	assert.Equal(t, []byte(`{}`), have.TagValue())
+	assert.Equal(t, nomix.KindJSON, have.TagKind())
+	assert.Equal(t, `{}`, have.String())
 }
 
 func Test_CreateJSON(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		// --- When ---
-		tag, err := CreateJSON("name", []byte(`{}`))
+		have, err := CreateJSON("name", []byte(`{}`))
 
 		// --- Then ---
 		assert.NoError(t, err)
-		assert.SameType(t, &JSON{}, tag)
-		assert.Equal(t, "name", tag.TagName())
-		assert.Equal(t, []byte(`{}`), tag.TagValue())
-		assert.Equal(t, nomix.KindJSON, tag.TagKind())
-		assert.Equal(t, `{}`, tag.String())
+		assert.SameType(t, &JSON{}, have)
+		assert.Equal(t, "name", have.TagName())
+		assert.Equal(t, []byte(`{}`), have.TagValue())
+		assert.Equal(t, nomix.KindJSON, have.TagKind())
+		assert.Equal(t, `{}`, have.String())
 	})
 
 	t.Run("error - invalid type", func(t *testing.T) {
 		// --- When ---
-		tag, err := CreateJSON("name", "abc")
+		have, err := CreateJSON("name", "abc")
 
 		// --- Then ---
 		assert.ErrorIs(t, nomix.ErrInvType, err)
 		assert.ErrorContain(t, "name: ", err)
-		assert.Nil(t, tag)
+		assert.Nil(t, have)
 	})
 }
 
@@ -116,12 +116,24 @@ func Test_createJSON(t *testing.T) {
 	})
 }
 
+func Test_ParseJSON(t *testing.T) {
+	t.Run("error - not supported string value", func(t *testing.T) {
+		// --- When ---
+		have, err := ParseJSON("name", "bad")
+
+		// --- Then ---
+		assert.ErrorEqual(t, "name: invalid element format", err)
+		assert.ErrorIs(t, nomix.ErrInvFormat, err)
+		assert.Nil(t, have)
+	})
+}
+
 func Test_ParseJSON_success_tabular(t *testing.T) {
 	tt := []struct {
 		testN string
 
 		str  string
-		have json.RawMessage
+		want json.RawMessage
 	}{
 		{
 			"object",
@@ -146,25 +158,13 @@ func Test_ParseJSON_success_tabular(t *testing.T) {
 	}
 
 	for _, tc := range tt {
-		t.Run(tc.str, func(t *testing.T) {
+		t.Run(tc.testN, func(t *testing.T) {
 			// --- When ---
-			tag, err := ParseJSON("name", tc.str)
+			have, err := ParseJSON("name", tc.str)
 
 			// --- Then ---
 			assert.NoError(t, err)
-			assert.JSON(t, string(tc.have), tag.String())
+			assert.JSON(t, string(tc.want), have.String())
 		})
 	}
-}
-
-func Test_ParseJSON(t *testing.T) {
-	t.Run("error - not supported string value", func(t *testing.T) {
-		// --- When ---
-		tag, err := ParseJSON("name", "bad")
-
-		// --- Then ---
-		assert.ErrorEqual(t, "name: invalid element format", err)
-		assert.ErrorIs(t, nomix.ErrInvFormat, err)
-		assert.Nil(t, tag)
-	})
 }

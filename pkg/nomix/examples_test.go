@@ -19,12 +19,13 @@ func ExampleCreateFunc() {
 
 	// CreateInt is a function creating a new [Int] instance by casting
 	// argument "val" to int.
-	var CreateInt = func(name string, val any, opts ...nomix.Option) (*Int, error) {
+	CreateInt := func(name string, val any, _ ...nomix.Option) (*Int, error) {
 		if v, ok := val.(int); ok {
-			sqlValue := func(val int) (driver.Value, error) {
+			toSQL := func(val int) (driver.Value, error) {
 				return int64(val), nil
 			}
-			return nomix.NewSingle(name, v, nomix.KindInt, strconv.Itoa, sqlValue), nil
+			tag := nomix.NewSingle(name, v, nomix.KindInt, strconv.Itoa, toSQL)
+			return tag, nil
 		}
 		return nil, nomix.ErrInvType
 	}

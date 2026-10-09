@@ -76,31 +76,6 @@ func Test_CreateFloat64(t *testing.T) {
 	})
 }
 
-func Test_ParseFloat64_success_tabular(t *testing.T) {
-	tt := []struct {
-		testN string
-
-		str string
-		exp float64
-	}{
-		{"negative", "-1.1", -1.1},
-		{"zero", "0", 0.0},
-		{"positive", "1.1", 1.1},
-		{"no fraction", "4", 4.0},
-	}
-
-	for _, tc := range tt {
-		t.Run(tc.str, func(t *testing.T) {
-			// --- When ---
-			have, err := ParseFloat64("name", tc.str)
-
-			// --- Then ---
-			assert.NoError(t, err)
-			assert.Equal(t, tc.exp, have.TagValue())
-		})
-	}
-}
-
 func Test_ParseFloat64(t *testing.T) {
 	t.Run("error - not supported string value", func(t *testing.T) {
 		// --- When ---
@@ -111,4 +86,29 @@ func Test_ParseFloat64(t *testing.T) {
 		assert.ErrorIs(t, nomix.ErrInvFormat, err)
 		assert.Nil(t, have)
 	})
+}
+
+func Test_ParseFloat64_success_tabular(t *testing.T) {
+	tt := []struct {
+		testN string
+
+		str  string
+		want float64
+	}{
+		{"negative", "-1.1", -1.1},
+		{"zero", "0", 0.0},
+		{"positive", "1.1", 1.1},
+		{"no fraction", "4", 4.0},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.testN, func(t *testing.T) {
+			// --- When ---
+			have, err := ParseFloat64("name", tc.str)
+
+			// --- Then ---
+			assert.NoError(t, err)
+			assert.Equal(t, tc.want, have.TagValue())
+		})
+	}
 }

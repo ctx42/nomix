@@ -240,9 +240,10 @@ func Test_NewInternalErrorf(t *testing.T) {
 	t.Run("wraps error with code", func(t *testing.T) {
 		// --- Given ---
 		cause := errors.New("original")
+		code := xrr.WithCode("ECTst")
 
 		// --- When ---
-		err := NewInternalErrorf("connect failed: %w", cause, xrr.WithCode("ECTst"))
+		err := NewInternalErrorf("connect failed: %w", cause, code)
 
 		// --- Then ---
 		e, _ := assert.SameType(t, &InternalError{}, err)

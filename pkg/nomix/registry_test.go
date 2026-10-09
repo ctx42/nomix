@@ -20,13 +20,13 @@ func Test_GlobalRegistry(t *testing.T) {
 
 func Test_NewRegistry(t *testing.T) {
 	// --- When ---
-	reg := NewRegistry()
+	have := NewRegistry()
 
 	// --- Then ---
-	assert.NotNil(t, reg.kinds)
-	assert.Len(t, 0, reg.kinds)
-	assert.NotNil(t, reg.specs)
-	assert.Len(t, 0, reg.specs)
+	assert.NotNil(t, have.kinds)
+	assert.Len(t, 0, have.kinds)
+	assert.NotNil(t, have.specs)
+	assert.Len(t, 0, have.specs)
 }
 
 func Test_Registry_Register(t *testing.T) {
@@ -47,7 +47,7 @@ func Test_Registry_Register(t *testing.T) {
 	t.Run("register existing", func(t *testing.T) {
 		// --- Given ---
 		reg := NewRegistry()
-		_ = reg.Register(TstIntSpec())
+		must.Nil(reg.Register(TstIntSpec()))
 
 		// --- When ---
 		err := reg.Register(TstIntSpec())
@@ -108,7 +108,7 @@ func Test_Registry_Associate(t *testing.T) {
 	})
 }
 
-func Test_Register_SpecForType(t *testing.T) {
+func Test_Registry_SpecForType(t *testing.T) {
 	t.Run("existing", func(t *testing.T) {
 		// --- Given ---
 		spec := TstIntSpec()
@@ -136,7 +136,7 @@ func Test_Register_SpecForType(t *testing.T) {
 	})
 }
 
-func Test_Register_SpecForKind(t *testing.T) {
+func Test_Registry_SpecForKind(t *testing.T) {
 	t.Run("existing", func(t *testing.T) {
 		// --- Given ---
 		spec := TstIntSpec()

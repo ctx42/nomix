@@ -12,7 +12,7 @@ import (
 	"github.com/ctx42/verax/pkg/spec"
 )
 
-func Test_NewSpec(t *testing.T) {
+func Test_NewKindSpec(t *testing.T) {
 	// --- When ---
 	have := NewKindSpec(KindInt, TstIntCreate, TstIntParse)
 
@@ -20,17 +20,6 @@ func Test_NewSpec(t *testing.T) {
 	assert.Equal(t, KindInt, have.knd)
 	assert.Same(t, TstIntCreate, have.tcr)
 	assert.Same(t, TstIntParse, have.tpr)
-}
-
-func Test_KindSpec_TagKind(t *testing.T) {
-	// --- Given ---
-	spec := NewKindSpec(KindInt, TstIntCreate, TstIntParse)
-
-	// --- Given ---
-	have := spec.TagKind()
-
-	// --- Then ---
-	assert.Equal(t, KindInt, have)
 }
 
 func Test_KindSpec_TagCreate(t *testing.T) {
@@ -59,6 +48,17 @@ func Test_KindSpec_TagParse(t *testing.T) {
 	assert.Equal(t, "name", have.TagName())
 	assert.Equal(t, 42, have.TagValue())
 	assert.Equal(t, KindInt, have.TagKind())
+}
+
+func Test_KindSpec_TagKind(t *testing.T) {
+	// --- Given ---
+	spec := NewKindSpec(KindInt, TstIntCreate, TstIntParse)
+
+	// --- When ---
+	have := spec.TagKind()
+
+	// --- Then ---
+	assert.Equal(t, KindInt, have)
 }
 
 func Test_KindSpec_IsZero_tabular(t *testing.T) {
@@ -183,14 +183,10 @@ func Test_KindSpec_Spec_KindSpecFromSpec_round_trip(t *testing.T) {
 	reg := NewRegistry()
 	must.Nil(reg.Register(TstIntSpec()))
 
-	// --- When ---
-	s, err := TstIntSpec().Spec()
-
-	// --- Then ---
-	assert.NoError(t, err)
+	spc := must.Value(TstIntSpec().Spec())
 
 	// --- When ---
-	have, err := KindSpecFromSpec(reg, s)
+	have, err := KindSpecFromSpec(reg, spc)
 
 	// --- Then ---
 	assert.NoError(t, err)

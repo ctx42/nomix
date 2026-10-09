@@ -30,38 +30,38 @@ func Test_StringSliceSpec(t *testing.T) {
 
 func Test_NewStringSlice(t *testing.T) {
 	// --- When ---
-	tag := NewStringSlice("name", "abc", "xyz")
+	have := NewStringSlice("name", "abc", "xyz")
 
 	// --- Then ---
-	assert.SameType(t, &StringSlice{}, tag)
-	assert.Equal(t, "name", tag.TagName())
-	assert.Equal(t, []string{"abc", "xyz"}, tag.TagValue())
-	assert.Equal(t, nomix.KindStringSlice, tag.TagKind())
-	assert.Equal(t, `["abc", "xyz"]`, tag.String())
+	assert.SameType(t, &StringSlice{}, have)
+	assert.Equal(t, "name", have.TagName())
+	assert.Equal(t, []string{"abc", "xyz"}, have.TagValue())
+	assert.Equal(t, nomix.KindStringSlice, have.TagKind())
+	assert.Equal(t, `["abc", "xyz"]`, have.String())
 }
 
 func Test_CreateStringSlice(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		// --- When ---
-		tag, err := CreateStringSlice("name", []string{"abc", "xyz"})
+		have, err := CreateStringSlice("name", []string{"abc", "xyz"})
 
 		// --- Then ---
 		assert.NoError(t, err)
-		assert.SameType(t, &StringSlice{}, tag)
-		assert.Equal(t, "name", tag.TagName())
-		assert.Equal(t, []string{"abc", "xyz"}, tag.TagValue())
-		assert.Equal(t, nomix.KindStringSlice, tag.TagKind())
-		assert.Equal(t, `["abc", "xyz"]`, tag.String())
+		assert.SameType(t, &StringSlice{}, have)
+		assert.Equal(t, "name", have.TagName())
+		assert.Equal(t, []string{"abc", "xyz"}, have.TagValue())
+		assert.Equal(t, nomix.KindStringSlice, have.TagKind())
+		assert.Equal(t, `["abc", "xyz"]`, have.String())
 	})
 
 	t.Run("error - invalid type", func(t *testing.T) {
 		// --- When ---
-		tag, err := CreateStringSlice("name", 42)
+		have, err := CreateStringSlice("name", 42)
 
 		// --- Then ---
 		assert.ErrorIs(t, nomix.ErrInvType, err)
 		assert.ErrorContain(t, "name: ", err)
-		assert.Nil(t, tag)
+		assert.Nil(t, have)
 	})
 }
 

@@ -30,6 +30,7 @@ func Test_NewSlice(t *testing.T) {
 }
 
 func Test_Slice_TagName(t *testing.T) {
+	// --- Given ---
 	tag := &Slice[int]{name: "name"}
 
 	// --- When ---
@@ -40,6 +41,7 @@ func Test_Slice_TagName(t *testing.T) {
 }
 
 func Test_Slice_TagKind(t *testing.T) {
+	// --- Given ---
 	tag := &Slice[int]{kind: KindIntSlice}
 
 	// --- When ---
@@ -50,6 +52,7 @@ func Test_Slice_TagKind(t *testing.T) {
 }
 
 func Test_Slice_TagValue(t *testing.T) {
+	// --- Given ---
 	tag := &Slice[int]{value: []int{42, 44}}
 
 	// --- When ---
@@ -86,6 +89,7 @@ func Test_Slice_TagSet(t *testing.T) {
 }
 
 func Test_Slice_Get(t *testing.T) {
+	// --- Given ---
 	tag := &Slice[int]{value: []int{42, 44}}
 
 	// --- When ---
@@ -153,7 +157,7 @@ func Test_Slice_Value(t *testing.T) {
 	})
 }
 
-func Test_Slice_TagEqual(t *testing.T) {
+func Test_Slice_TagEqual_tabular(t *testing.T) {
 	tt := []struct {
 		testN string
 
@@ -216,7 +220,7 @@ func Test_Slice_TagEqual(t *testing.T) {
 	}
 }
 
-func Test_Slice_TagSame(t *testing.T) {
+func Test_Slice_TagSame_tabular(t *testing.T) {
 	tt := []struct {
 		testN string
 
@@ -280,7 +284,7 @@ func Test_Slice_TagSame(t *testing.T) {
 }
 
 func Test_Slice_String(t *testing.T) {
-	t.Run("error - nil value", func(t *testing.T) {
+	t.Run("nil value", func(t *testing.T) {
 		// --- Given ---
 		tag := &Slice[int]{
 			value:     nil,

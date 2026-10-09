@@ -6,7 +6,7 @@ import (
 	"github.com/ctx42/testing/pkg/assert"
 )
 
-func Test_TagKind_String_tabular(t *testing.T) {
+func Test_Kind_String_tabular(t *testing.T) {
 	tt := []struct {
 		testN string
 

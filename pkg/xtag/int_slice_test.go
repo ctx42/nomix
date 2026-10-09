@@ -30,38 +30,38 @@ func Test_IntSliceSpec(t *testing.T) {
 
 func Test_NewIntSlice(t *testing.T) {
 	// --- When ---
-	tag := NewIntSlice("name", 42, 44)
+	have := NewIntSlice("name", 42, 44)
 
 	// --- Then ---
-	assert.SameType(t, &IntSlice{}, tag)
-	assert.Equal(t, "name", tag.TagName())
-	assert.Equal(t, []int{42, 44}, tag.TagValue())
-	assert.Equal(t, nomix.KindIntSlice, tag.TagKind())
-	assert.Equal(t, "[42, 44]", tag.String())
+	assert.SameType(t, &IntSlice{}, have)
+	assert.Equal(t, "name", have.TagName())
+	assert.Equal(t, []int{42, 44}, have.TagValue())
+	assert.Equal(t, nomix.KindIntSlice, have.TagKind())
+	assert.Equal(t, "[42, 44]", have.String())
 }
 
 func Test_CreateIntSlice(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		// --- When ---
-		tag, err := CreateIntSlice("name", []int{42, 44})
+		have, err := CreateIntSlice("name", []int{42, 44})
 
 		// --- Then ---
 		assert.NoError(t, err)
-		assert.SameType(t, &IntSlice{}, tag)
-		assert.Equal(t, "name", tag.TagName())
-		assert.Equal(t, []int{42, 44}, tag.TagValue())
-		assert.Equal(t, nomix.KindIntSlice, tag.TagKind())
-		assert.Equal(t, "[42, 44]", tag.String())
+		assert.SameType(t, &IntSlice{}, have)
+		assert.Equal(t, "name", have.TagName())
+		assert.Equal(t, []int{42, 44}, have.TagValue())
+		assert.Equal(t, nomix.KindIntSlice, have.TagKind())
+		assert.Equal(t, "[42, 44]", have.String())
 	})
 
 	t.Run("error - invalid type", func(t *testing.T) {
 		// --- When ---
-		tag, err := CreateIntSlice("name", "abc")
+		have, err := CreateIntSlice("name", "abc")
 
 		// --- Then ---
 		assert.ErrorIs(t, nomix.ErrInvType, err)
 		assert.ErrorContain(t, "name: ", err)
-		assert.Nil(t, tag)
+		assert.Nil(t, have)
 	})
 }
 

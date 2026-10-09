@@ -6,6 +6,8 @@ package nomix
 import (
 	"fmt"
 	"strconv"
+
+	"github.com/ctx42/testing/pkg/tester"
 )
 
 // TstIntSpec returns [KindSpec] used in testing. It is a very simple spec
@@ -44,4 +46,14 @@ func TstIntParse(name, val string, opts ...Option) (Tag, error) {
 type TstRule struct{ Err error }
 
 // Validate returns [TstRule.Err].
-func (t *TstRule) Validate(val any) error { return t.Err }
+func (rul *TstRule) Validate(val any) error { return rul.Err }
+
+// TstTag returns a new [Tag] instance with the given name and value.
+func TstTag[T comparable](t tester.T, name string, knd Kind, value T) *TagMock {
+	t.Helper()
+	tag := NewTagMock(t)
+	tag.OnTagName().Return(name).Optional()
+	tag.OnTagKind().Return(knd).Optional()
+	tag.OnTagValue().Return(value).Optional()
+	return tag
+}

@@ -172,7 +172,7 @@ func Test_Definition_TagParse(t *testing.T) {
 		assert.Equal(t, KindInt, have.TagKind())
 	})
 
-	t.Run("error - from creator", func(t *testing.T) {
+	t.Run("error - from parser", func(t *testing.T) {
 		// --- Given ---
 		def := Define("name", TstIntSpec())
 
