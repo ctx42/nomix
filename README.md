@@ -101,9 +101,10 @@ Each type is assigned a `Kind`, an `int16` number.
 ![tag-kind.png](doc/tag-kind.png)
 
 The lower octet is reserved by the library to hold *base types*, the seven
-higher bits are for use by a library user to create *derived types*. Notice that
-there is also a bit indicating *slice type* which allows us to create typed
-slices (arrays) of the base types.
+higher bits are for use by a library user to create *derived types*, except the
+values `0x01` and `0x02` the library's own `KindBool` and `KindInt` use. Notice
+that there is also a bit indicating *slice type* which allows us to create
+typed slices (arrays) of the base types.
 
 For example, if we wanted to define `[]int` *derived type* we could do it as
 follows:
