@@ -95,7 +95,7 @@ func (tag *Single[T]) String() string {
 // keyed by the tag name on failure.
 func (tag *Single[T]) ValidateWith(rule verax.Rule) error {
 	if err := rule.Validate(tag.value); err != nil {
-		return NewFieldError(tag.name, err)
+		return verax.NewFieldError(tag.name, err)
 	}
 	return nil
 }

@@ -158,6 +158,9 @@ func IsNomixError(err error) bool {
 
 // IsValidationError reports whether the error is non-nil [Error] or
 // [FieldErrors].
+//
+// Tag validation failures (from [Definition] and the ValidateWith methods)
+// are verax field errors and are not reported by this function.
 func IsValidationError(err error) bool {
 	return err != nil && xrr.IsDomain[edError](err)
 }

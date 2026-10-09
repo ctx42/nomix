@@ -334,6 +334,7 @@ func Test_Single_ValidateWith(t *testing.T) {
 		err := tag.ValidateWith(verax.Max(42))
 
 		// --- Then ---
+		assert.SameType(t, &verax.FieldErrors{}, err)
 		assert.ErrorEqual(t, "name: must be less or equal to 42", err)
 	})
 }
