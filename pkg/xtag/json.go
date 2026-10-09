@@ -33,7 +33,7 @@ func NewJSON(name string, v json.RawMessage) *JSON {
 // [json.RawMessage], []byte or string. Returns nil and error if the value's
 // type is not a supported type or the value is not a valid JSON.
 func CreateJSON(name string, val any, _ ...nomix.Option) (*JSON, error) {
-	vv, err := createJSON(val, nomix.Options{})
+	vv, err := createJSON(val)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", name, err)
 	}
@@ -44,7 +44,7 @@ func CreateJSON(name string, val any, _ ...nomix.Option) (*JSON, error) {
 // nil error if the value is a valid JSON represented as [json.RawMessage],
 // []byte or string. Returns nil and error if the value's type is not a
 // supported type or the value is not a valid JSON.
-func createJSON(val any, _ nomix.Options) (json.RawMessage, error) {
+func createJSON(val any) (json.RawMessage, error) {
 	var vv json.RawMessage
 	switch v := val.(type) {
 	case json.RawMessage:

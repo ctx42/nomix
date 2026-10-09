@@ -32,7 +32,7 @@ func NewIntSlice(name string, val ...int) *IntSlice {
 // with the given name and nil error on success. Returns nil and [ErrInvType]
 // if the value is not []int type.
 func CreateIntSlice(name string, val any, _ ...nomix.Option) (*IntSlice, error) {
-	v, err := createIntSlice(val, nomix.Options{})
+	v, err := createIntSlice(val)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", name, err)
 	}
@@ -41,7 +41,7 @@ func CreateIntSlice(name string, val any, _ ...nomix.Option) (*IntSlice, error) 
 
 // createIntSlice casts the value to []int. Returns the []int and nil error on
 // success. Returns nil and [ErrInvType] if the value is not the []int.
-func createIntSlice(val any, _ nomix.Options) ([]int, error) {
+func createIntSlice(val any) ([]int, error) {
 	if v, ok := val.([]int); ok {
 		return v, nil
 	}

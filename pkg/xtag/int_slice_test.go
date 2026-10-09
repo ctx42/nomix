@@ -68,7 +68,7 @@ func Test_CreateIntSlice(t *testing.T) {
 func Test_createIntSlice(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		// --- When ---
-		have, err := createIntSlice([]int{42, 44}, nomix.Options{})
+		have, err := createIntSlice([]int{42, 44})
 
 		// --- Then ---
 		assert.NoError(t, err)
@@ -77,7 +77,7 @@ func Test_createIntSlice(t *testing.T) {
 
 	t.Run("error - invalid type", func(t *testing.T) {
 		// --- When ---
-		have, err := createIntSlice("abc", nomix.Options{})
+		have, err := createIntSlice("abc")
 
 		// --- Then ---
 		assert.ErrorIs(t, err, nomix.ErrInvType)
@@ -86,7 +86,7 @@ func Test_createIntSlice(t *testing.T) {
 
 	t.Run("error - nil value", func(t *testing.T) {
 		// --- When ---
-		have, err := createIntSlice(nil, nomix.Options{})
+		have, err := createIntSlice(nil)
 
 		// --- Then ---
 		assert.ErrorIs(t, nomix.ErrInvType, err)

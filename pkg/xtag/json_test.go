@@ -82,7 +82,7 @@ func Test_CreateJSON(t *testing.T) {
 func Test_createJSON(t *testing.T) {
 	t.Run("valid json.RawMessage", func(t *testing.T) {
 		// --- When ---
-		have, err := createJSON(json.RawMessage(`{"A": 1}`), nomix.Options{})
+		have, err := createJSON(json.RawMessage(`{"A": 1}`))
 
 		// --- Then ---
 		assert.NoError(t, err)
@@ -91,7 +91,7 @@ func Test_createJSON(t *testing.T) {
 
 	t.Run("valid []byte", func(t *testing.T) {
 		// --- When ---
-		have, err := createJSON([]byte(`{"A": 1}`), nomix.Options{})
+		have, err := createJSON([]byte(`{"A": 1}`))
 
 		// --- Then ---
 		assert.NoError(t, err)
@@ -100,7 +100,7 @@ func Test_createJSON(t *testing.T) {
 
 	t.Run("valid string", func(t *testing.T) {
 		// --- When ---
-		have, err := createJSON(`{"A": 1}`, nomix.Options{})
+		have, err := createJSON(`{"A": 1}`)
 
 		// --- Then ---
 		assert.NoError(t, err)
@@ -109,7 +109,7 @@ func Test_createJSON(t *testing.T) {
 
 	t.Run("error - invalid type", func(t *testing.T) {
 		// --- When ---
-		have, err := createJSON(42, nomix.Options{})
+		have, err := createJSON(42)
 
 		// --- Then ---
 		assert.ErrorIs(t, nomix.ErrInvType, err)
@@ -118,7 +118,7 @@ func Test_createJSON(t *testing.T) {
 
 	t.Run("error - invalid format", func(t *testing.T) {
 		// --- When ---
-		have, err := createJSON([]byte(`{!!!}`), nomix.Options{})
+		have, err := createJSON([]byte(`{!!!}`))
 
 		// --- Then ---
 		assert.ErrorIs(t, nomix.ErrInvFormat, err)
@@ -127,7 +127,7 @@ func Test_createJSON(t *testing.T) {
 
 	t.Run("error - invalid string format", func(t *testing.T) {
 		// --- When ---
-		have, err := createJSON("abc", nomix.Options{})
+		have, err := createJSON("abc")
 
 		// --- Then ---
 		assert.ErrorIs(t, nomix.ErrInvFormat, err)
@@ -136,7 +136,7 @@ func Test_createJSON(t *testing.T) {
 
 	t.Run("error - nil value", func(t *testing.T) {
 		// --- When ---
-		have, err := createJSON(nil, nomix.Options{})
+		have, err := createJSON(nil)
 
 		// --- Then ---
 		assert.ErrorIs(t, nomix.ErrInvType, err)
