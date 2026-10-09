@@ -75,8 +75,8 @@ the following seven during the module's design:
 - `JSON`
 - `UUID`
 
-In the database layer, the **Base Types** can map to multiple types, termed *
-*Derived Types**, in the application layer. Examples of derived types include:
+In the database layer, the **Base Types** can map to multiple types, termed
+**Derived Types**, in the application layer. Examples of derived types include:
 
 - `bool`
 - `int`
