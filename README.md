@@ -195,7 +195,7 @@ concrete tag types into a `CreateFunc` and a `ParseFunc`.
 
 the *spec* for previously seen `Int` tag looks like this:
 
-<!-- gmdoceg:ExampleNewKindSpec -->
+<!-- gmmce:pkg/nomix/ExampleNewKindSpec -->
 ```go
 spec := nomix.NewKindSpec(
 	nomix.KindInt,
@@ -221,7 +221,7 @@ The `KindSpec` main job is to simplify creation of tags for given *base* or
 The `Definition` defines named tag using `KindSpec` and optionally set
 of [validation rules](https://github.com/ctx42/verax).
 
-<!-- gmdoceg:ExampleDefine -->
+<!-- gmmce:pkg/nomix/ExampleDefine -->
 ```go
 def := nomix.Define("name", xtag.IntSpec(), verax.Max(42))
 
@@ -245,7 +245,7 @@ tags.
 The `Registry` allows you to register *specs* (for *kinds*) and then associate
 Go types with them.
 
-<!-- gmdoceg:ExampleRegistry -->
+<!-- gmmce:pkg/nomix/ExampleRegistry -->
 ```go
 reg := nomix.NewRegistry()
 
@@ -282,7 +282,7 @@ reg := nomix.GlobalRegistry()
 
 The `nomix.TagSet` is a structure helping to operate on sets of typed tags.
 
-<!-- gmdoceg:ExampleTagSet -->
+<!-- gmmce:pkg/nomix/ExampleTagSet -->
 ```go
 set := nomix.NewTagSet()
 
@@ -308,7 +308,7 @@ fmt.Printf("- D: %v\n", set.TagGet("D"))
 
 and untyped tags.
 
-<!-- gmdoceg:ExampleMetaSet -->
+<!-- gmmce:pkg/nomix/ExampleMetaSet -->
 ```go
 set := nomix.NewMetaSet()
 
