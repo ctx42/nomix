@@ -86,9 +86,9 @@ func (reg *Registry) SpecForKind(knd Kind) KindSpec {
 // registered.
 func (reg *Registry) Create(name string, val any, opts ...Option) (Tag, error) {
 	reg.mx.RLock()
-	defer reg.mx.RUnlock()
-	valTyp := reflect.TypeOf(val)
-	if spec := reg.specs[valTyp]; !spec.IsZero() {
+	spec := reg.specs[reflect.TypeOf(val)]
+	reg.mx.RUnlock()
+	if !spec.IsZero() {
 		return spec.tcr(name, val, opts...)
 	}
 	return nil, NewErrorf("%w for %s of type %T", ErrNoCreator, name, val)

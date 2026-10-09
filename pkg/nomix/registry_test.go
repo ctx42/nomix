@@ -5,6 +5,7 @@ package nomix
 
 import (
 	"testing"
+	"time"
 
 	"github.com/ctx42/testing/pkg/assert"
 	"github.com/ctx42/testing/pkg/must"
@@ -178,6 +179,31 @@ func Test_Registry_Create(t *testing.T) {
 		assert.Equal(t, "name", have.TagName())
 		assert.Equal(t, 42, have.TagValue())
 		assert.Equal(t, KindInt, have.TagKind())
+	})
+
+	t.Run("creator may use the registry", func(t *testing.T) {
+		// --- Given ---
+		reg := NewRegistry()
+		create := func(name string, val any, opts ...Option) (Tag, error) {
+			if _, err := reg.Associate(42, KindInt); err != nil {
+				return nil, err
+			}
+			return TstIntCreate(name, val, opts...)
+		}
+		must.Nil(reg.Register(NewKindSpec(KindInt, create, TstIntParse)))
+		must.Value(reg.Associate(42, KindInt))
+
+		// --- When ---
+		done := make(chan error, 1)
+		go func() { _, err := reg.Create("name", 42); done <- err }()
+
+		// --- Then ---
+		select {
+		case err := <-done:
+			assert.NoError(t, err)
+		case <-time.After(time.Second):
+			t.Fatal("Registry.Create deadlocked")
+		}
 	})
 
 	t.Run("error - not registered type", func(t *testing.T) {
