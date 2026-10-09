@@ -5,6 +5,7 @@ package nomix_test
 
 import (
 	"database/sql/driver"
+	"errors"
 	"fmt"
 	"strconv"
 
@@ -138,4 +139,21 @@ func ExampleMetaSet() {
 	// - B: true
 	// - C: foo
 	// - D: <nil>
+}
+
+func ExampleGetTagValue() {
+	set := nomix.NewTagSet()
+	set.TagSet(xtag.NewInt("A", 42))
+
+	val, err := nomix.GetTagValue[int](set, "A")
+	fmt.Printf("- A: %d err: %v\n", val, err)
+
+	val, err = nomix.GetTagValue[int](set, "B")
+	fmt.Printf("- B: %d err: %v\n", val, err)
+	fmt.Printf("- B missing: %v\n", errors.Is(err, nomix.ErrMissing))
+
+	// Output:
+	// - A: 42 err: <nil>
+	// - B: 0 err: B: missing element
+	// - B missing: true
 }

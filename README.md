@@ -343,6 +343,27 @@ fmt.Printf("- D: %v\n", set.TagGet("D"))
 // - D: <nil>
 ```
 
+The generic `GetTag`, `GetTagValue`, and `GetMetaValue` functions read tags and
+values with their concrete types:
+
+<!-- gmmce:pkg/nomix/ExampleGetTagValue -->
+```go
+set := nomix.NewTagSet()
+set.TagSet(xtag.NewInt("A", 42))
+
+val, err := nomix.GetTagValue[int](set, "A")
+fmt.Printf("- A: %d err: %v\n", val, err)
+
+val, err = nomix.GetTagValue[int](set, "B")
+fmt.Printf("- B: %d err: %v\n", val, err)
+fmt.Printf("- B missing: %v\n", errors.Is(err, nomix.ErrMissing))
+
+// Output:
+// - A: 42 err: <nil>
+// - B: 0 err: B: missing element
+// - B missing: true
+```
+
 The `nomix.MetaSet` does the same for untyped metadata.
 
 <!-- gmmce:pkg/nomix/ExampleMetaSet -->
