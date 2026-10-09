@@ -350,3 +350,4 @@ used types:
 - `Bool` and `BoolSlice`
 - `Int` and `IntSlice`
 - `ByteSlice`
+- `JSON`
