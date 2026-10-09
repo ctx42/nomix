@@ -180,9 +180,15 @@ func Test_Single_TagEqual_tabular(t *testing.T) {
 			true,
 		},
 		{
-			"diff kind",
+			"diff type",
 			&Single[int]{value: 42},
 			&Single[string]{value: "abc"},
+			false,
+		},
+		{
+			"diff kind",
+			&Single[int]{kind: KindInt, value: 42},
+			&Single[int]{kind: KindInt64, value: 42},
 			false,
 		},
 		{
@@ -231,9 +237,15 @@ func Test_Single_TagSame_tabular(t *testing.T) {
 			false,
 		},
 		{
-			"diff kind",
+			"diff type",
 			&Single[int]{name: "name", value: 42},
 			&Single[string]{name: "name", value: "abc"},
+			false,
+		},
+		{
+			"diff kind",
+			&Single[int]{name: "name", kind: KindInt, value: 42},
+			&Single[int]{name: "name", kind: KindInt64, value: 42},
 			false,
 		},
 		{

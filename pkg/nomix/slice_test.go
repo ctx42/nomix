@@ -196,9 +196,15 @@ func Test_Slice_TagEqual_tabular(t *testing.T) {
 			true,
 		},
 		{
-			"diff kind",
+			"diff type",
 			&Slice[int]{value: []int{42, 44}},
 			&Slice[string]{value: []string{"abc"}},
+			false,
+		},
+		{
+			"diff kind",
+			&Slice[byte]{kind: KindJSON, value: []byte("1")},
+			&Slice[byte]{kind: KindByteSlice, value: []byte("1")},
 			false,
 		},
 		{
@@ -259,9 +265,15 @@ func Test_Slice_TagSame_tabular(t *testing.T) {
 			false,
 		},
 		{
-			"diff kind",
+			"diff type",
 			&Slice[int]{name: "name", value: []int{42, 44}},
 			&Slice[string]{name: "name", value: []string{"abc"}},
+			false,
+		},
+		{
+			"diff kind",
+			&Slice[byte]{name: "name", kind: KindJSON, value: []byte("1")},
+			&Slice[byte]{name: "name", kind: KindByteSlice, value: []byte("1")},
 			false,
 		},
 		{

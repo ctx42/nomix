@@ -74,23 +74,12 @@ func (tag *Single[T]) Value() (driver.Value, error) {
 }
 
 func (tag *Single[T]) TagEqual(other Tag) bool {
-	if other == nil {
-		return false
-	}
-	if o, ok := other.(*Single[T]); ok {
-		return tag.value == o.value
-	}
-	return false
+	o, ok := other.(*Single[T])
+	return ok && tag.kind == o.kind && tag.value == o.value
 }
 
 func (tag *Single[T]) TagSame(other Tag) bool {
-	if other == nil {
-		return false
-	}
-	if o, ok := other.(*Single[T]); ok {
-		return tag.value == o.value && tag.name == o.name
-	}
-	return false
+	return tag.TagEqual(other) && tag.name == other.TagName()
 }
 
 // String returns the tag value as a string. When the type has no strValuer

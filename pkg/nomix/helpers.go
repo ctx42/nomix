@@ -14,6 +14,9 @@ import (
 
 // GetTag retrieves the [Tag] of type T from the set. Returns the [Tag] if
 // found, or the zero value for T and error.
+//
+// The tag is matched by its Go type only. When several tag kinds share one
+// Go type (for example JSON and byte slice tags), check [Tag.TagKind] too.
 func GetTag[T any](set TagSet, name string) (T, error) {
 	var zero T
 	if tag := set.TagGet(name); tag != nil {
