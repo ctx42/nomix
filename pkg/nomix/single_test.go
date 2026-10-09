@@ -256,14 +256,27 @@ func Test_Single_TagSame_tabular(t *testing.T) {
 }
 
 func Test_Single_String(t *testing.T) {
-	// --- Given ---
-	tag := &Single[int]{value: 42, strValuer: strconv.Itoa}
+	t.Run("custom", func(t *testing.T) {
+		// --- Given ---
+		tag := &Single[int]{value: 42, strValuer: strconv.Itoa}
 
-	// --- When ---
-	have := tag.String()
+		// --- When ---
+		have := tag.String()
 
-	// --- Then ---
-	assert.Equal(t, "42", have)
+		// --- Then ---
+		assert.Equal(t, "42", have)
+	})
+
+	t.Run("default", func(t *testing.T) {
+		// --- Given ---
+		tag := &Single[int]{value: 42}
+
+		// --- When ---
+		have := tag.String()
+
+		// --- Then ---
+		assert.Equal(t, "42", have)
+	})
 }
 
 func Test_Single_ValidateWith(t *testing.T) {

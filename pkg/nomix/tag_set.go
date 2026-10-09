@@ -3,7 +3,8 @@
 
 package nomix
 
-// TagSet represents a set of tags.
+// TagSet represents a set of tags. The zero value is read-only; use
+// [NewTagSet] to create a set that can be modified.
 type TagSet struct {
 	m map[string]Tag
 }

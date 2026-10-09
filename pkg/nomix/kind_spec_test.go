@@ -23,31 +23,61 @@ func Test_NewKindSpec(t *testing.T) {
 }
 
 func Test_KindSpec_TagCreate(t *testing.T) {
-	// --- Given ---
-	spec := NewKindSpec(KindInt, TstIntCreate, TstIntParse)
+	t.Run("success", func(t *testing.T) {
+		// --- Given ---
+		spec := NewKindSpec(KindInt, TstIntCreate, TstIntParse)
 
-	// --- When ---
-	have, err := spec.TagCreate("name", 42)
+		// --- When ---
+		have, err := spec.TagCreate("name", 42)
 
-	// --- Then ---
-	assert.NoError(t, err)
-	assert.Equal(t, "name", have.TagName())
-	assert.Equal(t, 42, have.TagValue())
-	assert.Equal(t, KindInt, have.TagKind())
+		// --- Then ---
+		assert.NoError(t, err)
+		assert.Equal(t, "name", have.TagName())
+		assert.Equal(t, 42, have.TagValue())
+		assert.Equal(t, KindInt, have.TagKind())
+	})
+
+	t.Run("error - no creator", func(t *testing.T) {
+		// --- Given ---
+		spec := NewKindSpec(KindInt, nil, nil)
+
+		// --- When ---
+		have, err := spec.TagCreate("name", 42)
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrNoCreator, err)
+		assert.ErrorContain(t, "name: ", err)
+		assert.Nil(t, have)
+	})
 }
 
 func Test_KindSpec_TagParse(t *testing.T) {
-	// --- Given ---
-	spec := NewKindSpec(KindInt, TstIntCreate, TstIntParse)
+	t.Run("success", func(t *testing.T) {
+		// --- Given ---
+		spec := NewKindSpec(KindInt, TstIntCreate, TstIntParse)
 
-	// --- When ---
-	have, err := spec.TagParse("name", "42")
+		// --- When ---
+		have, err := spec.TagParse("name", "42")
 
-	// --- Then ---
-	assert.NoError(t, err)
-	assert.Equal(t, "name", have.TagName())
-	assert.Equal(t, 42, have.TagValue())
-	assert.Equal(t, KindInt, have.TagKind())
+		// --- Then ---
+		assert.NoError(t, err)
+		assert.Equal(t, "name", have.TagName())
+		assert.Equal(t, 42, have.TagValue())
+		assert.Equal(t, KindInt, have.TagKind())
+	})
+
+	t.Run("error - no parser", func(t *testing.T) {
+		// --- Given ---
+		spec := NewKindSpec(KindInt, nil, nil)
+
+		// --- When ---
+		have, err := spec.TagParse("name", "42")
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrNotImpl, err)
+		assert.ErrorContain(t, "name: ", err)
+		assert.Nil(t, have)
+	})
 }
 
 func Test_KindSpec_TagKind(t *testing.T) {

@@ -5,6 +5,7 @@ package nomix
 
 import (
 	"database/sql/driver"
+	"fmt"
 
 	"github.com/ctx42/verax/pkg/verax"
 )
@@ -111,7 +112,14 @@ func (tag *Slice[T]) TagSame(other Tag) bool {
 	return true
 }
 
-func (tag *Slice[T]) String() string { return tag.strValuer(tag.value) }
+// String returns the tag value as a string. When the type has no strValuer
+// defined, it formats the value with [fmt.Sprint].
+func (tag *Slice[T]) String() string {
+	if tag.strValuer == nil {
+		return fmt.Sprint(tag.value)
+	}
+	return tag.strValuer(tag.value)
+}
 
 // ValidateWith validates the tag value against rule, returning a field error
 // keyed by the tag name on failure.

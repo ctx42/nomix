@@ -31,6 +31,18 @@ func Test_NewRegistry(t *testing.T) {
 }
 
 func Test_Registry_Register(t *testing.T) {
+	t.Run("zero value registry", func(t *testing.T) {
+		// --- Given ---
+		var reg Registry
+
+		// --- When ---
+		err := reg.Register(TstIntSpec())
+
+		// --- Then ---
+		assert.NoError(t, err)
+		assert.HasKey(t, KindInt, reg.kinds)
+	})
+
 	t.Run("register new", func(t *testing.T) {
 		// --- Given ---
 		spec := TstIntSpec()
@@ -62,6 +74,20 @@ func Test_Registry_Register(t *testing.T) {
 }
 
 func Test_Registry_Associate(t *testing.T) {
+	t.Run("zero value registry", func(t *testing.T) {
+		// --- Given ---
+		var reg Registry
+		must.Nil(reg.Register(TstIntSpec()))
+
+		// --- When ---
+		have, err := reg.Associate(42, KindInt)
+
+		// --- Then ---
+		assert.NoError(t, err)
+		assert.Equal(t, Kind(0), have)
+		assert.Len(t, 1, reg.specs)
+	})
+
 	t.Run("associate with existing kind", func(t *testing.T) {
 		// --- Given ---
 		reg := NewRegistry()
@@ -204,6 +230,20 @@ func Test_Registry_Create(t *testing.T) {
 		case <-time.After(time.Second):
 			t.Fatal("Registry.Create deadlocked")
 		}
+	})
+
+	t.Run("error - spec without creator", func(t *testing.T) {
+		// --- Given ---
+		reg := NewRegistry()
+		must.Nil(reg.Register(KindSpec{knd: KindInt}))
+		must.Value(reg.Associate(42, KindInt))
+
+		// --- When ---
+		have, err := reg.Create("name", 42)
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrNoCreator, err)
+		assert.Nil(t, have)
 	})
 
 	t.Run("error - not registered type", func(t *testing.T) {

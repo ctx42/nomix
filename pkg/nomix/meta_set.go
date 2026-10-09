@@ -5,7 +5,8 @@ package nomix
 
 var _ Metadata = MetaSet{} // Compile time check.
 
-// MetaSet represents a set of metadata key-values.
+// MetaSet represents a set of metadata key-values. The zero value is
+// read-only; use [NewMetaSet] to create a set that can be modified.
 type MetaSet struct{ m map[string]any }
 
 // NewMetaSet returns a new [MetaSet] instance. By default, no initial capacity

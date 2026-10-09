@@ -141,6 +141,18 @@ func Test_Definition_TagCreate(t *testing.T) {
 		assert.ErrorIs(t, ErrInvType, err)
 		assert.Nil(t, have)
 	})
+
+	t.Run("error - zero spec", func(t *testing.T) {
+		// --- Given ---
+		def := Define("name", KindSpec{})
+
+		// --- When ---
+		have, err := def.TagCreate(42)
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrNoCreator, err)
+		assert.Nil(t, have)
+	})
 }
 
 func Test_Definition_TagParse(t *testing.T) {

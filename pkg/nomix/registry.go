@@ -17,7 +17,7 @@ var specs = NewRegistry()
 // Use [NewRegistry] when isolation is required.
 func GlobalRegistry() *Registry { return specs }
 
-// Registry represents a collection of [Spec]s.
+// Registry represents a collection of [Spec]s. The zero value is ready to use.
 type Registry struct {
 	kinds map[Kind]KindSpec
 	specs map[reflect.Type]KindSpec
@@ -44,6 +44,9 @@ func (reg *Registry) Register(spec KindSpec) error {
 		format := "spec for %[1]s(%[1]d) already registered"
 		return NewInternalErrorf(format, spec.knd)
 	}
+	if reg.kinds == nil {
+		reg.kinds = make(map[Kind]KindSpec)
+	}
 	reg.kinds[spec.knd] = spec
 	return nil
 }
@@ -61,6 +64,9 @@ func (reg *Registry) Associate(typ any, knd Kind) (Kind, error) {
 	}
 	rt := reflect.TypeOf(typ)
 	was := reg.specs[rt]
+	if reg.specs == nil {
+		reg.specs = make(map[reflect.Type]KindSpec)
+	}
 	reg.specs[rt] = spec
 	return was.knd, nil
 }
@@ -89,7 +95,7 @@ func (reg *Registry) Create(name string, val any, opts ...Option) (Tag, error) {
 	spec := reg.specs[reflect.TypeOf(val)]
 	reg.mx.RUnlock()
 	if !spec.IsZero() {
-		return spec.tcr(name, val, opts...)
+		return spec.TagCreate(name, val, opts...)
 	}
 	return nil, NewErrorf("%w for %s of type %T", ErrNoCreator, name, val)
 }

@@ -4,6 +4,8 @@
 package nomix
 
 import (
+	"fmt"
+
 	"github.com/ctx42/verax/pkg/spec"
 	"github.com/ctx42/xrr/pkg/xrr"
 )
@@ -23,18 +25,26 @@ func NewKindSpec(knd Kind, tcr CreateFunc, tpr ParseFunc) KindSpec {
 	return KindSpec{knd: knd, tcr: tcr, tpr: tpr}
 }
 
-// TagCreate creates a new [Tag] matching the [Kind] in the spec.
+// TagCreate creates a new [Tag] matching the [Kind] in the spec. Returns
+// [ErrNoCreator] when the spec has no creation function.
 func (ks KindSpec) TagCreate(
 	name string,
 	value any,
 	opts ...Option,
 ) (Tag, error) {
 
+	if ks.tcr == nil {
+		return nil, fmt.Errorf("%s: %w", name, ErrNoCreator)
+	}
 	return ks.tcr(name, value, opts...)
 }
 
-// TagParse creates a [Tag] based on its string representation.
+// TagParse creates a [Tag] based on its string representation. Returns
+// [ErrNotImpl] when the spec has no parsing function.
 func (ks KindSpec) TagParse(name, val string, opts ...Option) (Tag, error) {
+	if ks.tpr == nil {
+		return TagParserNotImpl(name, val, opts...)
+	}
 	return ks.tpr(name, val, opts...)
 }
 

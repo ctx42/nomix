@@ -325,6 +325,17 @@ func Test_Slice_String(t *testing.T) {
 		// --- Then ---
 		assert.Equal(t, "[42 44]", have)
 	})
+
+	t.Run("default", func(t *testing.T) {
+		// --- Given ---
+		tag := &Slice[int]{value: []int{42, 44}}
+
+		// --- When ---
+		have := tag.String()
+
+		// --- Then ---
+		assert.Equal(t, "[42 44]", have)
+	})
 }
 
 func Test_Slice_ValidateWith(t *testing.T) {
