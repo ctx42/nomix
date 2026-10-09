@@ -237,6 +237,12 @@ func Test_Slice_TagEqual_tabular(t *testing.T) {
 			nil,
 			false,
 		},
+		{
+			"other typed nil",
+			&Slice[int]{value: []int{42, 44}},
+			(*Slice[int])(nil),
+			false,
+		},
 	}
 
 	for _, tc := range tt {
@@ -304,6 +310,12 @@ func Test_Slice_TagSame_tabular(t *testing.T) {
 			"other nil",
 			&Slice[int]{name: "name", value: []int{42, 44}},
 			nil,
+			false,
+		},
+		{
+			"other typed nil",
+			&Slice[int]{name: "name", value: []int{42, 44}},
+			(*Slice[int])(nil),
 			false,
 		},
 	}

@@ -221,6 +221,12 @@ func Test_Single_TagEqual_tabular(t *testing.T) {
 			nil,
 			false,
 		},
+		{
+			"other typed nil",
+			&Single[int]{value: 42},
+			(*Single[int])(nil),
+			false,
+		},
 	}
 
 	for _, tc := range tt {
@@ -276,6 +282,12 @@ func Test_Single_TagSame_tabular(t *testing.T) {
 			"other nil",
 			&Single[int]{name: "name", value: 42},
 			nil,
+			false,
+		},
+		{
+			"other typed nil",
+			&Single[int]{name: "name", value: 42},
+			(*Single[int])(nil),
 			false,
 		},
 	}
