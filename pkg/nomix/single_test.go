@@ -77,13 +77,14 @@ func Test_Single_TagSet(t *testing.T) {
 
 	t.Run("error - invalid type", func(t *testing.T) {
 		// --- Given ---
-		tag := &Single[int]{value: 42}
+		tag := &Single[int]{name: "name", value: 42}
 
 		// --- When ---
 		err := tag.TagSet(true)
 
 		// --- Then ---
 		assert.ErrorIs(t, ErrInvType, err)
+		assert.ErrorContain(t, "name: ", err)
 		assert.Equal(t, 42, tag.value)
 	})
 }

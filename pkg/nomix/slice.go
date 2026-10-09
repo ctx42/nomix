@@ -56,7 +56,7 @@ func (tag *Slice[T]) TagSet(v any) error {
 		tag.value = v
 		return nil
 	}
-	return ErrInvType
+	return fmt.Errorf("%s: %w", tag.name, ErrInvType)
 }
 
 // Get returns the typed tag value slice.

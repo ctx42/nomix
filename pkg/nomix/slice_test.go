@@ -78,13 +78,14 @@ func Test_Slice_TagSet(t *testing.T) {
 
 	t.Run("error - invalid type", func(t *testing.T) {
 		// --- Given ---
-		tag := &Slice[int]{value: []int{42, 44}}
+		tag := &Slice[int]{name: "name", value: []int{42, 44}}
 
 		// --- When ---
 		err := tag.TagSet(true)
 
 		// --- Then ---
 		assert.ErrorIs(t, ErrInvType, err)
+		assert.ErrorContain(t, "name: ", err)
 		assert.Equal(t, []int{42, 44}, tag.value)
 	})
 }
