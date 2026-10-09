@@ -186,6 +186,13 @@ returns the string representation of the *derived type* and a function returning
 You can see the full implementation of `Int` and many other base and derived
 types in `xtag` package.
 
+Both types implement `driver.Valuer`, so tags can be passed directly as
+`database/sql` query arguments. The SQL value comes from the function given to
+the constructor, or is the tag value itself when none is given. Slice tags
+without such a function, like the `xtag` slice types other than `ByteSlice` and
+`JSON`, hand the Go slice to the driver, so storing them requires a driver that
+accepts array arguments.
+
 ## Tag Spec
 
 The `KindSpec` is a structure providing tag kind specification, it puts
