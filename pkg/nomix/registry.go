@@ -9,9 +9,7 @@ import (
 )
 
 // specs is the global registry of [Spec]s.
-var specs *Registry
-
-func init() { specs = NewRegistry() }
+var specs = NewRegistry()
 
 // GlobalRegistry returns the global, shared [Registry] instance initialised by
 // the package. All callers share this instance; [Registry.Register] and
