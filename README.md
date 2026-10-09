@@ -116,8 +116,8 @@ Based on the above idea, we can seamlessly map types from Go to a database.
 
 ## Tag Interface
 
-OK we have the basis of the module explained. Building on it we define the main
-`nomix` interface:
+With the basis of the module explained, we can define the main `nomix`
+interface:
 
 ```go
 // Tag is an interface representing a tag.
@@ -147,7 +147,7 @@ want to be able to handle tag sets with all the supported *base types* and
 ## Typed Tags
 
 To create typed tags the `nomix` package provides generic `Single` and `Slice`
-types which both implement the `Tag` interface and in the same time provide
+types which both implement the `Tag` interface and at the same time provide
 typed methods to access their typed values.
 
 ```go
@@ -161,7 +161,7 @@ type Slice[T comparable] struct { ... }
 Both of the types have constructor functions (`NewSingle` and `NewSlice`) to
 create the instances.
 
-Lets say we would like to define an `int` *derived type* based on `int64` *base
+Let's say we would like to define an `int` *derived type* based on `int64` *base
 type* and its constructor function.
 
 ```go
@@ -204,7 +204,7 @@ type ParseFunc func(name, val string, opts ...Option) (Tag, error)
 The `TagCreateFunc` and `TagParseFunc` adapters turn functions returning
 concrete tag types into a `CreateFunc` and a `ParseFunc`.
 
-the *spec* for previously seen `Int` tag looks like this:
+The *spec* for the previously seen `Int` tag looks like this:
 
 <!-- gmmce:pkg/nomix/ExampleNewKindSpec -->
 ```go
@@ -229,8 +229,8 @@ The `KindSpec` main job is to simplify creation of tags for given *base* or
 
 ## Tag Definition
 
-The `Definition` defines named tag using `KindSpec` and optionally set
-of [validation rules](https://github.com/ctx42/verax).
+The `Definition` defines a named tag using a `KindSpec` and an optional set of
+[validation rules](https://github.com/ctx42/verax).
 
 <!-- gmmce:pkg/nomix/ExampleDefine -->
 ```go
@@ -283,7 +283,7 @@ fmt.Printf(format, tag.TagName(), tag.TagKind(), tag.TagValue(), err)
 ```
 
 The `nomix` package also provides a global registry if you wish to register all
-your specs and types in for example `init` function.
+your specs and types, for example, in an `init` function.
 
 ```go
 reg := nomix.GlobalRegistry()
@@ -337,7 +337,7 @@ fmt.Printf("- D: %v\n", set.TagGet("D"))
 // - D: <nil>
 ```
 
-and untyped tags.
+The `nomix.MetaSet` does the same for untyped metadata.
 
 <!-- gmmce:pkg/nomix/ExampleMetaSet -->
 ```go
