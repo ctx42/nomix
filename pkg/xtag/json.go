@@ -51,6 +51,8 @@ func createJSON(val any, _ nomix.Options) (json.RawMessage, error) {
 		vv = v
 	case []byte:
 		vv = v
+	case string:
+		vv = json.RawMessage(v)
 	default:
 		return nil, nomix.ErrInvType
 	}
