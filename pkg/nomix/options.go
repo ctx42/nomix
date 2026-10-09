@@ -10,7 +10,9 @@ import (
 // Option represents an option function.
 type Option func(*Options)
 
-// Options represent a set of options used by [MetaSet] and [TagSet].
+// Options represents a set of options used when creating sets ([NewTagSet],
+// [NewMetaSet]) and when creating or parsing tag values (for example
+// [CreateTime], [ParseTime], and [CreateTimeSlice]).
 type Options struct {
 	// Initial map size.
 	//
@@ -24,20 +26,17 @@ type Options struct {
 
 	// Time format.
 	//
-	// When set, [MetaSet.MetaGetTime] will allow time to be represented as a
-	// string.
+	// When set, [CreateTime] and [CreateTimeSlice] accept times represented
+	// as strings, and [ParseTime] parses strings with this layout.
 	TimeFormat string
 
 	// Location to parse the time format.
 	//
-	// When set [time.ParseInLocation] instead of [time.Parse] in the
-	// [MetaSet.MetaGetTime] to parse strings.
+	// When set, [ParseTime] uses [time.ParseInLocation] instead of
+	// [time.Parse] to parse strings.
 	Location *time.Location
 
-	// When set, allows a timezone to be represented as a string.
-	//
-	// Example:
-	//   Europe/Warsaw
+	// Deprecated: LocationAsString has no effect and will be removed.
 	LocationAsString bool
 
 	// String values considered as zero time value.
@@ -87,20 +86,22 @@ func WithTags(m map[string]Tag) Option {
 	return func(opts *Options) { opts.init = m }
 }
 
-// WithTimeFormat is the [MetaSet] option setting string time format.
+// WithTimeFormat is an option setting the layout used to parse time strings.
 func WithTimeFormat(format string) Option {
 	return func(opts *Options) { opts.TimeFormat = format }
 }
 
-// WithTimeLoc is the [MetaSet] option setting location for parsed time strings.
+// WithTimeLoc is an option setting the location for parsed time strings.
 func WithTimeLoc(loc *time.Location) Option {
 	return func(opts *Options) { opts.Location = loc }
 }
 
-// WithLocString is the [MetaSet] option allowing string timezone names.
+// WithLocString sets [Options.LocationAsString].
+//
+// Deprecated: WithLocString has no effect and will be removed.
 func WithLocString(opts *Options) { opts.LocationAsString = true }
 
-// WithZeroTime is [MetaSet] option setting zero time values.
+// WithZeroTime is an option setting the strings parsed as the zero time.
 func WithZeroTime(zero ...string) Option {
 	return func(opts *Options) { opts.zeroTime = zero }
 }
