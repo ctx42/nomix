@@ -1,3 +1,6 @@
+## v0.12.1 (Sat, 10 Oct 2026 19:31:38 UTC)
+- build(deps): update 6 ctx42 dependencies.
+
 ## v0.12.0 (Fri, 09 Oct 2026 19:24:12 UTC)
 - chore: update AGENTS.md file.
 - test: align tests with the project test style.
