@@ -1,3 +1,6 @@
+## v0.12.2 (Thu, 15 Oct 2026 15:13:10 UTC)
+- chore(deps): update dependencies.
+
 ## v0.12.1 (Sat, 10 Oct 2026 19:31:38 UTC)
 - build(deps): update 6 ctx42 dependencies.
 
