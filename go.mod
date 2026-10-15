@@ -4,8 +4,8 @@ go 1.26
 
 require (
 	github.com/ctx42/testing v0.57.0
-	github.com/ctx42/verax v0.15.2
-	github.com/ctx42/xrr v0.18.1
+	github.com/ctx42/verax v0.15.3
+	github.com/ctx42/xrr v0.18.2
 )
 
 require (
